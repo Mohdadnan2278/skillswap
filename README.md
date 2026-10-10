@@ -30,8 +30,8 @@ If the machine's default npm cache is unwritable, append `--cache /tmp/skillswap
 - `src/app/`: Next.js App Router entry points and global styles; future HTTP route handlers.
 - `src/frontend/`: reusable UI components.
 - `src/backend/`: future server business operations.
-- `src/shared/`: future shared TypeScript contracts.
-- `docs/`: phase progress and, from Phase 2, API/database design.
+- `src/shared/`: compile-time design contracts for the planned API.
+- `docs/`: API/database design, UI plan, and phase progress.
 - `supabase/migrations/`: added when database implementation begins.
 - `.local/PROJECT_PROMPT.txt`: local source prompt, ignored by Git.
 
@@ -43,4 +43,4 @@ Vercel is the planned host. Use the Next.js preset, `npm run build`, and the rep
 
 ## Phases
 
-See `docs/PROGRESS.md`. Phase 2 defines the MVP, proposed business rules, UI plan, API contract, and database schema. Product rules are proposals until approved.
+See [PROJECT_SPEC.md](PROJECT_SPEC.md), [API contract](docs/API_CONTRACT.md), [database design](docs/DATABASE_SCHEMA.md), [UI plan](docs/UI_PLAN.md), and [progress](docs/PROGRESS.md). Phase 2 documents planned features and MVP defaults selected under owner delegation. These documents and shared types do not mean feature endpoints or tables exist. Implementation proceeds one authorized phase at a time.

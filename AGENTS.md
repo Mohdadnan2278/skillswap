@@ -8,6 +8,7 @@
 - Keep Next.js routes in `src/app`, UI in `src/frontend`, server operations in `src/backend`, and shared contracts in `src/shared`.
 - Keep database migrations in `supabase/migrations` when introduced. Document contracts and progress in `docs`.
 - Validate inputs and authorization on the server. Never trust client financial or reputation values.
+- Follow `PROJECT_SPEC.md` MVP defaults and the design documents in `docs/`; record any change to financial or scheduling rules before implementing it. Shared design DTOs are not runtime validators or deployed API claims.
 - Coordinate changes to shared configuration, dependencies, and types; document them in the phase report.
 - Never commit secrets, local environment values, `.local/`, or generated output.
 - Run `npm run check` and a functional page smoke check for foundation changes.

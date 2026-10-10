@@ -1,0 +1,80 @@
+# SkillSwap MVP specification
+
+## Status and scope
+
+Phase 2 is a design deliverable. Routes, tables, policies, and types described here are planned, not implemented. Phase 1's landing page is the only available screen. The owner delegated selection of appropriate rules for better interaction and user experience during Phase 2. The MVP defaults below were chosen under that authorization; they were not individually confirmed word for word. Changes affecting these rules must be recorded before dependent implementation.
+
+Confirmed by the owner's project prompt: one Next.js application with TypeScript, Tailwind, Supabase PostgreSQL/Auth, and a managed video provider selected in Phase 7. Use npm, versioned migrations, and a responsive browser experience. Prefer Vercel, with deployment only after explicit authorization. Everyone may teach and learn; teacher and learner are roles within a booking, never permanent account roles.
+
+The demonstration must eventually support two real accounts on two smartphones over HTTPS through signup → skills → discovery → request → accept → video → completion → credit transfer → feedback. No simulated balances, fake meetings, or accelerated hour-long sessions may be presented as verified behavior.
+
+## MVP capabilities and boundaries
+
+| Phase | Deliverable | Completion evidence |
+| --- | --- | --- |
+| 3 | Email/password signup/login/logout, onboarding, profile editing, authenticated navigation | Two configured accounts; valid server identity; ownership and unauthenticated access checks |
+| 4 | Shared catalogue, offered/wanted selections, deterministic discovery | Matches explain shared wanted/offered skills; current user excluded; cross-user edits denied |
+| 5 | Request/accept/reject/cancel and participant-only views | Valid transitions; concurrency-safe overlap checks across both roles; UTC/local-time behavior |
+| 6 | Starter grant, wallet, reservations, ledger, completion and releases | Replays and concurrent spending cannot duplicate grants/transfers or create negative available balances |
+| 7 | Private managed video, pre-join, device controls, reconnection | Nonparticipants denied; short-lived access; two smartphones over HTTPS |
+| 8 | Feedback and reputation leaderboard | Completed-session eligibility; one review per participant; server aggregate |
+| 9 | Complete integration and authorized hosting | Reproducible two-person demo and permission/error/mobile checks |
+
+Optional: Google OAuth if provider configuration is available. Deferred: payments, buying credits, AI matching, native apps, custom video infrastructure, chat, recurring/group sessions, penalties, and administrator dispute tooling. Do not add unrelated infrastructure.
+
+## Adopted MVP defaults — chosen under owner delegation
+
+Decision record: after being offered the core defaults, the owner instructed the assistant to choose appropriately for better user interaction and experience. The assistant adopted the rules below for this semester MVP. This approves the design direction, not implementation beyond the currently authorized phase, remote database changes, or paid services.
+
+| Rule | Proposed default |
+| --- | --- |
+| Starter grant | Once per verified account after profile onboarding: 3 credits (180 integer minute units). Demo accounts do not receive extra silent grants. |
+| Exact amounts | 1 credit = 60 integer minute units. Never store floating-point balances. 30/60/90-minute sessions cost 30/60/90 units (0.5/1/1.5 credits). |
+| Booking window | Start must be at least 15 minutes and at most 30 days ahead, checked against database time; sessions are fixed-duration and not editable. Cancel and request anew to reschedule. |
+| Participants | Requester is learner, recipient is teacher. Different verified/onboarded accounts; teacher must currently offer the selected catalogue skill. |
+| Reservation | Reserve the full cost when the request is created, atomically with booking and participant occupancy. A pending request holds time and credits for both people. |
+| Expiry | Pending requests expire at the earlier of creation + 24 hours or scheduled start. Expiry releases credits and occupancy exactly once. Reads and mutations process relevant overdue requests; an optional scheduled sweep improves prompt cleanup. |
+| Acceptance | Only teacher may accept/reject a pending, unexpired request before its start. Recheck locked participant occupancy, active reservation, and valid state. |
+| Cancellation | Either participant may cancel pending/accepted bookings before start, with no fee; reservation released exactly once. After start, use dispute or completion. |
+| Completion | Each participant independently confirms after scheduled end. First confirmation retains the reservation. Both confirmations atomically complete and transfer the reserved units from learner to teacher. Ending a call transfers nothing. |
+| Missing confirmation | After scheduled end, show accepted sessions as awaiting confirmation; do not auto-transfer, auto-confirm, or auto-release money. Either participant may raise a dispute. |
+| Dispute | Either participant may dispute an accepted session after start, including after one confirmation. Credits remain held. Both must vote for the same resolution: complete after scheduled end, or cancel/release at any time while disputed. No unilateral resolution and no MVP admin override. A changed vote replaces the prior vote until resolved. |
+| Unresolved dispute | Remains visible with funds reserved indefinitely; no automatic timeout or penalty. This limitation must be visible in the wallet and booking UI. |
+| Reputation | Each completed booking permits each participant to leave one immutable 1–5 integer star rating of the other, with optional plain-text comment up to 500 characters. Server computes arithmetic average and rating count, separate from credits. |
+| Leaderboard | Users with at least 3 received ratings; average descending, then count descending, then user ID for stable ties. Display score and count; no artificial starting rating. |
+| Classroom time | Use real scheduled duration. A shorter accelerated demonstration needs a separately approved, visibly labeled demo mode; it cannot silently earn an hour's credit. |
+
+These defaults prioritize understandable costs, reversible requests, and protection from one-sided credit transfers. A pending request visibly reserves both time and credits; its deadline is shown before submission and on booking detail. Starter credits are a one-time demo/community issuance, not currency. No further product-rule answer blocks Phase 3; each implementation phase still needs the owner's instruction to start. Any future fee, automatic dispute settlement, starter amount change, or accelerated-credit demonstration requires a new recorded decision.
+
+## Booking lifecycle
+
+Stored states: `pending`, `accepted`, `rejected`, `cancelled`, `expired`, `completed`, `disputed`. Awaiting confirmation is a UI view of an accepted booking after its end, not a second database state. End timestamps are derived from start + duration. Intervals are half-open `[start, end)` so back-to-back sessions are allowed.
+
+| From | Action / actor | To | Funds |
+| --- | --- | --- | --- |
+| New | Request / learner | pending | Reserve |
+| pending | Accept / teacher before expiry/start | accepted | Keep held |
+| pending | Reject / teacher | rejected | Release |
+| pending | Deadline passed / trusted expiry operation | expired | Release |
+| pending or accepted | Cancel / either before start | cancelled | Release |
+| accepted | Confirm / either after end | accepted until both confirm, then completed | Transfer once on second confirmation |
+| accepted | Dispute / either after start | disputed | Keep held |
+| disputed | Both choose complete after end | completed | Transfer once |
+| disputed | Both choose cancel | cancelled | Release once |
+
+Terminal states never reopen. Conflicts cover both participants in pending/accepted/disputed bookings' scheduled intervals. Overdue pending holds must be expired in the same transaction before a new operation assesses conflicts or available funds. A future dispute does not extend the original occupied interval indefinitely. Concurrent transactions lock both participants in sorted UUID order and use database exclusion constraints; application-only checks are insufficient.
+
+## Identity, privacy, and correctness
+
+- Validate identity on the server with current Supabase SSR guidance in Phase 3; never authorize from unverified cookie/session payloads. Require verified email and completed onboarding for booking operations.
+- Keep a safe public profile projection separate from private account preferences/email. Supabase Auth owns passwords and email identities.
+- RLS applies to every exposed application table. Profiles/skills are readable by authenticated members; owner edits only. Bookings, confirmations, disputes, wallet and meeting access are participant/owner only.
+- Financial/scheduling mutations use restricted atomic database functions with explicit actor checks, fixed search paths, least privilege, and database-enforced invariants. Browsers cannot directly edit balances, booking state, occupancy, ledger, confirmations, or meeting credentials.
+- Same-origin mutation endpoints reject foreign origins; handle OAuth redirects separately with an allowlist. Add input/body limits, pagination, and reasonable authentication/meeting rate limits. No secrets or private responses in logs/caches.
+- Store instants as PostgreSQL `timestamptz` in UTC; accept ISO 8601 UTC values, display in the browser's chosen IANA timezone and always show the timezone on scheduling screens. Reject past times and ambiguous local times before submitting.
+- Provider secrets remain server-only; membership and time windows are rechecked for every short-lived video token. Tokens are not long-lived join URLs in the database.
+- Deleting an account with outstanding reservations/bookings is outside MVP scope; do not cascade away financial audit history.
+
+## Phase 2 acceptance and pending decisions
+
+Deliver the specification, UI plan, API contract, database design, and compile-checked shared design types. Do not create live tables, feature screens, or business operations in this phase. Record the delegated rule decision above, then pause before Phase 3. Supabase project/provider configuration and two-account live checks are future prerequisites, not Phase 2 readiness claims.
