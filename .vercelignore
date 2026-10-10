@@ -1,0 +1,16 @@
+# Private local configuration and cloud-management files must never be uploaded.
+.local/
+.env
+.env.*
+.vercel/
+.git/
+node_modules/
+.next/
+*.log
+*.tsbuildinfo
+playwright-report/
+test-results/
+coverage/
+supabase/.temp/
+supabase/.branches/
+supabase/supabase.env
