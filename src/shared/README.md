@@ -1,5 +1,5 @@
-# Shared contracts
+# Shared contracts and validation
 
-`contracts.ts` contains Phase 2 design DTOs for planned frontend/backend interfaces. These are compile-time types only: strings/numbers are not runtime validation, authorization, or money operations. Do not treat them as a live API. See `docs/API_CONTRACT.md` and `PROJECT_SPEC.md`; business defaults were selected under owner delegation.
+`contracts.ts` includes the implemented Phase 3 profile/current-user DTOs and design-only contracts for later phases. `validation.ts` provides strict runtime auth/profile input schemas and the callback destination allowlist. Types alone do not authorize access; backend identity checks and database RLS/functions enforce ownership.
 
-Keep imports provider-neutral and free of server-only modules/secrets. UUIDs, UTC strings, integer units, and enums must be validated at the backend boundary. Derive database row types from actual migrations once available; do not expose private rows verbatim as DTOs.
+Keep shared imports provider-neutral and free of server-only code/secrets. Phase 3 database rows/types live under `src/backend/supabase`; safe DTOs omit private preferences/email from public profiles. Reputation is null/zero until feedback is implemented, not a simulated rating.

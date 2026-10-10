@@ -1,46 +1,61 @@
 # SkillSwap
 
-A student skill-exchange semester project. Phase 1 provides a responsive landing page only. Authentication, matching, bookings, credits, video, and reputation are not implemented.
+A student skill-exchange semester project built as one Next.js application with TypeScript, Tailwind, and Supabase. Phase 3 implements email/password authentication, confirmation, profile onboarding/editing, protected navigation, and logout. Skills, matching, bookings, credits, video, and reputation are later phases.
 
-## Development
+## Local development
 
-Use Node 24 (`nvm use` if available) and npm. From the repository root:
+Use Node 24 (`nvm use` if available), npm, and a running Docker daemon. From the repository root:
 
 ```sh
-npm ci
+npm ci --cache /tmp/skillswap-npm-cache
+npm run db:start
+node scripts/configure-local-env.mjs
 npm run dev
 ```
 
-Open the development server on port 3000. No credentials or environment variables are required for Phase 1. `.env.example` documents configuration; keep real values in ignored `.env.local`.
+The setup helper uses pinned official Supabase slim images from GHCR. It keeps CLI state and local Docker proxy configuration under ignored `.local/`, makes the email template readable, and configures local service networking. No remote database is linked or changed. Existing external HTTPS proxy settings are preserved; local-only containers use direct internal HTTP because their BusyBox health checks ignore `NO_PROXY`. The app uses port 3000; use the same origin as `SITE_URL` for browser requests.
+
+`configure-local-env.mjs` writes generated local `.env.local` with the local URL/public key without printing values. It preserves any user-written `.env.local`; configure those files manually. Confirmation messages appear in the local Mailpit inbox on port 54324. Supabase Auth has email confirmation enabled; accounts must confirm before onboarding. Container data survives ordinary `npm run db:stop`, but live containers must restart in a new task. No fresh-task restoration has been verified.
+
+If Docker is unavailable, the landing and auth setup notice still render; use [hosted configuration instructions](docs/SUPABASE_SETUP.md) for real auth. Do not disable health checks or TLS verification to make setup pass.
+
+## Checks
 
 ```sh
-npm run lint
-npm run typecheck
-npm run build
-# Or all three:
-npm run check
-# Serve a successful production build:
-npm start
+npm test                 # Validation/config boundary unit tests
+npm run check            # ESLint, Next route types, TypeScript, production build
+npm run test:integration  # Real local Auth/PostgreSQL/API tests; no browser needed
+npm run test:e2e          # Includes the mobile Chromium workflow
 ```
 
-If the machine's default npm cache is unwritable, append `--cache /tmp/skillswap-npm-cache` to installation commands. A production page request should return HTTP 200 and include the landing page heading and development notice. These checks do not validate future features.
+Integration tests create uniquely named accounts only on loopback Supabase/app origins and require local Mailpit; they refuse hosted URLs. They start their own app on the configured `SITE_URL` port, which must be free. Browser tests require Playwright's Chromium (`npx playwright install chromium`) or an existing compatible executable:
+
+```sh
+PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e
+```
+
+Browser cache/config folders use writable temporary paths in this cloud machine. Test output and local prompts are ignored. Synthetic local accounts remain in the local database; tests do not delete existing users or reset user data.
+
+After a successful build, `npm start` serves production. Stop app processes before reinstalling dependencies or building. `npm run db:start` is repeatable; `npm run db:stop` stops this project's containers while retaining their data. Later migrations can be applied locally with `npm run supabase -- migration up --local`; never run a reset on data you need to preserve.
 
 ## Structure
 
-- `src/app/`: Next.js App Router entry points and global styles; future HTTP route handlers.
-- `src/frontend/`: reusable UI components.
-- `src/backend/`: future server business operations.
-- `src/shared/`: compile-time design contracts for the planned API.
-- `docs/`: API/database design, UI plan, and phase progress.
-- `supabase/migrations/`: added when database implementation begins.
-- `.local/PROJECT_PROMPT.txt`: local source prompt, ignored by Git.
+- `src/app/`: App Router pages, protected member route group, callback handlers, and HTTP endpoints.
+- `src/frontend/`: auth/profile/navigation UI components.
+- `src/backend/`: config, verified session guard, Supabase server client/schema types, profile service, HTTP validation/errors.
+- `src/shared/`: shared DTOs and runtime input schemas.
+- `supabase/`: local configuration, confirmation template, and versioned database migration.
+- `scripts/`: reproducible local Supabase/environment helpers.
+- `tests/`: unit, integration, and mobile UI checks.
+- `docs/`: setup, API/database design, UI plan, and phase progress.
+- `.local/PROJECT_PROMPT.txt`: original project prompt, excluded from Git.
 
-One Next.js application hosts frontend and backend; separate services are unnecessary for this demo.
+## Security and configuration
 
-## Deployment
+Only use the project's public publishable key in `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`; no service-role/secret key is used by the application. Identity is validated on the server with `getUser()`; `getClaims()` in `src/proxy.ts` refreshes cookies. Private responses are not cached. The `save_my_profile` database function derives the actor, checks verified email, and writes profile/preferences atomically. RLS protects preferences, and ordinary API roles cannot directly mutate profile rows or onboarding timestamps.
 
-Vercel is the planned host. Use the Next.js preset, `npm run build`, and the repository root. No deployment has been performed; deployment requires owner authorization. Supabase and video provider configuration will be documented in their implementation phases.
+See [Supabase setup](docs/SUPABASE_SETUP.md), [MVP specification](PROJECT_SPEC.md), [API contract](docs/API_CONTRACT.md), [database design](docs/DATABASE_SCHEMA.md), [UI plan](docs/UI_PLAN.md), and [progress](docs/PROGRESS.md).
 
-## Phases
+## Hosting
 
-See [PROJECT_SPEC.md](PROJECT_SPEC.md), [API contract](docs/API_CONTRACT.md), [database design](docs/DATABASE_SCHEMA.md), [UI plan](docs/UI_PLAN.md), and [progress](docs/PROGRESS.md). Phase 2 documents planned features and MVP defaults selected under owner delegation. These documents and shared types do not mean feature endpoints or tables exist. Implementation proceeds one authorized phase at a time.
+Vercel is the planned host; use the Next.js preset and repository root. Configure the hosted Supabase URL/public key and HTTPS `SITE_URL` before building. Hosted provider configuration, remote migrations, Google OAuth, and deployment require the owner's setup/authorization and have not been verified. No paid resources have been created.
