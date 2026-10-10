@@ -1,6 +1,6 @@
 # API contract and future design
 
-Phase 3 implements the auth endpoints below and `GET /api/v1/me`, `PATCH /api/v1/me/profile`, and `GET /api/v1/profiles/:userId`. Phase 4 also implements `GET /skills`, `GET/PUT /me/skills`, and `GET /discover` under `/api/v1`. Booking/wallet/video/feedback/community endpoints remain planned. Runtime auth/profile/skills/query schemas live in `src/shared/validation.ts`; later DTOs remain design contracts. Business rules reference the adopted MVP defaults in `PROJECT_SPEC.md`.
+Phase 3 implements the auth endpoints below and `GET /api/v1/me`, `PATCH /api/v1/me/profile`, and `GET /api/v1/profiles/:userId`. Phase 4 also implements `GET /skills`, `GET/PUT /me/skills`, and `GET /discover` under `/api/v1`. Phase 5 implements booking creation, list/detail and accept/reject/cancel endpoints. Wallet/video/feedback/community and confirm/dispute/resolve remain planned. Runtime auth/profile/skills/booking/query schemas live in `src/shared/validation.ts`; later DTOs remain design contracts. Business rules reference the adopted MVP defaults in `PROJECT_SPEC.md`.
 
 ## Conventions
 
@@ -58,7 +58,7 @@ Profile validation: display name 2–60 characters, bio 0–500, college 0–120
 
 | Method/path | Request | Response data / actor |
 | --- | --- | --- |
-| POST `/bookings` | `CreateBookingRequest`: `{ teacherId, skillId, startsAt, durationMinutes }` | 201 `Booking`; actor is learner; check teacher offering, specified timing/duration, holds and funds atomically |
+| POST `/bookings` | `CreateBookingRequest`: `{ teacherId, skillId, startsAt, durationMinutes }` | 201 `Booking`; actor is learner; implemented time/offering/occupancy checks; financial reservation deferred to Phase 6 |
 | GET `/bookings` | Pagination; optional `state`, `role: teacher|learner` | `Page<Booking>`; participant only; expire actor's overdue pending requests first |
 | GET `/bookings/:id` | None | `Booking`; participants only; expire if overdue first |
 | POST `/bookings/:id/accept` | `{}` | `Booking`; teacher; pending/unexpired, before start |
@@ -70,7 +70,7 @@ Profile validation: display name 2–60 characters, bio 0–500, college 0–120
 
 `Booking` includes participant IDs, skill ID, start/end, duration, state, authoritative cost units, expiry, confirmation flags, optional participant-visible dispute reason/resolution votes, and created/updated timestamps. Public discovery never includes booking details. Changing skill selections does not invalidate an already requested/accepted session; new requests require the teacher's current offering.
 
-Financial operations and scheduling become one atomic workflow in Phase 6. Phase 5 must clearly label reservations as not yet implemented and must not expose real paid bookings or claim a usable financial workflow before integration. No unauthenticated expiry/settlement endpoint is exposed: use trusted database routines invoked with verified actors and, if configured, a restricted scheduler.
+Financial operations and scheduling become one atomic workflow in Phase 6. Phase 5 explicitly returns `creditReservationStatus: "not_integrated"` and labels financial reservations as unimplemented and must not expose real paid bookings or claim a usable financial workflow before integration. No unauthenticated expiry/settlement endpoint is exposed: use trusted database routines invoked with verified actors and, if configured, a restricted scheduler.
 
 ## Wallet, feedback, and video
 
@@ -112,3 +112,13 @@ Phase 3 verified locally: two accounts, invalid/forged identity, confirmation re
 Catalogue order is slug ascending; discovery order is user UUID ascending. Both return `{ items, nextCursor }` with default limit 20, max 50. Cursors contain a validated base64url tuple: catalogue last slug/enabled context, or discovery last UUID/current user/filter context. Malformed, repeated or unknown parameters and mismatched cursor/filter/user contexts return 400. Cursors are navigation aids, not authorization. Changes to selections between page reads may change results.
 
 `PUT /me/skills` accepts only the two ID arrays. Each allows 0–20 unique enabled catalogue UUIDs; a skill may be both offered and wanted. Verified email and completed profile are required. Writes replace both arrays atomically and serialize by account; database rejection leaves previous selections intact. `GET /me/skills` returns empty arrays before onboarding. Discovery requires onboarding, excludes self, returns only matching offered skills in slug order, and validates an optional filter against the caller's enabled wanted skills. No wanted skills produces an empty page. No booking or financial endpoints are enabled.
+
+## Implemented Phase 5 behavior
+
+Booking POST and accept/reject/cancel require a UUID `Idempotency-Key` and same-origin JSON. Owner identity is derived, and verified onboarding is required. Creation validates distinct verified/onboarded participants, the teacher's current enabled offering, UTC `Z` timestamp, 30/60/90 minutes, and database-time bounds (15 minutes–30 days). Stored end and future cost units derive from duration. Changes to offerings do not invalidate an existing request.
+
+Bookings are readable only by participants. List/detail RPCs expire the caller's overdue pending requests before selecting. Wrong-owner reads/actions return 404; wrong-role accept/reject returns 403. List filters support state and role, limit 1–50, and a `(startsAt,id)` ascending cursor scoped to caller/filter context. Repeated/unknown parameters or invalid cursors return 400. Reads use private no-store responses.
+
+Successful request/mutation replays return the original snapshot; clients refresh after actions. Creation key reuse with changed fields returns 409 `IDEMPOTENCY_CONFLICT`. New-key duplicate accept or terminal mutations return 409 `INVALID_STATE`. Expired pending actions return 409 `REQUEST_EXPIRED` after committed cleanup; later reads see expired and the time is free. UI actions are derived from database time, but mutation guards independently recheck eligibility.
+
+The preview has no financial reservation or settlement. `teacherConfirmed=false`, `learnerConfirmed=false`, `dispute=null` describe features not yet implemented. Completion/dispute/resolve and meeting routes are unavailable, not simulated. Historical preview bookings must not be financially completed when Phase 6 arrives.

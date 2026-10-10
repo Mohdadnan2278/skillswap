@@ -7,7 +7,7 @@ export const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
 if (!supabaseUrl || !["127.0.0.1", "localhost"].includes(new URL(supabaseUrl).hostname)) throw new Error("Tests require local Supabase; they must not create hosted accounts.");
 export const mailpitUrl = process.env.TEST_MAILPIT_URL ?? "http://127.0.0.1:54324";
 if (!["127.0.0.1", "localhost"].includes(new URL(mailpitUrl).hostname)) throw new Error("Tests require a local mail inbox.");
-export function credentials(label: string) { return { email: `phase3-${label}-${randomUUID()}@example.test`, password: `Aa1!${randomUUID()}` }; }
+export function credentials(label: string) { return { email: `skillswap-${label.toLowerCase().replace(/[^a-z0-9-]/g, "-").slice(0,30)}-${randomUUID()}@example.test`, password: `Aa1!${randomUUID()}` }; }
 export async function confirmationLink(email: string) {
   let id: string | undefined;
   await expect.poll(async () => {

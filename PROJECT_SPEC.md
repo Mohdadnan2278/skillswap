@@ -2,7 +2,7 @@
 
 ## Status and scope
 
-This is the living MVP specification. Phase 3 implements authentication, onboarding/profile editing, protected navigation and logout; auth/profile APIs and the two profile tables are verified locally. Phase 4 implements the shared catalogue, offered/wanted selection, deterministic discovery and public member profiles. Bookings, money, video and reputation remain future design. The owner delegated selection of appropriate rules for better interaction and user experience during Phase 2. The MVP defaults below were chosen under that authorization; they were not individually confirmed word for word. Changes affecting these rules must be recorded before dependent implementation.
+This is the living MVP specification. Phase 3 implements authentication, onboarding/profile editing, protected navigation and logout; auth/profile APIs and the two profile tables are verified locally. Phase 4 implements the shared catalogue, offered/wanted selection, deterministic discovery and public member profiles. Phase 5 adds locally verified scheduling requests, accept/reject/cancel, scoped expiry and private booking views. Money, video and reputation remain future design. The owner delegated selection of appropriate rules for better interaction and user experience during Phase 2. The MVP defaults below were chosen under that authorization; they were not individually confirmed word for word. Changes affecting these rules must be recorded before dependent implementation.
 
 Confirmed by the owner's project prompt: one Next.js application with TypeScript, Tailwind, Supabase PostgreSQL/Auth, and a managed video provider selected in Phase 7. Use npm, versioned migrations, and a responsive browser experience. Prefer Vercel, with deployment only after explicit authorization. Everyone may teach and learn; teacher and learner are roles within a booking, never permanent account roles.
 
@@ -78,3 +78,9 @@ Terminal states never reopen. Conflicts cover both participants in pending/accep
 ## Phase boundaries and pending external setup
 
 Phase 2 design is complete. Phase 3 has real local Supabase two-account and mobile Chromium evidence; hosted Supabase, Google OAuth, production SMTP, physical phones and fresh-task restoration remain unverified. The owner has authorized hosted Supabase creation/configuration followed by Phase 4; account access is still missing. The owner subsequently instructed an access recheck and continuation to Phase 4; Phase 4 is implemented and verified locally while hosted setup remains blocked. Business defaults were selected under owner delegation. Deployment and paid resources require separate authorization.
+
+## Phase 5 interim scheduling boundary
+
+The owner authorized continuation locally while hosted setup is pending. Consistent with the original phase plan, Phase 5 is a visibly labeled scheduling preview. It reserves time and enforces participant transitions/expiry, but has no wallet, starter grant, monetary reservation, ledger, confirmation or transfer. Each booking carries `creditReservationStatus: "not_integrated"`; the stored duration-derived `costUnits` is a future valuation, never a balance or held amount. No funded exchange or financial demo is claimed.
+
+The final MVP credit rules remain unchanged. Phase 6 must integrate request-time reservations and releases atomically before reporting funded booking readiness. Existing preview bookings must remain visibly unfunded and ineligible for settlement; do not retroactively charge or transfer for them. Future funded sessions require a new properly reserved request. No private video or feedback endpoint is implemented in Phase 5.
