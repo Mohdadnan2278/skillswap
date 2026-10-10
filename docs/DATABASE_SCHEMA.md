@@ -1,6 +1,6 @@
 # Database schema and future design
 
-Phase 3 implements `profiles`, `account_preferences`, and `save_my_profile` through `supabase/migrations/20261010160000_auth_profiles.sql`, applied only to local Supabase. Other tables below are future design. MVP defaults are recorded in `PROJECT_SPEC.md`. Implement tables incrementally in `supabase/migrations/`; never run migrations against an existing remote project without owner authorization.
+Phase 3 implements `profiles`, `account_preferences`, and `save_my_profile` through `supabase/migrations/20261010160000_auth_profiles.sql`, applied only to local Supabase. Phase 4 implements `skills`, `user_skills`, `replace_my_skills` and `discover_members` through `20261010180000_skills_matching.sql`, also applied only locally. Later tables below remain future design. MVP defaults are recorded in `PROJECT_SPEC.md`. Implement tables incrementally in `supabase/migrations/`; never run migrations against an existing remote project without owner authorization.
 
 ## Tables and relationships
 
@@ -10,7 +10,7 @@ Use UUID primary keys, `timestamptz` UTC timestamps, explicit foreign keys and c
 | --- | --- | --- |
 | `public.profiles` / 3 | `id` PK/FK auth user, `display_name` 2–60, `bio` ≤500, `college` ≤120, `onboarded_at`, timestamps | Authenticated members read onboarded safe profiles, profiles exist only after verified onboarding; members write their own safe fields only via `save_my_profile`; no direct mutation or member deletes |
 | `public.account_preferences` / 3 | `user_id` PK/FK, validated IANA `timezone`, timestamps | Self read; atomic writes via `save_my_profile`; no public email or timezone preference |
-| `public.skills` / 4 | `id`, unique `slug`, `name`, `category`, `enabled` | Members read enabled skills and referenced historical skills as needed; migration-controlled writes |
+| `public.skills` / 4 | `id`, unique `slug`, `name`, `category`, `enabled` | Members read enabled skills; historical booking references are future design; migration-controlled writes |
 | `public.user_skills` / 4 | `(user_id, skill_id, direction)` composite PK; direction offered/wanted; FKs | Members read onboarded members' selections; self writes through validated replacement operation, max 20 per direction |
 | `public.bookings` / 5–6 | `id`, teacher/learner FKs (different), skill FK, `starts_at`, derived `ends_at`, duration 30/60/90, state, cost units = duration, `request_expires_at`, timestamps | Participants read; only trusted functions write; no client-controlled financial fields |
 | `private.booking_occupancy` / 5 | `(booking_id, user_id)` PK; exactly two rows per active booking; `during` `tstzrange` `[)`; FK to profiles/bookings | No direct client access; maintained by booking functions |
@@ -25,7 +25,7 @@ Use UUID primary keys, `timestamptz` UTC timestamps, explicit foreign keys and c
 | `public.feedback` / 8 | `id`, booking FK, reviewer/reviewee FKs different, rating 1–5, plain-text comment ≤500, created_at; unique `(booking_id, reviewer_id)` | Authenticated members read published feedback; trusted eligible insert; immutable for MVP |
 | `private.idempotency_records` / 5–8 | Actor FK, operation, resource key, UUID request key composite unique; normalized request/result JSON and created_at | No direct client access; same transaction as mutation |
 
-Use restrictive deletion semantics for identity and financial references; account deletion must not cascade away audit history. Only the two Phase 3 tables are present. Financial DTOs require bigint-to-safe-integer conversion with explicit range checks at the API boundary. MVP amounts are tiny, but do not silently cast arbitrary 64-bit values into imprecise JavaScript numbers.
+Use restrictive deletion semantics for identity and financial references; account deletion must not cascade away audit history. The four Phase 3–4 tables are present. Financial DTOs require bigint-to-safe-integer conversion with explicit range checks at the API boundary. MVP amounts are tiny, but do not silently cast arbitrary 64-bit values into imprecise JavaScript numbers.
 
 ## Relationships
 
@@ -99,3 +99,11 @@ Later DB tests must cover anonymous and wrong-owner access, direct mutation deni
 ## Phase 3 implementation details
 
 Profiles are created on first verified onboarding, not at signup. `save_my_profile` takes only safe fields, derives `auth.uid()`, checks `auth.users.email_confirmed_at`, validates all values including `pg_timezone_names`, and upserts both tables in one transaction. Onboarding/creation timestamps remain fixed on edits. All ordinary direct writes are revoked, including own updates; the function has a fixed empty search path and explicit execute grants to authenticated members only. RLS permits member profile reads and owner-only preferences. No starter grant or reputation database exists yet. Backend schema types match this migration; regenerate after authorized schema changes.
+
+## Implemented Phase 4 permissions and matching
+
+The migration inserts 12 stable catalogue entries (programming, creative, music, communication, academic and productivity). Authenticated roles have SELECT only; anonymous roles have no table or function access. User selections reference onboarded profiles; members may read selections, but no ordinary member has direct INSERT/UPDATE/DELETE grants on either new table.
+
+`replace_my_skills` is a restricted security-definer function with an empty search path, derived `auth.uid()`, authoritative verified-email check and profile row lock. It rejects null arrays/elements, duplicates, more than 20 IDs per direction, unknown or disabled skills before deleting anything. It atomically replaces both lists and accepts empty arrays. Concurrent saves result in one complete selection, never a mixed set.
+
+`discover_members` is a security-invoker function with an empty search path and no actor argument. It requires onboarding, checks the optional filter against the caller's enabled wanted skills, joins wanted-to-offered IDs, excludes self and disabled skills, aggregates explanations in slug order, and pages in member UUID order. Only safe profile fields are returned; preferences/email stay private. Its maximum internal limit is 51 (50 plus one lookahead row). Local integration checks cover direct mutation denial, injected ownership, invalid atomic rollback, concurrency, explained matching and pagination.

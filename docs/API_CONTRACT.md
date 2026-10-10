@@ -1,6 +1,6 @@
 # API contract and future design
 
-Phase 3 implements the auth endpoints below and `GET /api/v1/me`, `PATCH /api/v1/me/profile`, and `GET /api/v1/profiles/:userId`. All skills/booking/wallet/video/feedback/community endpoints remain planned. Runtime auth/profile schemas live in `src/shared/validation.ts`; other DTOs remain design contracts. Business rules reference the adopted MVP defaults in `PROJECT_SPEC.md`.
+Phase 3 implements the auth endpoints below and `GET /api/v1/me`, `PATCH /api/v1/me/profile`, and `GET /api/v1/profiles/:userId`. Phase 4 also implements `GET /skills`, `GET/PUT /me/skills`, and `GET /discover` under `/api/v1`. Booking/wallet/video/feedback/community endpoints remain planned. Runtime auth/profile/skills/query schemas live in `src/shared/validation.ts`; later DTOs remain design contracts. Business rules reference the adopted MVP defaults in `PROJECT_SPEC.md`.
 
 ## Conventions
 
@@ -106,3 +106,9 @@ Success data contains the server-created booking with `state: "pending"`, `costU
 ## Required implementation checks
 
 Phase 3 verified locally: two accounts, invalid/forged identity, confirmation replay, owner-only saves and direct-write denial. Hosted/Google checks remain unrun. Phase 4: catalogue constraints and deterministic matching. Phase 5: state matrix, both-role overlaps, half-open boundaries and concurrent requests. Phase 6: concurrent spending, repeat starter/completion, expiry/cancellation races and ledger conservation. Phase 7: participant-only tokens, expiry and smartphone permissions. Phase 8: ineligible/duplicate/self feedback and aggregate accuracy. These tests are planned, not executed in Phase 2.
+
+## Phase 4 implementation details
+
+Catalogue order is slug ascending; discovery order is user UUID ascending. Both return `{ items, nextCursor }` with default limit 20, max 50. Cursors contain a validated base64url tuple: catalogue last slug/enabled context, or discovery last UUID/current user/filter context. Malformed, repeated or unknown parameters and mismatched cursor/filter/user contexts return 400. Cursors are navigation aids, not authorization. Changes to selections between page reads may change results.
+
+`PUT /me/skills` accepts only the two ID arrays. Each allows 0–20 unique enabled catalogue UUIDs; a skill may be both offered and wanted. Verified email and completed profile are required. Writes replace both arrays atomically and serialize by account; database rejection leaves previous selections intact. `GET /me/skills` returns empty arrays before onboarding. Discovery requires onboarding, excludes self, returns only matching offered skills in slug order, and validates an optional filter against the caller's enabled wanted skills. No wanted skills produces an empty page. No booking or financial endpoints are enabled.

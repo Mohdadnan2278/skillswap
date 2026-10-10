@@ -2,7 +2,7 @@
 
 ## Status and scope
 
-This is the living MVP specification. Phase 3 implements authentication, onboarding/profile editing, protected navigation and logout; auth/profile APIs and the two profile tables are verified locally. Skills, bookings, money, video and reputation remain future design. The owner delegated selection of appropriate rules for better interaction and user experience during Phase 2. The MVP defaults below were chosen under that authorization; they were not individually confirmed word for word. Changes affecting these rules must be recorded before dependent implementation.
+This is the living MVP specification. Phase 3 implements authentication, onboarding/profile editing, protected navigation and logout; auth/profile APIs and the two profile tables are verified locally. Phase 4 implements the shared catalogue, offered/wanted selection, deterministic discovery and public member profiles. Bookings, money, video and reputation remain future design. The owner delegated selection of appropriate rules for better interaction and user experience during Phase 2. The MVP defaults below were chosen under that authorization; they were not individually confirmed word for word. Changes affecting these rules must be recorded before dependent implementation.
 
 Confirmed by the owner's project prompt: one Next.js application with TypeScript, Tailwind, Supabase PostgreSQL/Auth, and a managed video provider selected in Phase 7. Use npm, versioned migrations, and a responsive browser experience. Prefer Vercel, with deployment only after explicit authorization. Everyone may teach and learn; teacher and learner are roles within a booking, never permanent account roles.
 
@@ -77,4 +77,4 @@ Terminal states never reopen. Conflicts cover both participants in pending/accep
 
 ## Phase boundaries and pending external setup
 
-Phase 2 design is complete. Phase 3 has real local Supabase two-account and mobile Chromium evidence; hosted Supabase, Google OAuth, production SMTP, physical phones and fresh-task restoration remain unverified. The owner has authorized hosted Supabase creation/configuration followed by Phase 4; account access is still missing. Business defaults were selected under owner delegation. Deployment and paid resources require separate authorization.
+Phase 2 design is complete. Phase 3 has real local Supabase two-account and mobile Chromium evidence; hosted Supabase, Google OAuth, production SMTP, physical phones and fresh-task restoration remain unverified. The owner has authorized hosted Supabase creation/configuration followed by Phase 4; account access is still missing. The owner subsequently instructed an access recheck and continuation to Phase 4; Phase 4 is implemented and verified locally while hosted setup remains blocked. Business defaults were selected under owner delegation. Deployment and paid resources require separate authorization.

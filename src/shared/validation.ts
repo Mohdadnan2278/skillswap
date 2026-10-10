@@ -20,3 +20,11 @@ export const userIdSchema = z.string().uuid();
 export function safeReturnPath(input: unknown): string {
   return typeof input === "string" && ["/dashboard", "/profile", "/onboarding"].includes(input) ? input : "/dashboard";
 }
+
+const skillIds = z.array(z.string().uuid()).max(20).refine(ids => new Set(ids).size === ids.length, "Choose each skill only once.");
+export const skillSelectionsSchema = z.object({ offeredSkillIds: skillIds, wantedSkillIds: skillIds }).strict();
+export const catalogueQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+  cursor: z.string().min(1).max(512).optional(),
+}).strict();
+export const discoveryQuerySchema = catalogueQuerySchema.extend({ skillId: z.string().uuid().optional() });
