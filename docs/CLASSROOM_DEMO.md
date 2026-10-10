@@ -41,7 +41,7 @@ Copy this table into an ignored local note, or a report containing no keys/passw
 
 | Check | Current status | Actual observation/date |
 | --- | --- | --- |
-| Authorized HTTPS deployment and exact Auth callbacks | Pending | |
+| Authorized HTTPS deployment and exact Auth callbacks | Verified | 2026-10-10: https://skillswap-delta-taupe.vercel.app; live public pages 200, protected pages redirect, anonymous APIs 401 and foreign-origin mutation 403 |
 | Two real signup/confirmation/login flows | Pending | |
 | Phone A OS/browser and phone B OS/browser | Pending | |
 | Google Meet: join/audio/video/devices/rejoin | Pending | |
@@ -51,4 +51,4 @@ Copy this table into an ignored local note, or a report containing no keys/passw
 | Feedback persistence and real average/count | Verified locally; hosted pending | |
 | Unauthorized booking/access and logout separation | Verified locally; hosted pending | |
 
-Phase 9 is ready for external validation only after its local checks pass. The final live-demo goal remains open until hosting, actual email delivery and the chosen provider's two-phone call are observed.
+Phase 9's local checks and authorized HTTPS deployment are verified. The final live-demo goal remains open until actual email delivery, the chosen provider's two-phone call and real-duration hosted completion are observed.

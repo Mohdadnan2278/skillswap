@@ -86,7 +86,7 @@ Final lint, route types, TypeScript and production build passed. Hosted Auth set
 
 ## Phase 9 authorization
 
-The owner authorized continuation into final integration and classroom demo preparation. Deployment remains subject to separate authorization. Results and external prerequisites are recorded below.
+The owner authorized continuation into final integration and classroom demo preparation, then explicitly authorized Vercel deployment on 2026-10-10. Initial preparation and the subsequent release are recorded below.
 
 ## Phase 9 — Integration and classroom release preparation
 
@@ -100,4 +100,12 @@ Updated member error recovery to Next 16.4's documented `retry()` refetch behavi
 
 Verified: 27 unit tests; all 17 real-local integration/mobile browser cases passed in one complete regression run, including the connected journey and previous phase permission/timezone/concurrency/idempotency/ledger/feedback checks. Final ESLint, route types, TypeScript and production build passed after the test server stopped. An earlier parallel typegen encountered generated-file churn; the sequential final check passed. Hosted-configured production smoke checks passed: home/login/signup 200, protected dashboard/wallet/community redirects, anonymous booking/wallet/reviews 401, foreign-origin mutation 403 and unknown page 404. The original prompt and all local environments remain Git-ignored.
 
-**Still pending for Phase 9's live-demo completion:** owner-authorized deployment to a real HTTPS origin, matching deployed Auth URLs, a configured SMTP sender and two actual signup/confirmation deliveries, two physical phones with a live Google Meet or Jitsi call, and real scheduled-duration completion on the hosted app. No Vercel binding/token is available in this workspace. Google OAuth remains optional and unconfigured; it is not needed for manually shared Meet links. The unused Daily secret requirement remains environment-UI cleanup because the available draft API cannot delete requirements. Do not report the final hosted demo as complete while these checks remain pending.
+## Phase 9 — Authorized Vercel release (2026-10-10)
+
+Verified the securely supplied Vercel token through the supported HTTPS API and the owner's existing Hobby account. Created free-plan project `skillswap` and deployed tested source commit `87d48f1682fc3aa5aaee4c896aa754ddc15d4dfe` from `phase-9-demo-readiness`. Vercel marked deployment `dpl_2K8fs8as3wSWizyongX7oKUgT9tS` READY and assigned **https://skillswap-delta-taupe.vercel.app**. Uploaded 141 tracked source files after `.vercelignore` filtering, excluding the prompt, environments, management files and generated artifacts. No merge, paid upgrade, hosted account creation, database reset or financial acceleration occurred. This is an API release; Git pushes do not automatically redeploy the project.
+
+Configured Vercel's five production app variables and Node 24.x, and updated hosted Auth's Site URL and exact confirmation/callback URLs to the real production origin. Generated ignored hosted/app environment files now use that origin. The app receives only the public Supabase key; account-management secrets were not included in the deployment. The obsolete Daily secret requirement was removed by the owner; its unused network rule remains optional cleanup.
+
+Reran all 27 unit tests and the complete lint/typecheck/production build successfully. Vercel's remote build also passed. Live HTTPS checks verified home/login/signup 200, protected dashboard/wallet/community 307 to login, anonymous booking/wallet/leaderboard/review APIs 401, private no-store responses and foreign-origin feedback mutation 403. The post-release read-only audit passes HTTPS, hosted project/Auth health, all 10 migrations, RLS on all 12 exposed tables, confirmed email and matching callbacks. It correctly exits 1 solely because custom SMTP is absent. The previously passing 17 local integration/mobile cases were not repeated for this deployment-only change; no actual phone or media call is claimed.
+
+**Still pending for Phase 9's live-demo completion:** a configured SMTP sender and two actual signup/confirmation deliveries, two physical phones with a live Google Meet or Jitsi call, and real scheduled-duration completion on the hosted app. Google OAuth remains optional and unconfigured; it is not needed for manually shared Meet links. Do not report the final hosted demo as complete while these checks remain pending.
