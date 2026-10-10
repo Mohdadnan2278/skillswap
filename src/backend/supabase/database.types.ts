@@ -1,4 +1,4 @@
-/** Phase 3–6 schema types, aligned to the versioned migrations.
+/** Phase 3–7 schema types, aligned to the versioned migrations.
  * Regenerate using Supabase gen types after authorized migration changes.
  */
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
@@ -47,6 +47,7 @@ export interface Database {
     };
     Views: { [_ in never]: never };
     Functions: {
+      meeting_access_context: { Args: { p_booking_id: string; p_consume?: boolean }; Returns: Json };
       booking_financial_action: { Args: { p_booking_id: string; p_action: string; p_key: string; p_reason?: string; p_resolution?: string }; Returns: Json };
       read_my_wallet: { Args: { p_kind?: string; p_limit?: number; p_after_created?: string; p_after_id?: string }; Returns: Json };
       create_booking_request: { Args: { p_teacher_id: string; p_skill_id: string; p_starts_at: string; p_duration: number; p_key: string }; Returns: Json };
