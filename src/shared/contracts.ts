@@ -1,4 +1,4 @@
-/** Shared DTOs. Phase 3–6 auth/profile/skills/discovery/scheduling APIs are implemented; later contracts remain design-only.
+/** Shared DTOs. Phase 3–7 auth/profile/skills/discovery/scheduling APIs are implemented; later contracts remain design-only.
  * These types do not validate runtime input or authorize database access.
  */
 export type UUID = string;
@@ -83,9 +83,9 @@ export interface Feedback {
   rating: Rating; comment: string; createdAt: UtcTimestamp;
 }
 export interface LeaderboardEntry { profile: PublicProfile; rank: number }
-/** Provider-neutral draft. Final mapping and revocation behavior decided in Phase 7. */
+/** Public Jitsi demo room. App checks do not enforce access on the public video provider. */
 export interface MeetingAccess {
-  roomReference: string; joinToken: string; expiresAt: UtcTimestamp;
+  provider: "jitsi_demo"; roomReference: string; serverOrigin: "https://meet.jit.si"; roomClosesAt: UtcTimestamp; serverNow: UtcTimestamp;
 }
 
 export type BookingAction = "accept" | "reject" | "cancel" | "confirm" | "dispute" | "resolve";

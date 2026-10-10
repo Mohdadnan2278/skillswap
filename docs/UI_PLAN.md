@@ -1,6 +1,6 @@
 # UI plan
 
-Phase 3 implements `/`, `/signup`, `/login`, auth callbacks, `/onboarding`, `/dashboard`, and `/profile`. Phase 4 implements profile skill editing, `/discover`, and `/people/[id]`. Phase 5 implements `/people/[id]/request`, `/bookings` and `/bookings/[id]` as a scheduling preview. Phase 6 implements `/wallet`, funded request review and completion/dispute controls. Video/community screens remain planned. One mobile-first visual system continues Phase 1's emerald, off-white, rounded-card palette. Use system fonts, readable contrast, semantic headings, visible keyboard focus, explicit labels, and touch targets of at least 44px.
+Phase 3 implements `/`, `/signup`, `/login`, auth callbacks, `/onboarding`, `/dashboard`, and `/profile`. Phase 4 implements profile skill editing, `/discover`, and `/people/[id]`. Phase 5 implements `/people/[id]/request`, `/bookings` and `/bookings/[id]` as a scheduling preview. Phase 6 implements `/wallet`, funded request review and completion/dispute controls. Phase 7 implements the public Jitsi meeting demo screen. Community screens remain planned. One mobile-first visual system continues Phase 1's emerald, off-white, rounded-card palette. Use system fonts, readable contrast, semantic headings, visible keyboard focus, explicit labels, and touch targets of at least 44px.
 
 ## Navigation and screen map
 
@@ -19,7 +19,7 @@ Current navigation contains Dashboard, Profile, Discover, Bookings and Sign out;
 | `/bookings` | Upcoming, incoming, history filters | No bookings, pending request deadline, local timezone, failures |
 | `/people/[id]/request` | Implemented offered-skill/date/duration form and review | Explicit timezone, invalid/ambiguous time, overlap, retry, no-credit notice |
 | `/bookings/[id]` | Implemented participants, skill, schedule, state and permitted actions | Expired request, stale action, terminal read-only; completion/disputes deferred |
-| `/bookings/[id]/meeting` | Pre-join device check, private call, leave/rejoin | Unsupported device, denied permission, too early, cancelled booking, expired token, disconnect/reconnect |
+| `/bookings/[id]/meeting` | Pre-join device check, public classroom-demo call, leave/rejoin | Unsupported device, denied permission, too early, cancelled booking, ended app window, disconnect/reconnect |
 | `/wallet` | Total, reserved, available; auditable history | No transactions, funds held in dispute, insufficient available credits |
 | `/community` | Leaderboard with score and count | No qualifying members, loading, error |
 
@@ -64,3 +64,7 @@ Mobile Chromium at 390×844 verifies review/edit persistence, UTC storage/Kolkat
 ## Phase 6 mobile evidence
 
 390×844 Chromium checks exercise the 3-credit wallet, real 0.5-credit reservation, separate participant confirmations, history and updated balances without horizontal overflow. Pending holds and disputed funds are explicitly explained. Completion controls depend on server-derived actions; dispute completion votes stay disabled before end. Successful actions refresh authoritative state, while failed network requests retain the same idempotency key for safe retry. Local timestamp fixtures advance the test clock boundary explicitly; physical-phone/video testing remains pending.
+
+## Phase 7 classroom demo UI
+
+The meeting page shows schedule/timezone, device check/stop controls, camera/microphone toggles, permission and connection errors, embedded Jitsi, leave/rejoin and a new-tab fallback for provider authentication. Public-room access limits and first-host sign-in are visible before joining. SkillSwap checks grants and polls booking eligibility; leaving transfers nothing. Timers end the app’s embedded view, not an independently opened public room. Live Jitsi media and physical phones remain separate manual validation.

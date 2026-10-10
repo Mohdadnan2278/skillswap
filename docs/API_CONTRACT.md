@@ -1,6 +1,6 @@
 # API contract and future design
 
-Phase 3 implements the auth endpoints below and `GET /api/v1/me`, `PATCH /api/v1/me/profile`, and `GET /api/v1/profiles/:userId`. Phase 4 also implements `GET /skills`, `GET/PUT /me/skills`, and `GET /discover` under `/api/v1`. Phase 5 implements booking creation, list/detail and accept/reject/cancel endpoints. Phase 6 implements wallet reads and confirm/dispute/resolve. Video/feedback/community remain planned. Runtime auth/profile/skills/booking/query schemas live in `src/shared/validation.ts`; later DTOs remain design contracts. Business rules reference the adopted MVP defaults in `PROJECT_SPEC.md`.
+Phase 3 implements the auth endpoints below and `GET /api/v1/me`, `PATCH /api/v1/me/profile`, and `GET /api/v1/profiles/:userId`. Phase 4 also implements `GET /skills`, `GET/PUT /me/skills`, and `GET /discover` under `/api/v1`. Phase 5 implements booking creation, list/detail and accept/reject/cancel endpoints. Phase 6 implements wallet reads and confirm/dispute/resolve. Phase 7 implements a public Jitsi demo. Feedback/community remain planned. Runtime auth/profile/skills/booking/query schemas live in `src/shared/validation.ts`; later DTOs remain design contracts. Business rules reference the adopted MVP defaults in `PROJECT_SPEC.md`.
 
 ## Conventions
 
@@ -81,7 +81,7 @@ Financial operations and scheduling become one atomic workflow in Phase 6. Phase
 | GET `/me/wallet/reservations` | Pagination | `Page<Reservation>`; own active holds with booking ID and reserved units |
 | POST `/bookings/:id/feedback` | `{ rating: 1..5, comment?: string }` | 201 `Feedback`; completed participant reviewing the other; unique booking/reviewer; no target ID input |
 | GET `/profiles/:userId/feedback` | Pagination | `Page<Feedback>`; published feedback received by profile, readable by authenticated members |
-| POST `/bookings/:id/meeting-access` | `{}` | `MeetingAccess`: short-lived opaque join token, room reference and expiry; accepted participant only, within the initial design window of 10 minutes before start through 15 minutes after end |
+| POST `/bookings/:id/meeting-access` | `{}` | `MeetingAccess`: explicit public-demo room reference, provider origin and app window; accepted funded participant only, within the initial design window of 10 minutes before start through 15 minutes after end |
 
 Meeting provider response mapping is provisional until Phase 7 chooses a provider. Browser receives participant join authorization only, never a provider API secret. Recheck current membership/state on every request; cancelled/completed/disputed bookings cannot issue new tokens. Limit grants to the remaining join window and provider-supported TTL. Already-issued token revocation and removal from a cancelled room must be evaluated with the provider; cannot promise immediate revocation before that evaluation.
 
@@ -137,3 +137,9 @@ All endpoints require a verified, onboarded session. Mutations require same-orig
 | POST `/api/v1/bookings/:id/resolve` | `{resolution: "complete" or "cancel"}` | Own replaceable vote; two matching votes settle/release |
 
 New requests return `creditReservationStatus: held`; terminal releases return `released`, completed transfers `settled`. Insufficient availability returns 409 `INSUFFICIENT_CREDITS`. Confirmation flags and dispute votes reflect stored rows. Completing a dispute requires the scheduled end to have passed. A single confirmation, differing votes, or call ending cannot transfer credits. Preview bookings remain unfunded and financial actions return 409 `INVALID_STATE`. Wallet cursors preserve PostgreSQL microseconds and are scoped to actor and history type. Reads perform scoped pending expiry; there is no unauthenticated expiry endpoint or automatic dispute timeout. Earlier Phase 5 descriptions above record behavior at that phase.
+
+## Implemented Phase 7 demo access
+
+`POST /api/v1/bookings/:id/meeting-access` requires same-origin JSON `{}`, verified onboarding, participation, accepted state, held funding and the interval from 10 minutes before start until 15 minutes after end (end exclusive). It returns `{provider: "jitsi_demo", roomReference, serverOrigin: "https://meet.jit.si", roomClosesAt, serverNow}` with private/no-store headers. It returns no `joinToken`: public Jitsi has no SkillSwap token enforcement. Unknown/injected fields are rejected; outsiders receive 404, anonymous users 401, invalid state/window 409 and unconfigured video 503. A per-member database limit allows 8 grants in a rolling fixed one-minute window, then 429 with Retry-After. Both participants receive the same stable random room; no client writes private mapping/rate tables.
+
+The owner changed Phase 7 to a server-free classroom demonstration. Provider-neutral private-token design above is deferred. In-app controls and polling do not protect a leaked public room link or revoke external calls. No durable replay token or financial effect accompanies access.
