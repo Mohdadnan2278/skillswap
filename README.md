@@ -1,6 +1,6 @@
 # SkillSwap
 
-A student skill-exchange semester project built as one Next.js application with TypeScript, Tailwind, and Supabase. Phase 3 implements email/password authentication, confirmation, profile onboarding/editing, protected navigation, and logout. Phase 4 adds the shared skill catalogue, offered/wanted selections, explained discovery and member profiles. Bookings, credits, video, and reputation are later phases.
+A student skill-exchange semester project built as one Next.js application with TypeScript, Tailwind, and Supabase. Phase 3 implements email/password authentication, confirmation, profile onboarding/editing, protected navigation, and logout. Phase 4 adds the shared skill catalogue, offered/wanted selections, explained discovery and member profiles. Phase 5 adds a scheduling preview: requests, acceptance/rejection/cancellation, expiry and private booking screens. Credits, video and reputation are later phases.
 
 ## Local development
 
@@ -35,15 +35,15 @@ Integration tests create uniquely named accounts only on loopback Supabase/app o
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e
 ```
 
-Browser cache/config folders use writable temporary paths in this cloud machine. Test output and local prompts are ignored. Synthetic local accounts remain in the local database; Phase 4 tests clear only their own selections after use. Tests do not delete existing users or reset user data.
+Browser cache/config folders use writable temporary paths in this cloud machine. Test output and local prompts are ignored. Synthetic local accounts remain in the local database; Phase 4–5 tests clear their own selections and cancel their own future requests after use. Local booking deadline fixtures advance timestamps to exercise expiry/started-session guards; they do not simulate elapsed sessions, credits or completion. Tests do not delete existing users or reset user data.
 
 After a successful build, `npm start` serves production. Stop app processes before reinstalling dependencies or building. `npm run db:start` is repeatable; `npm run db:stop` stops this project's containers while retaining their data. Later migrations can be applied locally with `npm run supabase -- migration up --local`; never run a reset on data you need to preserve.
 
 ## Structure
 
 - `src/app/`: App Router pages, protected member route group, callback handlers, and HTTP endpoints.
-- `src/frontend/`: auth/profile/skill-selection/navigation UI components.
-- `src/backend/`: config, verified session guard, Supabase server client/schema types, profile/skills/discovery services, HTTP validation/errors.
+- `src/frontend/`: auth/profile/skill-selection/scheduling/navigation UI components.
+- `src/backend/`: config, verified session guard, Supabase server client/schema types, profile/skills/discovery/booking services, HTTP validation/errors.
 - `src/shared/`: shared DTOs and runtime input schemas.
 - `supabase/`: local configuration, confirmation template, and versioned database migrations.
 - `scripts/`: reproducible local Supabase/environment helpers.
@@ -60,3 +60,9 @@ See [Supabase setup](docs/SUPABASE_SETUP.md), [MVP specification](PROJECT_SPEC.m
 ## Hosting
 
 Vercel is the planned host; use the Next.js preset and repository root. Configure the hosted Supabase URL/public key and HTTPS `SITE_URL` before building. Hosted project creation and migration setup are authorized but blocked by missing `SUPABASE_ACCESS_TOKEN`; enter it securely in environment settings. Hosted provider configuration, Google OAuth and deployment have not been verified. Deployment needs separate authorization. No paid resources have been created.
+
+## Scheduling preview
+
+Use a member's **Request a session** action, choose an offered skill and a date/time in your saved IANA timezone, select 30/60/90 minutes, review and submit. Bookings show start/end, request expiry, roles and state. The teacher can accept/reject; either participant can cancel before start. Overlapping requests reserve both people's time across teaching/learning roles; rejection/cancellation/expiry releases that time. Requests expire at creation + 24 hours or session start, whichever comes first.
+
+This preview reserves **time only**. `creditReservationStatus` is always `not_integrated`: no starter credits, wallet, financial holds, transfers, completion or video exist yet. Full credit integration belongs to Phase 6. Preview bookings cannot later be treated as funded sessions or silently charged. A single database advisory transaction lock serializes MVP scheduling operations; UUID-ordered profile locks and a GiST exclusion constraint protect the two-person occupancy invariant. This favors correctness for the semester demo over high-volume scheduling throughput.

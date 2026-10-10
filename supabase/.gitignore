@@ -6,3 +6,6 @@
 .env.keys
 .env.local
 .env.*.local
+
+# Local account credentials; never commit.
+supabase.env

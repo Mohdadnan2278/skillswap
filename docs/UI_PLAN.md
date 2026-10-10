@@ -1,10 +1,10 @@
 # UI plan
 
-Phase 3 implements `/`, `/signup`, `/login`, auth callbacks, `/onboarding`, `/dashboard`, and `/profile`. Phase 4 implements profile skill editing, `/discover`, and `/people/[id]`. Booking/wallet/video/community screens remain planned. One mobile-first visual system continues Phase 1's emerald, off-white, rounded-card palette. Use system fonts, readable contrast, semantic headings, visible keyboard focus, explicit labels, and touch targets of at least 44px.
+Phase 3 implements `/`, `/signup`, `/login`, auth callbacks, `/onboarding`, `/dashboard`, and `/profile`. Phase 4 implements profile skill editing, `/discover`, and `/people/[id]`. Phase 5 implements `/people/[id]/request`, `/bookings` and `/bookings/[id]` as a scheduling preview. Wallet/video/community screens remain planned. One mobile-first visual system continues Phase 1's emerald, off-white, rounded-card palette. Use system fonts, readable contrast, semantic headings, visible keyboard focus, explicit labels, and touch targets of at least 44px.
 
 ## Navigation and screen map
 
-Current navigation contains Dashboard, Profile, Discover and Sign out; future sections are not dead links. The device timezone is selected explicitly with “Use my device timezone” during onboarding, otherwise UTC is the default. Desktop: compact header and primary navigation. Future mobile plan: a five-item navigation for Home, Discover, Bookings, Wallet, and Community; Profile available from the account menu. Navigation avoids covering page content and accounts for device safe areas. Meeting mode uses its own controls instead of the main navigation.
+Current navigation contains Dashboard, Profile, Discover, Bookings and Sign out; future sections are not dead links. The device timezone is selected explicitly with “Use my device timezone” during onboarding, otherwise UTC is the default. Desktop: compact header and primary navigation. Future mobile plan: a five-item navigation for Home, Discover, Bookings, Wallet, and Community; Profile available from the account menu. Navigation avoids covering page content and accounts for device safe areas. Meeting mode uses its own controls instead of the main navigation.
 
 | Route | Screen and primary interaction | Important states |
 | --- | --- | --- |
@@ -15,9 +15,10 @@ Current navigation contains Dashboard, Profile, Discover and Sign out; future se
 | `/dashboard` | Implemented introduction and discovery link; later sessions/credits | New account guidance, no sessions, partial data failure |
 | `/profile` | Edit own profile and offered/wanted catalogue selections | Independent save feedback, no selected skills, loading catalogue |
 | `/discover` | People offering wanted skills; skill filter; each card says why matched | No wanted skills → profile link; no matches; loading; retry |
-| `/people/[id]` | Implemented safe public profile and offered skills; ratings and requests deferred | Missing profile; own profile → edit; no private email/wallet |
+| `/people/[id]` | Implemented safe public profile, offered skills and scheduling request link; ratings deferred | Missing profile; own profile → edit; no private email/wallet |
 | `/bookings` | Upcoming, incoming, history filters | No bookings, pending request deadline, local timezone, failures |
-| `/bookings/[id]` | Participants, skill, schedule, cost, state; permitted actions only | State changed elsewhere; first completion awaiting other; disputed funds held; terminal read-only |
+| `/people/[id]/request` | Implemented offered-skill/date/duration form and review | Explicit timezone, invalid/ambiguous time, overlap, retry, no-credit notice |
+| `/bookings/[id]` | Implemented participants, skill, schedule, state and permitted actions | Expired request, stale action, terminal read-only; completion/disputes deferred |
 | `/bookings/[id]/meeting` | Pre-join device check, private call, leave/rejoin | Unsupported device, denied permission, too early, cancelled booking, expired token, disconnect/reconnect |
 | `/wallet` | Total, reserved, available; auditable history | No transactions, funds held in dispute, insufficient available credits |
 | `/community` | Leaderboard with score and count | No qualifying members, loading, error |
@@ -53,3 +54,9 @@ Check widths 360/390/768/1280px, no horizontal scroll, keyboard navigation and z
 Skill editing uses separate offered/wanted checkbox fieldsets, category labels and counts, max-20 selection guards, independent saving/error feedback and preserved choices on connection failure. Discovery has wanted-skill filtering, a reset action for invalid links, empty-state profile guidance, explained cards and next-page navigation. Member pages expose name/bio/college/enabled offered skills, redirect self to editing, and return 404 for missing IDs. They show no fake rating or booking action.
 
 Chromium at 390×844 verified selection save/reload, discovery filtering, match explanation, safe member navigation and no horizontal overflow on discovery/member pages. Physical phones and hosted HTTPS remain unverified.
+
+## Phase 5 scheduling evidence
+
+Scheduling converts the saved IANA wall-clock time to UTC, rejects daylight-saving gaps/repeated times, reviews the exact start/teacher/skill/duration, and preserves details when returning to edit. All booking screens state that only time is reserved, with no credit reservation/transfer, video or completion. Request/action buttons retain idempotency keys across connection retries and refresh server state after mutations. Lists filter by role/state and page; detail shows the explicit viewer timezone and pending deadline. Teachers see accept/reject; participants see cancellation before start; server-derived actions hide ineligible controls.
+
+Mobile Chromium at 390×844 verifies review/edit persistence, UTC storage/Kolkata display, a separate teacher browser using UTC, acceptance, cancellation, filtered participant list and no detail/list horizontal overflow. Unit checks cover fractional-offset zones, date rollover and US daylight-saving ambiguity/gaps. Physical smartphones/HTTPS remain unverified.

@@ -34,13 +34,22 @@ Verified: 19 unit tests and all 5 local integration/browser tests passed, includ
 
 The prompt remains Git-ignored. Hosted setup, Google OAuth, production SMTP, physical phones and fresh-task restoration remain unverified.
 
-## Next: Phase 5 — Scheduling and bookings
+## Phase 5 — Scheduling and bookings
 
-Await owner instruction. Implement requests, acceptance/rejection/cancellation, participant-only views, database-safe occupancy/transition checks and UTC scheduling. Hosted setup can resume when secure account access is available. Deployment and paid resources remain unauthorized.
+The owner authorized local continuation while catching up on hosted Supabase setup. Their credential file is on their computer and absent from this cloud workspace; no hosted resource or database was changed. Added an explicit Git ignore for `supabase/supabase.env`.
+
+Implemented time-only scheduling preview requests, accept/reject/cancel, participant list/detail, scoped expiry, duration/time/offering checks, UTC storage, saved-timezone display, daylight-saving ambiguity rejection and responsive review/action screens. Restricted atomic database functions derive verified/onboarded actors. UUID-ordered participant locks, a global MVP scheduling advisory lock and two-row GiST occupancy prevent concurrent/both-role conflicts. Private durable idempotency makes successful retries safe. JSON conflicts preserve committed expiry cleanup.
+
+Credit boundary: all bookings are explicitly `not_integrated`; only time is reserved. No starter grant, wallet, credit reservation, settlement, confirmation, dispute, video or feedback exists. UI/API/docs state this. Phase 6 must never silently fund or settle historical preview bookings; new funded requests are needed.
+
+Verified: 22 unit tests and all 8 local integration/browser regression tests passed. Booking coverage includes actor/RLS/role checks, replay/conflicting keys, time/duration/input rules, both-role and concurrent overlaps, adjacent intervals, terminal release, offering changes, exact 24-hour expiry, persisted expired actions and started-session cancellation denial. Mobile review/edit/submit, Kolkata-vs-UTC participant displays, accept/cancel/list filters and overflow checks passed. Final lint, type generation, TypeScript and production build passed. Production anonymous booking reads returned 401, protected screens redirected to login, homepage returned 200 and unknown route 404. Reapplying migrations made no changes. Direct privilege checks confirmed anonymous booking read/RPC denial and member direct-write/private-expiry denial.
+
+## Next: Phase 6 — Credits and completion
+
+Await owner instruction. Integrate starter issuance, wallet, reservations/releases, ledger, two-party confirmation/transfer and disputes atomically. Preserve final MVP rules and the preview-booking boundary. Hosted setup can resume when secure account access reaches this workspace. Paid resources and deployment remain unauthorized.
 
 ## Later phases
 
-5. Scheduling and bookings
 6. Credits and completion
 7. Private video
 8. Feedback and reputation
@@ -48,4 +57,4 @@ Await owner instruction. Implement requests, acceptance/rejection/cancellation, 
 
 ## Limitations
 
-Phase 3 auth/profile behavior is verified against local services; hosted readiness has not been established. Bookings, wallet/credit transfers, video, and feedback are unavailable. Matching is verified locally. No cloud database or hosting resources have been created.
+Phase 3 auth/profile behavior is verified against local services; hosted readiness has not been established. Financial bookings, wallet/credit transfers, completion/disputes, video and feedback are unavailable. Matching and time-only scheduling are verified locally. No cloud database or hosting resources have been created.

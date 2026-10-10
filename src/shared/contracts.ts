@@ -1,4 +1,4 @@
-/** Shared DTOs. Phase 3–4 auth/profile/skills/discovery APIs are implemented; later contracts remain design-only.
+/** Shared DTOs. Phase 3–5 auth/profile/skills/discovery/scheduling APIs are implemented; later contracts remain design-only.
  * These types do not validate runtime input or authorize database access.
  */
 export type UUID = string;
@@ -55,6 +55,7 @@ export interface Booking {
   id: UUID; teacherId: UUID; learnerId: UUID; skillId: UUID;
   startsAt: UtcTimestamp; endsAt: UtcTimestamp; durationMinutes: DurationMinutes;
   state: BookingState; costUnits: CreditUnits; requestExpiresAt: UtcTimestamp;
+  creditReservationStatus: "not_integrated" | "held" | "released" | "settled";
   teacherConfirmed: boolean; learnerConfirmed: boolean;
   dispute: BookingDispute | null;
   createdAt: UtcTimestamp; updatedAt: UtcTimestamp;
