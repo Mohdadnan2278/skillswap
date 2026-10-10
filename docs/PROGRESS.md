@@ -24,9 +24,19 @@ Verified: 19 unit tests; 3 local Playwright integration/browser tests. Two real 
 
 External checks still unrun: hosted Supabase/migrations, Google OAuth, real SMTP delivery, physical smartphones over HTTPS, and fresh-task restoration. Setup instructions are in `docs/SUPABASE_SETUP.md`. Reputation fields remain null/zero because Phase 8 is not implemented; no credits are granted yet.
 
-## Next: Phase 4 — Skills and matching
+## Phase 4 — Skills and matching
 
-The owner authorized hosted Supabase project creation/configuration followed by Phase 4. Hosted setup is blocked: no Supabase account token is injected, and `projects list` reports missing access token. A secure `SUPABASE_ACCESS_TOKEN` requirement scoped to `api.supabase.com` and current startup instructions were saved in the environment draft; this does not supply credentials or create resources. Once access is supplied, configure a new free project, apply and verify the Phase 3 migration, then add the skill catalogue, offered/wanted selections, deterministic discovery, responsive UI, migrations/contracts, and permission checks. Deployment and paid resources remain unauthorized.
+The owner instructed an access recheck and continuation. Hosted access remains missing: no injected token, saved requirement has no binding, and CLI project listing returns missing access token. No hosted project or paid resource was created. Phase 4 was implemented against real local Supabase under that continuation instruction.
+
+Implemented the 12-entry migration-controlled catalogue, strict offered/wanted selections with max 20 unique enabled IDs per direction, atomic verified/onboarded owner replacement, concurrent-save serialization, and deterministic wanted-to-offered discovery. Self is excluded; each match explains the shared skills. Catalogue/discovery use bounded validated pagination, user/filter-scoped discovery cursors and strict query inputs. Added profile checkboxes, filtering, empty/error states, safe member pages and navigation.
+
+Verified: 19 unit tests and all 5 local integration/browser tests passed, including earlier Phase 3 regression checks. Phase 4 checks exercised cross-user/direct-write denial, injected fields, unknown/duplicate/over-limit atomic rollback, concurrent whole-set replacement, self exclusion, explanations, stable pagination, cursor-context rejection and clearing selections. Mobile Chromium at 390×844 verified save/reload/filter/member profile/404 and no discovery/member-page overflow. Final lint, type generation, TypeScript and production build passed. Production smoke checks verified homepage 200, all three new anonymous API reads 401, discovery/member redirects to login, and unknown route 404. Reapplying migrations applied zero files and preserved data. Tests use account IDs rather than nonunique names and clear only their own selections for repeatability.
+
+The prompt remains Git-ignored. Hosted setup, Google OAuth, production SMTP, physical phones and fresh-task restoration remain unverified.
+
+## Next: Phase 5 — Scheduling and bookings
+
+Await owner instruction. Implement requests, acceptance/rejection/cancellation, participant-only views, database-safe occupancy/transition checks and UTC scheduling. Hosted setup can resume when secure account access is available. Deployment and paid resources remain unauthorized.
 
 ## Later phases
 
@@ -38,4 +48,4 @@ The owner authorized hosted Supabase project creation/configuration followed by 
 
 ## Limitations
 
-Phase 3 auth/profile behavior is verified against local services; hosted readiness has not been established. Matching, bookings, wallet/credit transfers, video, and feedback are unavailable. No cloud database or hosting resources have been created.
+Phase 3 auth/profile behavior is verified against local services; hosted readiness has not been established. Bookings, wallet/credit transfers, video, and feedback are unavailable. Matching is verified locally. No cloud database or hosting resources have been created.

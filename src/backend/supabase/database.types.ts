@@ -1,4 +1,4 @@
-/** Phase 3 schema types, aligned to 20261010160000_auth_profiles.sql.
+/** Phase 3–4 schema types, aligned to the versioned migrations.
  * Regenerate using Supabase gen types after authorized migration changes.
  */
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
@@ -11,6 +11,18 @@ export interface Database {
         Update: { display_name?: string; bio?: string; college?: string };
         Relationships: [];
       };
+      skills: {
+        Row: { id: string; slug: string; name: string; category: string; enabled: boolean };
+        Insert: { id: string; slug: string; name: string; category: string; enabled?: boolean };
+        Update: { enabled?: boolean };
+        Relationships: [];
+      };
+      user_skills: {
+        Row: { user_id: string; skill_id: string; direction: string };
+        Insert: { user_id: string; skill_id: string; direction: string };
+        Update: { skill_id?: string; direction?: string };
+        Relationships: [];
+      };
       account_preferences: {
         Row: { user_id: string; timezone: string; updated_at: string };
         Insert: { user_id: string; timezone: string; updated_at?: string };
@@ -19,7 +31,10 @@ export interface Database {
       };
     };
     Views: { [_ in never]: never };
-    Functions: { save_my_profile: { Args: { p_display_name: string; p_bio: string; p_college: string; p_timezone: string }; Returns: undefined } };
+    Functions: {
+      replace_my_skills: { Args: { p_offered: string[]; p_wanted: string[] }; Returns: undefined };
+      discover_members: { Args: { p_after?: string; p_skill_id?: string; p_limit?: number }; Returns: { id: string; display_name: string; bio: string; college: string; matched_skills: Json }[] };
+      save_my_profile: { Args: { p_display_name: string; p_bio: string; p_college: string; p_timezone: string }; Returns: undefined } };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };
   };

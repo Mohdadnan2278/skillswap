@@ -1,4 +1,4 @@
-# Supabase setup and Phase 3 verification
+# Supabase setup and Phase 3–4 verification
 
 ## Local setup (verified in the current cloud machine)
 
@@ -8,6 +8,7 @@ Requires Node 24, npm, Docker, and registry access to `ghcr.io` plus its package
 npm ci --cache /tmp/skillswap-npm-cache
 npm run db:start
 node scripts/configure-local-env.mjs
+npm run supabase -- migration up --local
 npm run dev
 ```
 
@@ -32,7 +33,7 @@ No wallet or starter credits are granted during Phase 3. This migration must not
 3. Enable email/password signup, require email confirmation, and use a minimum password length of at least 8. Configure provider rate limits and production SMTP as appropriate. If a stricter password policy is enabled, the auth service remains authoritative and the UI reports weak-password errors.
 4. In Supabase Authentication URL settings, set Site URL to the same `SITE_URL`. Add only the intended callback URLs: `<SITE_URL>/auth/callback` and local development callback origins you actually use. Do not use an unrestricted redirect wildcard for production.
 5. Replace the confirmation email body with the placeholder-only template in `supabase/templates/confirmation.html`, or the equivalent link `<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=email">Confirm email</a>`. Never paste real tokens or private keys into templates. The default PKCE confirmation flow also works when opened in the original browser; cross-device links may lack the verifier, so the token-hash template is recommended.
-6. Review `supabase/migrations/20261010160000_auth_profiles.sql`. Apply it to the chosen hosted project only after explicitly authorizing that database change (through Supabase SQL editor or your normal approved migration workflow). Do not run local reset commands against a hosted database. The local CLI wrapper is for local infrastructure; do not assume it has hosted login credentials.
+6. Review both migrations in `supabase/migrations/`, in timestamp order. Apply it to the chosen hosted project only after explicitly authorizing that database change (through Supabase SQL editor or your normal approved migration workflow). Do not run local reset commands against a hosted database. The local CLI wrapper is for local infrastructure; do not assume it has hosted login credentials.
 7. Configure Internet access for the specific project API hostname (or configured custom domain), and for Google destinations only if OAuth is enabled. No project hostname can be inferred yet; preserve existing allowlist entries when adding it.
 8. Restart/rebuild the app after changes to the public URL/key. Production builds inline `NEXT_PUBLIC_` values. Run the two-account manual checklist below before claiming hosted auth readiness.
 
@@ -65,3 +66,9 @@ For a hosted project, repeat the flow with two real accounts in separate browser
 - Version-matched Next.js authentication, cookies, and proxy docs bundled in `node_modules/next/dist/docs/`.
 
 The public Supabase docs host returned 403 in this cloud environment; SSR guidance was read from the official Supabase repository's documentation source instead.
+
+## Hosted access status
+
+Latest recheck: `SUPABASE_ACCESS_TOKEN` is absent from the running machine; the saved secure requirement has `has_saved_binding=false`; CLI `projects list` reports a missing token. The requirement is scoped to `api.supabase.com`. Enter the personal access token securely in environment settings, review/save the draft and publish the environment as appropriate; never paste token values in chat. A draft requirement does not supply a credential or create a project. Hosted project creation/configuration is authorized; no hosted project, migration or billing resource has been changed. Phase 4 proceeds locally under the owner's latest continuation instruction.
+
+Local Phase 4 checks passed for skill selection ownership/counts/duplicates, unknown IDs and atomic rollback, concurrent replacements, explained matching/self exclusion, validated cursors/pagination, and mobile skill save→reload→discovery→member profile. Apply both migrations to the authorized hosted project once access is available, then separately verify hosted RLS and email delivery.

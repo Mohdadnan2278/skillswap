@@ -1,10 +1,10 @@
 # UI plan
 
-Phase 3 implements `/`, `/signup`, `/login`, auth callbacks, `/onboarding`, `/dashboard`, and `/profile`. Profile skill editing and all other screens are planned. One mobile-first visual system continues Phase 1's emerald, off-white, rounded-card palette. Use system fonts, readable contrast, semantic headings, visible keyboard focus, explicit labels, and touch targets of at least 44px.
+Phase 3 implements `/`, `/signup`, `/login`, auth callbacks, `/onboarding`, `/dashboard`, and `/profile`. Phase 4 implements profile skill editing, `/discover`, and `/people/[id]`. Booking/wallet/video/community screens remain planned. One mobile-first visual system continues Phase 1's emerald, off-white, rounded-card palette. Use system fonts, readable contrast, semantic headings, visible keyboard focus, explicit labels, and touch targets of at least 44px.
 
 ## Navigation and screen map
 
-Phase 3 navigation contains Dashboard, Profile and Sign out; future sections are not dead links. The device timezone is selected explicitly with “Use my device timezone” during onboarding, otherwise UTC is the default. Desktop: compact header and primary navigation. Mobile: a five-item navigation for Home, Discover, Bookings, Wallet, and Community; Profile available from the account menu. Navigation avoids covering page content and accounts for device safe areas. Meeting mode uses its own controls instead of the main navigation.
+Current navigation contains Dashboard, Profile, Discover and Sign out; future sections are not dead links. The device timezone is selected explicitly with “Use my device timezone” during onboarding, otherwise UTC is the default. Desktop: compact header and primary navigation. Future mobile plan: a five-item navigation for Home, Discover, Bookings, Wallet, and Community; Profile available from the account menu. Navigation avoids covering page content and accounts for device safe areas. Meeting mode uses its own controls instead of the main navigation.
 
 | Route | Screen and primary interaction | Important states |
 | --- | --- | --- |
@@ -12,10 +12,10 @@ Phase 3 navigation contains Dashboard, Profile and Sign out; future sections are
 | `/signup`, `/login` | Email/password forms; optional configured Google button | Validation, submitting, invalid credentials, email verification required, expired auth link |
 | `/auth/callback` | Server identity redirect handler, no feature screen | Allowlisted redirect, provider error, return to login |
 | `/onboarding` | Display name, short bio, college, timezone | Save progress; required-name error; successful redirect to dashboard |
-| `/dashboard` | Next session, incoming requests, wanted skills, available/reserved credits | New account guidance, no sessions, partial data failure |
+| `/dashboard` | Implemented introduction and discovery link; later sessions/credits | New account guidance, no sessions, partial data failure |
 | `/profile` | Edit own profile and offered/wanted catalogue selections | Independent save feedback, no selected skills, loading catalogue |
 | `/discover` | People offering wanted skills; skill filter; each card says why matched | No wanted skills → profile link; no matches; loading; retry |
-| `/people/[id]` | Safe public profile, offered skills, reputation and request action | Missing profile; own profile → edit; no private email/wallet |
+| `/people/[id]` | Implemented safe public profile and offered skills; ratings and requests deferred | Missing profile; own profile → edit; no private email/wallet |
 | `/bookings` | Upcoming, incoming, history filters | No bookings, pending request deadline, local timezone, failures |
 | `/bookings/[id]` | Participants, skill, schedule, cost, state; permitted actions only | State changed elsewhere; first completion awaiting other; disputed funds held; terminal read-only |
 | `/bookings/[id]/meeting` | Pre-join device check, private call, leave/rejoin | Unsupported device, denied permission, too early, cancelled booking, expired token, disconnect/reconnect |
@@ -47,3 +47,9 @@ Meeting: request device permission after user intent, show camera preview and de
 ## Later validation
 
 Check widths 360/390/768/1280px, no horizontal scroll, keyboard navigation and zoom, form errors, and empty/loading states. Complete Phase 9 on two physical smartphones over HTTPS, including camera/microphone permissions and recovery. The local Phase 3 Chromium test passed at 390×844 through signup, email verification, onboarding, editing, logout, and login; dashboard overflow was checked. Broader widths/accessibility/device testing and future screens remain unverified.
+
+## Phase 4 evidence
+
+Skill editing uses separate offered/wanted checkbox fieldsets, category labels and counts, max-20 selection guards, independent saving/error feedback and preserved choices on connection failure. Discovery has wanted-skill filtering, a reset action for invalid links, empty-state profile guidance, explained cards and next-page navigation. Member pages expose name/bio/college/enabled offered skills, redirect self to editing, and return 404 for missing IDs. They show no fake rating or booking action.
+
+Chromium at 390×844 verified selection save/reload, discovery filtering, match explanation, safe member navigation and no horizontal overflow on discovery/member pages. Physical phones and hosted HTTPS remain unverified.
