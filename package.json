@@ -22,7 +22,9 @@
     "env:hosted": "node scripts/environment.mjs hosted",
     "hosted:check": "node --use-env-proxy scripts/hosted-supabase.mjs check",
     "hosted:migrate": "node --use-env-proxy scripts/hosted-supabase.mjs migrate",
-    "hosted:configure": "node --use-env-proxy scripts/hosted-supabase.mjs configure"
+    "hosted:configure": "node --use-env-proxy scripts/hosted-supabase.mjs configure",
+    "demo:check": "node --use-env-proxy scripts/demo-readiness.mjs",
+    "test:demo": "playwright test demo-workflow.spec.ts"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",

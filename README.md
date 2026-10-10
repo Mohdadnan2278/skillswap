@@ -26,7 +26,7 @@ If Docker is unavailable, the landing and auth setup notice still render; use [h
 ```sh
 npm test                 # Validation/config boundary unit tests
 npm run check            # ESLint, Next route types, TypeScript, production build
-npm run test:integration  # Real local Auth/PostgreSQL/API tests; no browser needed
+npm run test:integration  # Real local Auth/PostgreSQL and feature/mobile checks
 npm run test:e2e          # Includes the mobile Chromium workflow
 ```
 
@@ -60,7 +60,7 @@ See [Supabase setup](docs/SUPABASE_SETUP.md), [MVP specification](PROJECT_SPEC.m
 
 ## Hosting
 
-Vercel is the planned host; use the Next.js preset and repository root. Configure the hosted Supabase URL/public key and HTTPS `SITE_URL` before building. Hosted project **SkillSwap** (`avunxagyeywvfjhhowqk`, Mumbai) is created on the organization’s free plan and all migrations through Phase 7 are applied. A separate pre-existing project was not changed. Email confirmation is required; the default hosted template uses the existing PKCE callback. Custom SMTP is still needed for reliable student signup delivery. Google OAuth, physical-phone calls and deployment have not been verified. Deployment needs separate authorization. No paid resources have been created.
+Vercel is the planned host; use the Next.js preset and repository root. Configure the hosted Supabase URL/public key and HTTPS `SITE_URL` before building. Hosted project **SkillSwap** (`avunxagyeywvfjhhowqk`, Mumbai) is created on the organization’s free plan and all 10 migrations through Phase 8 are applied. A separate pre-existing project was not changed. Email confirmation is required; the default hosted template uses the existing PKCE callback. Custom SMTP is still needed for reliable student signup delivery. Google OAuth, physical-phone calls and deployment have not been verified. Deployment needs separate authorization. No paid resources have been created.
 
 ## Scheduling and credits
 
@@ -101,4 +101,15 @@ For an accepted funded booking, the teacher can paste a standard `https://meet.g
 
 After both participants complete and settle a session, each can publish one immutable 1–5 star review of the other with an optional comment of at most 500 characters. Names, ratings and plain-text comments are visible to signed-in members. Profile/discovery scores use the server’s average and count; unrated members show no score. **Community** ranks members with at least 3 received ratings by average, count and stable user-ID ties. Scores never grant or spend credits. Feedback supports safe idempotent retries and paginated received reviews.
 
-Phase 9 remains the integration/deployment phase. Hosted email delivery, actual Google Meet/Jitsi calls, physical-phone HTTPS checks and deployment are still outstanding.
+Phase 9 adds a single two-account browser journey, Vercel configuration, a read-only deployment readiness command and the [classroom demonstration checklist](docs/CLASSROOM_DEMO.md). Hosted email delivery, actual Google Meet/Jitsi calls, physical-phone HTTPS checks and authorized deployment are still outstanding.
+
+## Phase 9 verification and hosting preparation
+
+See [deployment instructions](docs/DEPLOYMENT.md) and the [two-phone demonstration checklist](docs/CLASSROOM_DEMO.md). `main` includes the merged Phase 8 application. The additional Phase 9 preparation is on `phase-9-demo-readiness`; use that branch or an explicitly approved merge for these release checks.
+
+```sh
+npm run demo:check       # Read-only hosted configuration report; exits 1 for blockers
+PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:demo
+```
+
+The integrated journey uses two independently confirmed local accounts, responsive browser screens, real reservations/ledger settlement and feedback. Timing and Jitsi SDK fixtures are clearly identified tests, not a live call or accelerated hosted mode. The readiness command checks the hosted project, migration/RLS/Auth settings and SMTP metadata without exposing credentials or making changes. A passing configuration report does not prove email delivery, deployment or live media. `vercel.json` and `.vercelignore` prepare the dynamic Next.js app for an explicitly authorized Vercel deployment and exclude private local files. No deployment has been performed.
