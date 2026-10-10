@@ -2,13 +2,14 @@ import "server-only";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database, BookingRow, Json } from "@/backend/supabase/database.types";
-import type { Booking, CreateBookingRequest, ErrorCode, Page } from "@/shared/contracts";
+import type { Booking, CreateBookingRequest, ErrorCode, Page, BookingAction } from "@/shared/contracts";
 import { HttpError } from "@/backend/http";
 import { utcInstantSchema } from "@/shared/validation";
 type Client = SupabaseClient<Database>;
 export type BookingQuery = { limit: number; cursor?: string; state?: string; role?: string };
 const messages: Partial<Record<ErrorCode,string>> = {
  VALIDATION_ERROR: "Choose an offered skill, 30/60/90 minutes, and a start between 15 minutes and 30 days ahead.",
+ INSUFFICIENT_CREDITS: "You do not have enough available credits for this session. Check your wallet or choose a shorter duration.",
  SCHEDULE_CONFLICT: "One of you already has a request or session at that time. Choose another time.",
  IDEMPOTENCY_CONFLICT: "This request key was already used for different details. Start a new request.",
  NOT_FOUND: "Booking or member not found.", FORBIDDEN: "Only the teacher can accept or reject this request.",
@@ -18,7 +19,7 @@ function outcome(data: Json | null, error: { code?: string } | null) {
  if (error?.code === "42501") throw new HttpError(403,"FORBIDDEN","A verified account is required.");
  if (error?.code === "P0001") throw new HttpError(403,"PROFILE_INCOMPLETE","Finish your profile before booking.");
  if (error || !data || typeof data !== "object" || Array.isArray(data)) throw new HttpError(503,"DATABASE_UNAVAILABLE","Booking storage is unavailable. Please try again.");
- const result = data as { error?: ErrorCode; booking?: BookingRow; items?: BookingRow[]; allowed_actions?: ("accept"|"reject"|"cancel")[] };
+ const result = data as { error?: ErrorCode; booking?: BookingRow; items?: BookingRow[]; allowed_actions?: BookingAction[]; can_resolve_complete?: boolean };
  if (result.error) {
   const code=result.error;
   const status=code === "NOT_FOUND" ? 404 : code === "FORBIDDEN" ? 403 : code === "VALIDATION_ERROR" ? 400 : 409;
@@ -30,7 +31,7 @@ export function bookingDto(row: BookingRow): Booking {
  return { id: row.id,teacherId: row.teacher_id,learnerId: row.learner_id,skillId: row.skill_id,
   startsAt: new Date(row.starts_at).toISOString(),endsAt: new Date(row.ends_at).toISOString(),durationMinutes: row.duration_minutes,
   costUnits: row.cost_units,state: row.state,requestExpiresAt: new Date(row.request_expires_at).toISOString(),
-  creditReservationStatus: row.credit_reservation_status,teacherConfirmed: false,learnerConfirmed: false,dispute: null,
+  creditReservationStatus: row.credit_reservation_status,teacherConfirmed: row.teacher_confirmed ?? false,learnerConfirmed: row.learner_confirmed ?? false,dispute: row.dispute ? {...row.dispute,openedAt:new Date(row.dispute.openedAt).toISOString(),resolvedAt:row.dispute.resolvedAt?new Date(row.dispute.resolvedAt).toISOString():null} : null,
   createdAt: new Date(row.created_at).toISOString(),updatedAt: new Date(row.updated_at).toISOString() };
 }
 export async function createBooking(client: Client,fields: CreateBookingRequest,key: string) {
@@ -63,5 +64,10 @@ export async function listBookings(client: Client,userId: string,query: BookingQ
 export async function bookingView(client: Client,id: string) {
  const {data,error}=await client.rpc("read_my_bookings",{p_id:id});
  const result=outcome(data,error);if(!result.booking)throw new Error("Missing booking result");
- return { booking: bookingDto(result.booking), actions: result.allowed_actions??[] };
+ return { booking: bookingDto(result.booking), actions: result.allowed_actions??[], canResolveComplete: result.can_resolve_complete??false };
+}
+
+export async function financialBookingAction(client: Client,id: string,action: string,key: string,fields: {reason?: string;resolution?: string}) {
+ const {data,error}=await client.rpc("booking_financial_action",{p_booking_id:id,p_action:action,p_key:key,...(fields.reason?{p_reason:fields.reason}:{}),...(fields.resolution?{p_resolution:fields.resolution}:{})});
+ const result=outcome(data,error);if(!result.booking)throw new Error("Missing booking result");return bookingDto(result.booking);
 }

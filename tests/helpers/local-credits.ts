@@ -1,0 +1,4 @@
+import {execFileSync} from 'node:child_process';
+import {supabaseUrl} from './local-auth';
+export function localSql(sql:string){if(!['127.0.0.1','localhost'].includes(new URL(supabaseUrl).hostname))throw Error('Local fixtures only');return execFileSync('docker',['exec','-i','supabase_db_skillswap','psql','-U','postgres','-d','postgres','-v','ON_ERROR_STOP=1','-Atq'],{input:sql,encoding:'utf8',stdio:['pipe','pipe','pipe']}).trim();}
+export function endedFixture(id:string){if(!/^[0-9a-f-]{36}$/.test(id))throw Error('Invalid fixture');localSql(`begin; update public.bookings set starts_at=now()-make_interval(mins=>duration_minutes+1),ends_at=now()-interval '1 minute',request_expires_at=now()-make_interval(mins=>duration_minutes+1) where id='${id}'; update private.booking_occupancy o set during=tstzrange(b.starts_at,b.ends_at,'[)') from public.bookings b where b.id=o.booking_id and b.id='${id}'; commit;`);}

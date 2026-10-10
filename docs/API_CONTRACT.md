@@ -1,6 +1,6 @@
 # API contract and future design
 
-Phase 3 implements the auth endpoints below and `GET /api/v1/me`, `PATCH /api/v1/me/profile`, and `GET /api/v1/profiles/:userId`. Phase 4 also implements `GET /skills`, `GET/PUT /me/skills`, and `GET /discover` under `/api/v1`. Phase 5 implements booking creation, list/detail and accept/reject/cancel endpoints. Wallet/video/feedback/community and confirm/dispute/resolve remain planned. Runtime auth/profile/skills/booking/query schemas live in `src/shared/validation.ts`; later DTOs remain design contracts. Business rules reference the adopted MVP defaults in `PROJECT_SPEC.md`.
+Phase 3 implements the auth endpoints below and `GET /api/v1/me`, `PATCH /api/v1/me/profile`, and `GET /api/v1/profiles/:userId`. Phase 4 also implements `GET /skills`, `GET/PUT /me/skills`, and `GET /discover` under `/api/v1`. Phase 5 implements booking creation, list/detail and accept/reject/cancel endpoints. Phase 6 implements wallet reads and confirm/dispute/resolve. Video/feedback/community remain planned. Runtime auth/profile/skills/booking/query schemas live in `src/shared/validation.ts`; later DTOs remain design contracts. Business rules reference the adopted MVP defaults in `PROJECT_SPEC.md`.
 
 ## Conventions
 
@@ -58,7 +58,7 @@ Profile validation: display name 2–60 characters, bio 0–500, college 0–120
 
 | Method/path | Request | Response data / actor |
 | --- | --- | --- |
-| POST `/bookings` | `CreateBookingRequest`: `{ teacherId, skillId, startsAt, durationMinutes }` | 201 `Booking`; actor is learner; implemented time/offering/occupancy checks; financial reservation deferred to Phase 6 |
+| POST `/bookings` | `CreateBookingRequest`: `{ teacherId, skillId, startsAt, durationMinutes }` | 201 `Booking`; actor is learner; implemented time/offering/occupancy checks; atomic available-credit check and funded reservation |
 | GET `/bookings` | Pagination; optional `state`, `role: teacher|learner` | `Page<Booking>`; participant only; expire actor's overdue pending requests first |
 | GET `/bookings/:id` | None | `Booking`; participants only; expire if overdue first |
 | POST `/bookings/:id/accept` | `{}` | `Booking`; teacher; pending/unexpired, before start |
@@ -122,3 +122,18 @@ Bookings are readable only by participants. List/detail RPCs expire the caller's
 Successful request/mutation replays return the original snapshot; clients refresh after actions. Creation key reuse with changed fields returns 409 `IDEMPOTENCY_CONFLICT`. New-key duplicate accept or terminal mutations return 409 `INVALID_STATE`. Expired pending actions return 409 `REQUEST_EXPIRED` after committed cleanup; later reads see expired and the time is free. UI actions are derived from database time, but mutation guards independently recheck eligibility.
 
 The preview has no financial reservation or settlement. `teacherConfirmed=false`, `learnerConfirmed=false`, `dispute=null` describe features not yet implemented. Completion/dispute/resolve and meeting routes are unavailable, not simulated. Historical preview bookings must not be financially completed when Phase 6 arrives.
+
+## Implemented Phase 6 credit workflow
+
+All endpoints require a verified, onboarded session. Mutations require same-origin requests and a UUID `Idempotency-Key`; bodies are strict and reject actor, amount and state injection. Successful replays return their original snapshot; clients refresh authoritative detail afterward. Reusing a key with changed data yields 409 `IDEMPOTENCY_CONFLICT`.
+
+| Endpoint | Body/query | Result |
+| --- | --- | --- |
+| GET `/api/v1/me/wallet` | none | settledUnits, reservedUnits, availableUnits (60 units = 1 credit) |
+| GET `/api/v1/me/wallet/transactions` | limit 1–50, scoped cursor | Own ledger history newest first |
+| GET `/api/v1/me/wallet/reservations` | limit 1–50, scoped cursor | Own active learner holds with booking state |
+| POST `/api/v1/bookings/:id/confirm` | `{}` | Accepted funded booking, after scheduled end; second confirmation settles once |
+| POST `/api/v1/bookings/:id/dispute` | `{reason}` trimmed 10–500 characters | Accepted funded booking after start; holds credits |
+| POST `/api/v1/bookings/:id/resolve` | `{resolution: "complete" or "cancel"}` | Own replaceable vote; two matching votes settle/release |
+
+New requests return `creditReservationStatus: held`; terminal releases return `released`, completed transfers `settled`. Insufficient availability returns 409 `INSUFFICIENT_CREDITS`. Confirmation flags and dispute votes reflect stored rows. Completing a dispute requires the scheduled end to have passed. A single confirmation, differing votes, or call ending cannot transfer credits. Preview bookings remain unfunded and financial actions return 409 `INVALID_STATE`. Wallet cursors preserve PostgreSQL microseconds and are scoped to actor and history type. Reads perform scoped pending expiry; there is no unauthenticated expiry endpoint or automatic dispute timeout. Earlier Phase 5 descriptions above record behavior at that phase.

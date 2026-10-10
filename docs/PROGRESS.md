@@ -44,17 +44,18 @@ Credit boundary: all bookings are explicitly `not_integrated`; only time is rese
 
 Verified: 22 unit tests and all 8 local integration/browser regression tests passed. Booking coverage includes actor/RLS/role checks, replay/conflicting keys, time/duration/input rules, both-role and concurrent overlaps, adjacent intervals, terminal release, offering changes, exact 24-hour expiry, persisted expired actions and started-session cancellation denial. Mobile review/edit/submit, Kolkata-vs-UTC participant displays, accept/cancel/list filters and overflow checks passed. Final lint, type generation, TypeScript and production build passed. Production anonymous booking reads returned 401, protected screens redirected to login, homepage returned 200 and unknown route 404. Reapplying migrations made no changes. Direct privilege checks confirmed anonymous booking read/RPC denial and member direct-write/private-expiry denial.
 
-## Next: Phase 6 — Credits and completion
+## Phase 6 — Credits and completion
 
-Await owner instruction. Integrate starter issuance, wallet, reservations/releases, ledger, two-party confirmation/transfer and disputes atomically. Preserve final MVP rules and the preview-booking boundary. Hosted setup can resume when secure account access reaches this workspace. Paid resources and deployment remain unauthorized.
+Implemented one-time 3-credit issuance for verified onboarding (including eligible existing members), private wallet/history and active reservations, atomic funded booking creation/releases, append-only balanced ledger pairs, exact bigint boundaries, two-party after-end completion and mutual dispute votes. New requests reserve the session cost; rejection, cancellation before start and pending expiry release it. A single confirmation transfers nothing. Both participants must agree to complete or cancel a dispute, and disagreeing votes retain funds indefinitely. Historical preview bookings remain unfunded and cannot settle. No extra demo credits are minted.
 
-## Later phases
+Added responsive wallet and completion/dispute controls, credit-aware request review and actionable insufficient-credit messages. Server input/actor/amount guards, RLS, durable idempotency, unique financial events and deferred wallet/reservation/ledger reconciliation protect transactions. Shared schema/DTOs, runtime validators and the integration script were updated without adding dependencies. Database migration is applied only locally; hosted credentials are still absent.
 
-6. Credits and completion
-7. Private video
-8. Feedback and reputation
-9. Integration, authorized deployment, and smartphone demo
+Verified: 24 unit tests and all 11 real-local integration/mobile tests passed, including earlier phase regressions. Coverage includes one-time issuance, concurrent spending, exact refunds and expiry, owner RLS/direct-write denial, immutable ledger and deferred reconciliation, duplicate final confirmations, single transfer, after-end guards, changed/mismatched dispute votes, mutual cancellation, scoped history/hold pagination and legacy funding rejection. Mobile wallets show real reservations and separate participant completion with correct balances and no overflow. Lint, route types, TypeScript, production build and anonymous production wallet/redirect smoke checks passed. Reapplying migrations made no changes. Final migration sources also applied successfully to a temporary empty PostgreSQL database with minimal Auth/schema stubs; this checks migration ordering and SQL, while the integration suite checks real Supabase Auth. The temporary database was removed. Local timing fixtures advance deadlines/end times explicitly; they do not represent real elapsed sessions, physical-phone testing or a completed video demo. Funds use actual PostgreSQL transactions and normal starter grants.
+
+## Next: Phase 7 — Private video
+
+Await owner instruction. Video, feedback/reputation and deployment are not implemented. Hosted setup can resume when secure account access reaches this workspace. Paid resources and deployment remain unauthorized.
 
 ## Limitations
 
-Phase 3 auth/profile behavior is verified against local services; hosted readiness has not been established. Financial bookings, wallet/credit transfers, completion/disputes, video and feedback are unavailable. Matching and time-only scheduling are verified locally. No cloud database or hosting resources have been created.
+Phases 3–6 are checked against local services. Hosted setup, Google OAuth, production SMTP, physical-phone HTTPS testing and fresh-task restoration remain unverified. No hosted database or hosting resources have been created.

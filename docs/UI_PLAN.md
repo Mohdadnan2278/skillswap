@@ -1,6 +1,6 @@
 # UI plan
 
-Phase 3 implements `/`, `/signup`, `/login`, auth callbacks, `/onboarding`, `/dashboard`, and `/profile`. Phase 4 implements profile skill editing, `/discover`, and `/people/[id]`. Phase 5 implements `/people/[id]/request`, `/bookings` and `/bookings/[id]` as a scheduling preview. Wallet/video/community screens remain planned. One mobile-first visual system continues Phase 1's emerald, off-white, rounded-card palette. Use system fonts, readable contrast, semantic headings, visible keyboard focus, explicit labels, and touch targets of at least 44px.
+Phase 3 implements `/`, `/signup`, `/login`, auth callbacks, `/onboarding`, `/dashboard`, and `/profile`. Phase 4 implements profile skill editing, `/discover`, and `/people/[id]`. Phase 5 implements `/people/[id]/request`, `/bookings` and `/bookings/[id]` as a scheduling preview. Phase 6 implements `/wallet`, funded request review and completion/dispute controls. Video/community screens remain planned. One mobile-first visual system continues Phase 1's emerald, off-white, rounded-card palette. Use system fonts, readable contrast, semantic headings, visible keyboard focus, explicit labels, and touch targets of at least 44px.
 
 ## Navigation and screen map
 
@@ -60,3 +60,7 @@ Chromium at 390×844 verified selection save/reload, discovery filtering, match 
 Scheduling converts the saved IANA wall-clock time to UTC, rejects daylight-saving gaps/repeated times, reviews the exact start/teacher/skill/duration, and preserves details when returning to edit. All booking screens state that only time is reserved, with no credit reservation/transfer, video or completion. Request/action buttons retain idempotency keys across connection retries and refresh server state after mutations. Lists filter by role/state and page; detail shows the explicit viewer timezone and pending deadline. Teachers see accept/reject; participants see cancellation before start; server-derived actions hide ineligible controls.
 
 Mobile Chromium at 390×844 verifies review/edit persistence, UTC storage/Kolkata display, a separate teacher browser using UTC, acceptance, cancellation, filtered participant list and no detail/list horizontal overflow. Unit checks cover fractional-offset zones, date rollover and US daylight-saving ambiguity/gaps. Physical smartphones/HTTPS remain unverified.
+
+## Phase 6 mobile evidence
+
+390×844 Chromium checks exercise the 3-credit wallet, real 0.5-credit reservation, separate participant confirmations, history and updated balances without horizontal overflow. Pending holds and disputed funds are explicitly explained. Completion controls depend on server-derived actions; dispute completion votes stay disabled before end. Successful actions refresh authoritative state, while failed network requests retain the same idempotency key for safe retry. Local timestamp fixtures advance the test clock boundary explicitly; physical-phone/video testing remains pending.

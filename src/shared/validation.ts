@@ -35,3 +35,9 @@ export const bookingStateSchema = z.enum(["pending","accepted","rejected","cance
 export const bookingQuerySchema = catalogueQuerySchema.extend({ state: bookingStateSchema.optional(), role: z.enum(["teacher","learner"]).optional() });
 export const bookingActionSchema = z.enum(["accept","reject","cancel"]);
 export const idempotencyKeySchema = z.string().uuid("A valid Idempotency-Key header is required.");
+
+export const financialActionSchema = z.enum(["confirm","dispute","resolve"]);
+export const disputeSchema = z.object({ reason: z.string().trim().min(10).max(500) }).strict();
+export const resolutionSchema = z.object({ resolution: z.enum(["complete","cancel"]) }).strict();
+
+export const databaseInstantSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$/).refine(value=>!Number.isNaN(Date.parse(value)));
