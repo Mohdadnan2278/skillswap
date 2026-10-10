@@ -9,7 +9,7 @@ test('booking permissions, replay, role transitions, timing and transactional ex
   expect((await anon.get('/api/v1/bookings')).status()).toBe(401);
   const start=startsAfter(120);const key=randomUUID();
   const response=await requestBooking(alice,b.id,start,30,key);expect(response.status()).toBe(201);
-  const booking=(await response.json()).data;expect(booking.state).toBe('pending');expect(booking.creditReservationStatus).toBe('not_integrated');expect(booking.costUnits).toBe(30);expect(booking.learnerId).toBe(a.id);
+  const booking=(await response.json()).data;expect(booking.state).toBe('pending');expect(booking.creditReservationStatus).toBe('held');expect(booking.costUnits).toBe(30);expect(booking.learnerId).toBe(a.id);
   expect(Date.parse(booking.endsAt)-Date.parse(booking.startsAt)).toBe(30*60000);
   expect(booking.requestExpiresAt).toBe(start);
   expect((await (await requestBooking(alice,b.id,start,30,key)).json()).data).toEqual(booking);
@@ -40,7 +40,7 @@ test('booking permissions, replay, role transitions, timing and transactional ex
   expect((await alice.post('/api/v1/bookings',{headers:{origin},data:body})).status()).toBe(400);
   expect((await alice.post('/api/v1/bookings',{headers:{origin:'https://other.example','Idempotency-Key':randomUUID()},data:body})).status()).toBe(403);
   expect((await alice.post(`/api/v1/bookings/${nextId}/cancel`,{headers:{origin,'Idempotency-Key':randomUUID()},data:{teacherId:c.id}})).status()).toBe(400);
-  expect((await bookingAction(bob,nextId,'confirm')).status()).toBe(404);
+  expect((await bookingAction(bob,nextId,'confirm')).status()).toBe(409);
   const expiry=await requestBooking(alice,b.id,startsAfter(420));expect(expiry.status()).toBe(201);const expiryId=(await expiry.json()).data.id;
   deadlineFixture(expiryId);
   expect((await bookingAction(bob,expiryId,'accept')).status()).toBe(409);
@@ -50,6 +50,7 @@ test('booking permissions, replay, role transitions, timing and transactional ex
    const result=await requestBooking(alice,b.id,startsAfter(48*60+duration*2),duration);expect(result.status()).toBe(201);
    const row=(await result.json()).data;expect(row.costUnits).toBe(duration);expect(Date.parse(row.endsAt)-Date.parse(row.startsAt)).toBe(duration*60000);
    expect(Date.parse(row.requestExpiresAt)-Date.parse(row.createdAt)).toBe(24*60*60000);
+   expect((await bookingAction(alice,row.id,'cancel')).status()).toBe(200);
   }
   const list=(await (await alice.get('/api/v1/bookings?limit=1&role=learner')).json()).data;
   expect(list.items).toHaveLength(1);expect(list.nextCursor).toBeTruthy();
