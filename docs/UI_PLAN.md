@@ -68,3 +68,9 @@ Mobile Chromium at 390×844 verifies review/edit persistence, UTC storage/Kolkat
 ## Phase 7 classroom demo UI
 
 The meeting page shows schedule/timezone, device check/stop controls, camera/microphone toggles, permission and connection errors, embedded Jitsi, leave/rejoin and a new-tab fallback for provider authentication. Public-room access limits and first-host sign-in are visible before joining. SkillSwap checks grants and polls booking eligibility; leaving transfers nothing. Timers end the app’s embedded view, not an independently opened public room. Live Jitsi media and physical phones remain separate manual validation.
+
+## Phase 8 screens
+
+Accepted booking pages let the teacher add/remove a Google Meet link. Meeting pages present Google Meet and Jitsi alternatives with external-link limits; Meet requires a fresh join-window check before exposing its new-tab link. Google handles devices and admission.
+
+Completed settled bookings show a single rating/comment publication form, visibility/immutability notice, safe retry, pending/error/success feedback, and the persisted review after refresh. Member pages show received comments as escaped plain text with pagination and reviewer names. Own profile and discovery cards show average/count or “No ratings yet”. Community has responsive ranked cards, the ≥3-rating explanation, no-qualifiers state and bounded next-page links. Parent member loading/error boundaries apply; invalid page/query links offer a first-page reset. Credits and reputation remain separate.

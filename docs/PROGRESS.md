@@ -66,8 +66,24 @@ The initial Phase 7 provider schema had already been applied before the owner se
 
 ## Next: Phase 8 — Feedback and reputation
 
-Await owner instruction. Build completed-session feedback and server-computed reputation; do not start deployment without separate authorization. Full private video needs a later server/provider configuration decision.
+The owner authorized both video options, active Daily cleanup and continuation to Phase 8. Implementation and checks are recorded below. Full private video requires a later server/provider configuration decision.
 
 ## Limitations
 
 Hosted account signup/delivery is not end-to-end verified and still subject to default SMTP restrictions. The app is not deployed; its workspace Auth origin must become the eventual HTTPS app origin before phone use. Google OAuth, physical-phone Jitsi, public-provider sign-in and future-task restoration remain unverified. The Jitsi integration is explicitly a public classroom demo. No paid resources were created.
+
+## Phase 8 — Feedback, reputation and both demo video options
+
+Implemented teacher-managed Google Meet links alongside the existing Jitsi demo. Accepted funded participants can prepare Google Meet during the app join window; the teacher alone can add/replace/remove a canonical HTTPS Meet URL. Private link storage and restricted RPCs serialize against booking transitions. Meet opens in a protected new tab and Google manages admission/devices; no provider key, server, embedding, automatic creation or Google OAuth integration is needed. Both external link limitations and unchanged completion/credit rules are visible.
+
+Implemented one immutable 1–5 star review per completed settled booking participant, optional trimmed plain-text comment ≤500, server-derived review target, natural uniqueness and atomic idempotent retries. Direct member review/score writes are denied and the trigger independently guards eligibility and immutability. Published reviews are readable by signed-in members. A security-invoker aggregate view supplies real profile/discovery average/count; the community leaderboard requires three ratings and uses average/count/UUID ordering, exact database cursor values, bounded pagination and accessible mobile empty/error/publication states. Backend/frontend/shared files follow the existing project structure. No new dependency was added.
+
+Applied all three new migrations to local and authorized hosted Supabase (10 total); repeated hosted migration applies zero changes. Preserved applied historical provider migrations. Active source/dependencies contain no Daily integration; the obsolete cloud `DAILY_API_KEY` requirement and `api.daily.co` rule remain UI cleanup because the draft tool cannot delete requirements. Original prompt and all environment/management files remain Git-ignored.
+
+Verified: 24 unit tests; all 16 distinct integration/mobile Chromium cases pass. The full regression run passed 15 cases and found an unrated-label punctuation regression; restoring the original sentence and rerunning the three affected mobile/video cases passed. An earlier rating-label timeout was corrected by separating the label from its select options. Reviews were tested before acceptance, before completion, after one confirmation, after cancellation, under concurrent same/new-key attempts, and against foreign origins, forged targets/scores, invalid inputs, direct writes and anonymous reads. Tests verify average/count/threshold/ties, scoped precision-preserving pagination, wallet independence, persistence and escaped comment text. Google Meet checks validate URLs, private storage, teacher/participant/window rules, removal, new-tab attributes and continued Jitsi availability. Local end-time fixtures are explicitly tests and do not claim a real elapsed class.
+
+Final lint, route types, TypeScript and production build passed. Hosted Auth settings returned 200; anonymous hosted feedback/reputation reads and leaderboard/Meet RPCs returned 401. Hosted-configured production smoke checks returned home/login 200, protected community redirect and anonymous leaderboard/Meet/reviews 401. No hosted test accounts, synthetic balances, deployment or paid resources were created. Actual Google Meet/Jitsi media calls, physical phones over HTTPS, Google OAuth and hosted student-email delivery remain unverified; SMTP configuration is still required for wider student signup.
+
+## Next phase — 9
+
+Await owner instruction for final integration and classroom demo preparation. Deployment needs separate authorization and an actual HTTPS app origin; SMTP and real-phone/provider checks remain external prerequisites.

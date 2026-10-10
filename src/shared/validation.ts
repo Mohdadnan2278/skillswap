@@ -41,3 +41,7 @@ export const disputeSchema = z.object({ reason: z.string().trim().min(10).max(50
 export const resolutionSchema = z.object({ resolution: z.enum(["complete","cancel"]) }).strict();
 
 export const databaseInstantSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$/).refine(value=>!Number.isNaN(Date.parse(value)));
+
+export const googleMeetUrlSchema = z.string().length(36).regex(/^https:\/\/meet\.google\.com\/[a-z]{3}-[a-z]{4}-[a-z]{3}$/, "Use a Google Meet link like https://meet.google.com/abc-defg-hij without extra parameters.");
+export const googleMeetLinkSchema = z.object({url: googleMeetUrlSchema.nullable()}).strict();
+export const feedbackSchema = z.object({rating:z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4),z.literal(5)]),comment:z.string().trim().max(500).default('')}).strict();
