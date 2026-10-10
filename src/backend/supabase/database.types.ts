@@ -1,4 +1,4 @@
-/** Phase 3–7 schema types, aligned to the versioned migrations.
+/** Phase 3–8 schema types, aligned to the versioned migrations.
  * Regenerate using Supabase gen types after authorized migration changes.
  */
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
@@ -13,6 +13,7 @@ export type BookingRow = {
 export interface Database {
   public: {
     Tables: {
+      feedback: {Row:{id:string;booking_id:string;reviewer_id:string;reviewee_id:string;rating:number;comment:string;created_at:string};Insert:{booking_id:string;reviewer_id:string;reviewee_id:string;rating:number;comment?:string};Update:{rating?:number;comment?:string};Relationships:[]};
       wallets: { Row: { user_id: string; settled_units: number; reserved_units: number }; Insert: { user_id: string; settled_units?: number; reserved_units?: number }; Update: { settled_units?: number; reserved_units?: number }; Relationships: [] };
       reservations: { Row: { booking_id: string; learner_id: string; units: number; status: string; created_at: string; updated_at: string }; Insert: { booking_id: string; learner_id: string; units: number; status: string }; Update: { status?: string }; Relationships: [] };
       ledger_entries: { Row: { id: string; event_id: string; user_id: string | null; delta_units: number; created_at: string }; Insert: { event_id: string; user_id?: string; delta_units: number }; Update: { delta_units?: number }; Relationships: [] };
@@ -45,8 +46,11 @@ export interface Database {
         Relationships: [{ foreignKeyName: "account_preferences_user_id_fkey"; columns: ["user_id"]; isOneToOne: true; referencedRelation: "profiles"; referencedColumns: ["id"] }];
       };
     };
-    Views: { [_ in never]: never };
+    Views: {profile_reputation:{Row:{user_id:string;average_rating:number;rating_count:number};Relationships:[]}};
     Functions: {
+      create_feedback:{Args:{p_booking_id:string;p_rating:number;p_comment:string;p_key:string};Returns:Json};
+      community_leaderboard:{Args:{p_limit?:number;p_after_average?:number|string;p_after_count?:number;p_after_id?:string};Returns:{id:string;display_name:string;bio:string;college:string;average_rating:string;rating_count:number;rank:number}[]};
+      booking_meet_link: { Args: {p_booking_id:string;p_write?:boolean;p_url?:string|null;p_join?:boolean}; Returns:Json };
       meeting_access_context: { Args: { p_booking_id: string; p_consume?: boolean }; Returns: Json };
       booking_financial_action: { Args: { p_booking_id: string; p_action: string; p_key: string; p_reason?: string; p_resolution?: string }; Returns: Json };
       read_my_wallet: { Args: { p_kind?: string; p_limit?: number; p_after_created?: string; p_after_id?: string }; Returns: Json };

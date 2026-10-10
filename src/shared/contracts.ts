@@ -1,4 +1,4 @@
-/** Shared DTOs. Phase 3–7 auth/profile/skills/discovery/scheduling APIs are implemented; later contracts remain design-only.
+/** Shared DTOs. Phase 3–8 APIs are implemented.
  * These types do not validate runtime input or authorize database access.
  */
 export type UUID = string;

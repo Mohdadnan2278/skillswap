@@ -69,7 +69,7 @@ The public Supabase docs host returned 403 in this cloud environment; SSR guidan
 
 ## Hosted access status
 
-Latest recheck: `SUPABASE_ACCESS_TOKEN` is absent from the running machine; the saved secure requirement has `has_saved_binding=false`; CLI `projects list` reports a missing token. The requirement is scoped to `api.supabase.com`. Enter the personal access token securely in environment settings, review/save the draft and publish the environment as appropriate; never paste token values in chat. A draft requirement does not supply a credential or create a project. Hosted project creation/configuration is authorized; no hosted project, migration or billing resource has been changed. Phase 4 proceeds locally under the owner's latest continuation instruction.
+Historical Phase 4 check: `SUPABASE_ACCESS_TOKEN` is absent from the running machine; the saved secure requirement has `has_saved_binding=false`; CLI `projects list` reports a missing token. The requirement is scoped to `api.supabase.com`. Enter the personal access token securely in environment settings, review/save the draft and publish the environment as appropriate; never paste token values in chat. A draft requirement does not supply a credential or create a project. Hosted project creation/configuration is authorized; no hosted project, migration or billing resource has been changed. Phase 4 proceeds locally under the owner's latest continuation instruction.
 
 Local Phase 4 checks passed for skill selection ownership/counts/duplicates, unknown IDs and atomic rollback, concurrent replacements, explained matching/self exclusion, validated cursors/pagination, and mobile skill save→reload→discovery→member profile. Apply all versioned migrations to the authorized hosted project once access is available, then separately verify hosted RLS and email delivery.
 
@@ -90,3 +90,11 @@ Supabase account access is now verified. Created free-plan project `avunxagyeywv
 Hosted Auth requires confirmed email and uses the default PKCE confirmation/callback flow. The free default email provider rejects custom template changes; setup applies a custom template only when custom SMTP exists. Default SMTP delivery restrictions still apply. This workspace’s Auth origin is `http://127.0.0.1:3000`; update it to the eventual HTTPS application origin with `hosted:configure` before deployment. Do not fabricate a deployed URL. Native Node environment proxy support is enabled in dev/build/start and management scripts; preserve proxy/TLS settings.
 
 Public Jitsi demo mode needs no video secret. Remove any unused `DAILY_API_KEY` requirement from environment settings after the provider switch; the configuration tool can add requirements but cannot delete them. Review/save the startup/network draft and publish when ready. Publication/restoration and a real two-phone call are not implied by these local checks.
+
+## Phase 8 continuation
+
+Apply the three new migrations (Google Meet, feedback/reputation and actor qualification) through `hosted:migrate` under the owner’s existing hosted setup authorization. Local tests use only `.local/local.env`; active hosted configuration is preserved. Google Meet links need no environment variable, Google API key or OAuth setup. `VIDEO_PROVIDER=jitsi_demo` continues to enable the optional embedded Jitsi demo.
+
+No active Daily integration remains. Its original applied migration is preserved for database history. The environment draft tool cannot delete requirements: remove the obsolete video key requirement and its `api.daily.co` destination in environment settings. Neither video flow needs that key. Review/save/publish updates for the current branch snapshot.
+
+Current verification: all 10 migrations are applied locally and to hosted SkillSwap; repeated hosted migration applies zero changes. Hosted Auth settings return 200; anonymous feedback/reputation and new RPCs return 401. Complete signed-in workflows are verified locally, not against hosted email or real video media.

@@ -1,4 +1,5 @@
 import "server-only";
+import {reputations} from "@/backend/feedback/service";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/backend/supabase/database.types";
 import type { DiscoveryMatch, Page, Skill, SkillSelections } from "@/shared/contracts";
@@ -69,7 +70,8 @@ export async function discover(client: Client, userId: string, query: Query): Pr
   databaseError(error);
   if (!data) throw storageError();
   const rows = data.slice(0, query.limit);
-  const items = rows.map(row => ({ profile: { id: row.id, displayName: row.display_name, bio: row.bio, college: row.college, reputation: { averageRating: null, ratingCount: 0 } }, matchedSkills: z.array(skillSchema).parse(row.matched_skills) }));
+  const scores=await reputations(client,rows.map(row=>row.id));
+  const items = rows.map(row => ({ profile: { id: row.id, displayName: row.display_name, bio: row.bio, college: row.college, reputation: scores.get(row.id)??{averageRating:null,ratingCount:0} }, matchedSkills: z.array(skillSchema).parse(row.matched_skills) }));
   return { items, nextCursor: data.length > query.limit ? encodeCursor("discover", rows.at(-1)!.id, context) : null };
 }
 /** Reject repeated parameters rather than silently taking the last value. */

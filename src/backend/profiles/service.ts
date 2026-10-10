@@ -1,14 +1,14 @@
 import "server-only";
+import {reputations} from "@/backend/feedback/service";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import type { Database } from "@/backend/supabase/database.types";
 import type { CurrentUser, PublicProfile, UpdateProfileRequest } from "@/shared/contracts";
 import { HttpError } from "@/backend/http";
 
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
-export function publicProfile(row: ProfileRow): PublicProfile {
+export function publicProfile(row: ProfileRow, reputation: PublicProfile["reputation"]={averageRating:null,ratingCount:0}): PublicProfile {
   return { id: row.id, displayName: row.display_name, bio: row.bio, college: row.college,
-    // Phase 8 has not introduced ratings; null explicitly means no rating is available.
-    reputation: { averageRating: null, ratingCount: 0 } };
+    reputation };
 }
 export async function getCurrentUser(client: SupabaseClient<Database>, user: User): Promise<CurrentUser> {
   const [profile, preferences] = await Promise.all([
@@ -16,7 +16,8 @@ export async function getCurrentUser(client: SupabaseClient<Database>, user: Use
     client.from("account_preferences").select("timezone").eq("user_id", user.id).maybeSingle(),
   ]);
   if (profile.error || preferences.error) throw new HttpError(503, "DATABASE_UNAVAILABLE", "Profile storage is unavailable. Check the database migration or try again shortly.");
-  return { id: user.id, profile: profile.data ? publicProfile(profile.data) : null,
+  const scores=await reputations(client,profile.data?[user.id]:[]);
+  return { id: user.id, profile: profile.data ? publicProfile(profile.data,scores.get(user.id)) : null,
     timezone: preferences.data?.timezone ?? "UTC", emailVerified: Boolean(user.email_confirmed_at) };
 }
 export async function saveProfile(client: SupabaseClient<Database>, fields: UpdateProfileRequest) {
