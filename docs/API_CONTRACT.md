@@ -1,10 +1,10 @@
-# Planned API contract
+# API contract and future design
 
-Phase 2 design only. None of these feature endpoints exists. Types in `src/shared/contracts.ts` describe intended DTOs, not runtime validators or a deployed API. Business rules reference the adopted MVP defaults in `PROJECT_SPEC.md`.
+Phase 3 implements the auth endpoints below and `GET /api/v1/me`, `PATCH /api/v1/me/profile`, and `GET /api/v1/profiles/:userId`. All skills/booking/wallet/video/feedback/community endpoints remain planned. Runtime auth/profile schemas live in `src/shared/validation.ts`; other DTOs remain design contracts. Business rules reference the adopted MVP defaults in `PROJECT_SPEC.md`.
 
 ## Conventions
 
-Base path `/api/v1`. JSON request/response bodies; auth is a validated Supabase SSR session cookie, never a browser-supplied actor ID. All endpoints require authentication except auth provider flows; mutations require same-origin checks. Booking/meeting/financial actions also require verified email and completed onboarding. Return private responses with `Cache-Control: no-store` and do not log tokens.
+Profile and future business base path `/api/v1`; authentication paths are listed separately below. JSON request/response bodies; auth is a validated Supabase SSR session cookie, never a browser-supplied actor ID. Business/profile endpoints require authentication; auth entry points are public. Mutations require same-origin checks. Booking/meeting/financial actions also require verified email and completed onboarding. Return private responses with `Cache-Control: no-store` and do not log tokens.
 
 Successful responses: `{ "data": T }`; lists: `{ "data": { "items": T[], "nextCursor": string | null } }`. Errors: `{ "error": { "code": ErrorCode, "message": string, "fieldErrors"?: { "field": ["message"] } } }`. Create returns 201, reads/updates return 200; no JSON-less successes. ISO timestamps are UTC ending in `Z`. UUID IDs and integer minute units are server-validated. Unknown fields are rejected. Strings are trimmed, comments/bios treated as plain text, request body limit 16 KiB excluding future provider operations.
 
@@ -21,9 +21,23 @@ Paginated reads accept `limit` (default 20, maximum 50) and an opaque `cursor`. 
 | 502 | PROVIDER_UNAVAILABLE | Video/auth provider operation unavailable |
 | 500 | INTERNAL_ERROR | Generic message; private diagnostic logged without credentials |
 
-## Authentication — Phase 3
+## Authentication — implemented in Phase 3
 
-Use Supabase Auth through SSR helpers for signup, login, logout, and callback processing rather than inventing a password store. Forms invoke server actions with the same validation/error conventions: signup `{ email, password }` returns `{ verificationRequired: boolean }`; login `{ email, password }` returns `{ redirectTo }`; logout accepts no user ID. Provider email verification may mean no initial session exists. Validate password limits against configured Supabase policy; show generic invalid-login errors. Google OAuth is optional and appears only when configured. Phase 3 documents exact callbacks, origin/redirect allowlists, and session refresh handling using current official guidance.
+Auth uses Supabase SSR cookie helpers through Next.js route handlers. These public auth endpoints require configured Supabase/SITE_URL and same-origin JSON mutations; profile APIs independently validate authoritative identity with `getUser()` and verified email. `src/proxy.ts` uses `getClaims()` to refresh sessions and passes refreshed cookies/cache headers to the browser. No password store or trusted cookie-user authorization exists in the app.
+
+| Method/path | Request | Response data |
+| --- | --- | --- |
+| POST `/api/auth/signup` | `{ email, password }` | 201 `{ verificationRequired, redirectTo: string|null }`; new passwords 8–128 characters; confirm email when required |
+| POST `/api/auth/login` | `{ email, password }` | 200 `{ redirectTo: "/dashboard" }`; invalid credentials 401; unconfirmed email 403 |
+| POST `/api/auth/logout` | `{}` | 200 `{ redirectTo: "/login" }`; signs out this session locally, not every other device |
+| POST `/api/auth/resend` | `{ email }` | 200 `{ message }`; neutral confirmation response; provider throttling returns 429 |
+| POST `/api/auth/google` | `{}` | 200 `{ redirectTo }` Supabase OAuth URL; 403 when disabled; actual provider configuration unverified |
+| GET `/auth/callback` | `code`, optional `next` | PKCE exchange then 307 redirect; next allowlist: dashboard/profile/onboarding, default dashboard |
+| GET `/auth/confirm` | `token_hash`, `type=email|signup` | OTP verification then 307 dashboard redirect; rejects replay/invalid tokens with generic login notice |
+
+Callbacks reject unsupported/missing inputs, never echo tokens/provider errors, and redirect to the configured app origin. Auth mutation origins must match `SITE_URL` exactly. Mutations limit JSON to 16 KiB, reject unknown fields, and use Supabase's configured auth rate limits; 429 includes Retry-After. No custom distributed rate limiter is implemented. See `docs/SUPABASE_SETUP.md` for callbacks, template and optional OAuth configuration. Hosting must redact callback query strings from access logs; dev incoming request logs are disabled to avoid token logging.
+
+Extra implemented errors: 401 `INVALID_CREDENTIALS`; 503 `CONFIGURATION_REQUIRED` for missing/invalid app configuration; 503 `DATABASE_UNAVAILABLE` for missing/unavailable profile storage. Invalid provider keys/URL connectivity can still require operator diagnosis; presence alone is not readiness. The public profile `reputation` is null average/zero count until Phase 8 introduces feedback.
 
 ## Profiles and skills
 
@@ -91,4 +105,4 @@ Success data contains the server-created booking with `state: "pending"`, `costU
 
 ## Required implementation checks
 
-Phase 3: two accounts and expired/invalid identity; own versus other profile writes. Phase 4: catalogue constraints and deterministic matching. Phase 5: state matrix, both-role overlaps, half-open boundaries and concurrent requests. Phase 6: concurrent spending, repeat starter/completion, expiry/cancellation races and ledger conservation. Phase 7: participant-only tokens, expiry and smartphone permissions. Phase 8: ineligible/duplicate/self feedback and aggregate accuracy. These tests are planned, not executed in Phase 2.
+Phase 3 verified locally: two accounts, invalid/forged identity, confirmation replay, owner-only saves and direct-write denial. Hosted/Google checks remain unrun. Phase 4: catalogue constraints and deterministic matching. Phase 5: state matrix, both-role overlaps, half-open boundaries and concurrent requests. Phase 6: concurrent spending, repeat starter/completion, expiry/cancellation races and ledger conservation. Phase 7: participant-only tokens, expiry and smartphone permissions. Phase 8: ineligible/duplicate/self feedback and aggregate accuracy. These tests are planned, not executed in Phase 2.

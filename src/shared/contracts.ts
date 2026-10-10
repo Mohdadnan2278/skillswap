@@ -1,4 +1,4 @@
-/** Phase 2 design DTOs. No feature API exists yet; business defaults selected under owner delegation.
+/** Shared DTOs. Phase 3 auth/profile APIs are implemented; other contracts remain design-only.
  * These types do not validate runtime input or authorize database access.
  */
 export type UUID = string;
@@ -18,7 +18,8 @@ export type ErrorCode =
   | "EMAIL_UNVERIFIED" | "PROFILE_INCOMPLETE" | "NOT_FOUND"
   | "INVALID_STATE" | "SCHEDULE_CONFLICT" | "INSUFFICIENT_CREDITS"
   | "REQUEST_EXPIRED" | "ALREADY_REVIEWED" | "IDEMPOTENCY_CONFLICT"
-  | "RATE_LIMITED" | "PROVIDER_UNAVAILABLE" | "INTERNAL_ERROR";
+  | "RATE_LIMITED" | "PROVIDER_UNAVAILABLE" | "INTERNAL_ERROR"
+  | "INVALID_CREDENTIALS" | "CONFIGURATION_REQUIRED" | "DATABASE_UNAVAILABLE";
 
 export interface ApiSuccess<T> { data: T }
 export interface ApiFailure {

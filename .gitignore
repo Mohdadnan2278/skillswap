@@ -36,3 +36,7 @@ supabase/.branches/
 # Local project prompts and Next.js output
 .local/
 next-env.d.ts
+
+# Local test outputs
+playwright-report/
+test-results/

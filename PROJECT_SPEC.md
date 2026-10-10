@@ -2,7 +2,7 @@
 
 ## Status and scope
 
-Phase 2 is a design deliverable. Routes, tables, policies, and types described here are planned, not implemented. Phase 1's landing page is the only available screen. The owner delegated selection of appropriate rules for better interaction and user experience during Phase 2. The MVP defaults below were chosen under that authorization; they were not individually confirmed word for word. Changes affecting these rules must be recorded before dependent implementation.
+This is the living MVP specification. Phase 3 implements authentication, onboarding/profile editing, protected navigation and logout; auth/profile APIs and the two profile tables are verified locally. Skills, bookings, money, video and reputation remain future design. The owner delegated selection of appropriate rules for better interaction and user experience during Phase 2. The MVP defaults below were chosen under that authorization; they were not individually confirmed word for word. Changes affecting these rules must be recorded before dependent implementation.
 
 Confirmed by the owner's project prompt: one Next.js application with TypeScript, Tailwind, Supabase PostgreSQL/Auth, and a managed video provider selected in Phase 7. Use npm, versioned migrations, and a responsive browser experience. Prefer Vercel, with deployment only after explicit authorization. Everyone may teach and learn; teacher and learner are roles within a booking, never permanent account roles.
 
@@ -26,7 +26,7 @@ Optional: Google OAuth if provider configuration is available. Deferred: payment
 
 Decision record: after being offered the core defaults, the owner instructed the assistant to choose appropriately for better user interaction and experience. The assistant adopted the rules below for this semester MVP. This approves the design direction, not implementation beyond the currently authorized phase, remote database changes, or paid services.
 
-| Rule | Proposed default |
+| Rule | Adopted default |
 | --- | --- |
 | Starter grant | Once per verified account after profile onboarding: 3 credits (180 integer minute units). Demo accounts do not receive extra silent grants. |
 | Exact amounts | 1 credit = 60 integer minute units. Never store floating-point balances. 30/60/90-minute sessions cost 30/60/90 units (0.5/1/1.5 credits). |
@@ -75,6 +75,6 @@ Terminal states never reopen. Conflicts cover both participants in pending/accep
 - Provider secrets remain server-only; membership and time windows are rechecked for every short-lived video token. Tokens are not long-lived join URLs in the database.
 - Deleting an account with outstanding reservations/bookings is outside MVP scope; do not cascade away financial audit history.
 
-## Phase 2 acceptance and pending decisions
+## Phase boundaries and pending external setup
 
-Deliver the specification, UI plan, API contract, database design, and compile-checked shared design types. Do not create live tables, feature screens, or business operations in this phase. Record the delegated rule decision above, then pause before Phase 3. Supabase project/provider configuration and two-account live checks are future prerequisites, not Phase 2 readiness claims.
+Phase 2 design is complete. Phase 3 has real local Supabase two-account and mobile Chromium evidence; hosted Supabase, Google OAuth, production SMTP, physical phones and fresh-task restoration remain unverified. The owner has authorized hosted Supabase creation/configuration followed by Phase 4; account access is still missing. Business defaults were selected under owner delegation. Deployment and paid resources require separate authorization.

@@ -1,10 +1,10 @@
 # UI plan
 
-Design only; all routes below except `/` are unimplemented. One mobile-first visual system continues Phase 1's emerald, off-white, rounded-card palette. Use system fonts, readable contrast, semantic headings, visible keyboard focus, explicit labels, and touch targets of at least 44px.
+Phase 3 implements `/`, `/signup`, `/login`, auth callbacks, `/onboarding`, `/dashboard`, and `/profile`. Profile skill editing and all other screens are planned. One mobile-first visual system continues Phase 1's emerald, off-white, rounded-card palette. Use system fonts, readable contrast, semantic headings, visible keyboard focus, explicit labels, and touch targets of at least 44px.
 
 ## Navigation and screen map
 
-Desktop: compact header and primary navigation. Mobile: a five-item navigation for Home, Discover, Bookings, Wallet, and Community; Profile available from the account menu. Navigation avoids covering page content and accounts for device safe areas. Meeting mode uses its own controls instead of the main navigation.
+Phase 3 navigation contains Dashboard, Profile and Sign out; future sections are not dead links. The device timezone is selected explicitly with “Use my device timezone” during onboarding, otherwise UTC is the default. Desktop: compact header and primary navigation. Mobile: a five-item navigation for Home, Discover, Bookings, Wallet, and Community; Profile available from the account menu. Navigation avoids covering page content and accounts for device safe areas. Meeting mode uses its own controls instead of the main navigation.
 
 | Route | Screen and primary interaction | Important states |
 | --- | --- | --- |
@@ -46,4 +46,4 @@ Meeting: request device permission after user intent, show camera preview and de
 
 ## Later validation
 
-Check widths 360/390/768/1280px, no horizontal scroll, keyboard navigation and zoom, form errors, and empty/loading states. Complete Phase 9 on two physical smartphones over HTTPS, including camera/microphone permissions and recovery. These checks have not been performed on the planned screens.
+Check widths 360/390/768/1280px, no horizontal scroll, keyboard navigation and zoom, form errors, and empty/loading states. Complete Phase 9 on two physical smartphones over HTTPS, including camera/microphone permissions and recovery. The local Phase 3 Chromium test passed at 390×844 through signup, email verification, onboarding, editing, logout, and login; dashboard overflow was checked. Broader widths/accessibility/device testing and future screens remain unverified.

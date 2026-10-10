@@ -14,13 +14,22 @@ Business decision: the owner delegated choosing appropriate rules for user inter
 
 Validation: `npm run check` passed ESLint, route type generation, TypeScript checking (including shared DTOs), and the production build. `git diff --check` passed. Database, authentication, business API, and planned screen behavior remain unimplemented and untested.
 
-## Next: Phase 3 — Authentication and profiles
+## Phase 3 — Authentication and profiles
 
-Await owner instruction. Add Supabase SSR authentication, signup/login/logout, onboarding/profile forms, authenticated navigation, versioned migrations and RLS. Configure a Supabase project and permitted callbacks, and verify with two real accounts when available. Google sign-in is optional. No remote database change or deployment is authorized by completion of Phase 2.
+Implemented Supabase SSR email/password signup/login/logout, email confirmation and resend, optional configured Google OAuth entry point/callback, onboarding/profile editing, protected dashboard/navigation, strict input validation, and owner-only profile endpoints. Added the atomic `save_my_profile` migration with RLS/least-privilege grants and private timezone preferences. Added server-only boundaries, authoritative `getUser()` guards, `getClaims()` cookie refresh, cache/CSRF protection, and safe redirects.
+
+Prepared real local Supabase with official GHCR slim images, a readable confirmation template, local Docker proxy/health-check corrections, and reusable local environment helpers. No remote project, database, OAuth provider, or host was changed. Shared dependency additions were made within the owner's authorized Phase 3 scope and are recorded in package.json/lockfile.
+
+Verified: 19 unit tests; 3 local Playwright integration/browser tests. Two real accounts exercised confirmation, persistence, owner/injected-field checks, direct Data API mutation denial, private preference RLS, invalid RPC rollback, logout and independent sessions. Chromium at 390×844 exercised the signup→confirm→onboard→edit→reload→logout→login flow and dashboard overflow. Lint, route type generation, TypeScript and production build passed. Production smoke checks passed: homepage/login 200, anonymous current-user API 401, protected profile redirects to login, unknown route 404. Re-running local database startup succeeded without resetting data. Frozen-lockfile installation passed.
+
+External checks still unrun: hosted Supabase/migrations, Google OAuth, real SMTP delivery, physical smartphones over HTTPS, and fresh-task restoration. Setup instructions are in `docs/SUPABASE_SETUP.md`. Reputation fields remain null/zero because Phase 8 is not implemented; no credits are granted yet.
+
+## Next: Phase 4 — Skills and matching
+
+The owner authorized hosted Supabase project creation/configuration followed by Phase 4. Hosted setup is blocked: no Supabase account token is injected, and `projects list` reports missing access token. A secure `SUPABASE_ACCESS_TOKEN` requirement scoped to `api.supabase.com` and current startup instructions were saved in the environment draft; this does not supply credentials or create resources. Once access is supplied, configure a new free project, apply and verify the Phase 3 migration, then add the skill catalogue, offered/wanted selections, deterministic discovery, responsive UI, migrations/contracts, and permission checks. Deployment and paid resources remain unauthorized.
 
 ## Later phases
 
-4. Skills and matching
 5. Scheduling and bookings
 6. Credits and completion
 7. Private video
@@ -29,4 +38,4 @@ Await owner instruction. Add Supabase SSR authentication, signup/login/logout, o
 
 ## Limitations
 
-The landing page is a foundation preview. No signup, persisted data, matching, booking, wallet, video, or feedback behavior is available. No cloud database or hosting resources have been created.
+Phase 3 auth/profile behavior is verified against local services; hosted readiness has not been established. Matching, bookings, wallet/credit transfers, video, and feedback are unavailable. No cloud database or hosting resources have been created.
