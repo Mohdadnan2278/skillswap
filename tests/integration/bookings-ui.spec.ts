@@ -29,7 +29,7 @@ test('mobile scheduling review, two-party acceptance, cancellation and local tim
   await page.getByRole('button',{name:'Cancel booking',exact:true}).click();await expect(page.getByTestId('booking-state')).toHaveText('cancelled');
   await teacherPage.reload();await expect(teacherPage.getByRole('button',{name:'Cancel booking'})).toHaveCount(0);
   await page.getByRole('link',{name:'Back to bookings'}).click();await expect(page.getByRole('heading',{name:'Your bookings'})).toBeVisible();
-  await page.getByLabel('Status',{exact:true}).selectOption('cancelled');await page.getByRole('button',{name:'Apply filter',exact:true}).click();
+  await page.getByLabel('View',{exact:true}).selectOption('history');await page.getByLabel('Status',{exact:true}).selectOption('cancelled');await page.getByRole('button',{name:'Apply filter',exact:true}).click();
   await expect(page.getByRole('article')).toHaveCount(1);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  } finally {await Promise.all([cleanupBookings(page.request),cleanupBookings(teacherContext.request)]);await teacherContext.close();}
 });

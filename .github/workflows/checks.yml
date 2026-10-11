@@ -1,0 +1,38 @@
+name: Checks
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run check
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Start isolated local Supabase
+        run: npm run db:start > /tmp/skillswap-db-start.log 2>&1
+      - run: node scripts/environment.mjs prepare-tests
+      - run: npm run test:integration
+      - name: Stop local Supabase
+        if: always()
+        run: npm run db:stop > /tmp/skillswap-db-stop.log 2>&1

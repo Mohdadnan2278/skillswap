@@ -1,6 +1,12 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { getSiteOrigin, getSupabaseConfig } from "@/backend/config";
+import { getSiteOrigin, getSupabaseConfig,emailDeliveryEnabled } from "@/backend/config";
 afterEach(() => vi.unstubAllEnvs());
+it('requires an explicit email sender opt-in on hosted sites',()=>{
+ vi.stubEnv('EMAIL_DELIVERY_ENABLED',undefined);vi.stubEnv('SITE_URL','https://skillswap.example');expect(emailDeliveryEnabled()).toBe(false);
+ vi.stubEnv('EMAIL_DELIVERY_ENABLED','true');expect(emailDeliveryEnabled()).toBe(true);
+ vi.stubEnv('EMAIL_DELIVERY_ENABLED',undefined);vi.stubEnv('SITE_URL','http://127.0.0.1:3000');expect(emailDeliveryEnabled()).toBe(true);
+ vi.stubEnv('EMAIL_DELIVERY_ENABLED','false');expect(emailDeliveryEnabled()).toBe(false);
+});
 it("rejects provider secret keys as public config", () => {
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://project.supabase.co");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "sb_secret_do-not-expose");

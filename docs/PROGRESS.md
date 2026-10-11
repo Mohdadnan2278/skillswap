@@ -1,5 +1,21 @@
 # Progress
 
+## Friendly production URL — 2026-10-11
+
+The owner requested `skillswap-comm.vercel.app`. It is verified and assigned to READY deployment `dpl_67e2bxdGytmLjsDNoWQX6FbYa5pU`, rebuilt from the exact original demo source `69b77dc88186ca9c046459efeb62c8080af5084b`. Updated production SITE_URL and Supabase Site URL, retained prior callback entries and added exact new callbacks, and redirected the old domain with HTTP 307. Google credentials and all application/financial data remain unchanged; the separate upgrade code and migrations are not released. Vercel alias/readiness/source, Auth settings and the old-domain redirect are verified. New-hostname HTTP/sign-in checks are blocked by the current environment allowlist; its new network rule is saved for publication. See [current URL and origin-safe rollback](FRIENDLY_URL.md).
+
+## Phase 10 — Product upgrade with a retained working release — 2026-10-11
+
+The owner reports a successful live Jitsi call and a 0.5-credit transfer leaving 2.5/3.5 credits. Pushed exact production-source tag `demo-working-2026-10-11` at `69b77dc88186ca9c046459efeb62c8080af5084b` and merged-release backup branch `demo-backup-2026-10-11`. Work is isolated on `product-upgrade`. The existing Vercel deployment and hosted database remain unchanged throughout implementation.
+
+Added expiring opt-in availability and an available-now discovery filter; private transactional booking notifications, read controls and mobile unread badges; live standard booking refresh; named active/history booking cards; cookie refresh for Admin/Community; SMTP-gated password recovery and global session revocation; bounded selected-skill queries; sanitized error IDs; and a prepared GitHub checks workflow. Fixed booking cursor precision with a regression reproducing same-millisecond PostgreSQL rows. Public video limits remain disclosed; five minutes in Start now is an acceptance deadline, not a SkillSwap call cap. The exact current public Jitsi duration could not be independently verified because its policy page is inaccessible from this environment.
+
+Recorded the support-policy exception before implementation: only an uninvolved verified active administrator can cancel an accepted/disputed held booking after 24 hours past its end, or when a participant is suspended. Reasons, retry protection, before/after audit and notifications apply; release uses the original hold helper without payment, issuance or settled-balance edits. Two additive migrations are applied only to local Supabase. The restricted expiry worker is tested locally; its named one-minute Cron schedule is a deliberate rollout step, not enabled on production.
+
+Validation: 39 unit tests pass. The full selected integration run passed 26 cases, including the original real-elapsed 320px demo transfer with conserved totals and exact-once settlement. Focused follow-ups pass the added timestamp regression, all seven upgrade cases and all five older mobile UI cases; the older cancellation-list expectation was updated to select History. All 32 distinct integration/browser cases have passing evidence across these runs. Lint, Next route generation, TypeScript and production build pass. Tests use only loopback Auth/PostgreSQL/mail services; no hosted test account, booking, credit edit or clock fixture was introduced. GitHub CI execution, real SMTP delivery and fresh-task restoration remain unverified. The development-only braces advisory has no published compatible patch; dependencies and lockfile are preserved.
+
+See [upgrade and rollback](PRODUCT_UPGRADE.md) for reviewed migration/scheduler/email/deployment sequencing and restoring the retained Vercel application without resetting ledger data. This phase changes source on a review branch, not the live site.
+
 ## Phase 1 — Foundation
 
 Implemented Next.js App Router, TypeScript, Tailwind CSS, npm scripts and lockfile, a responsive landing page, and frontend/backend/shared directories. Updated ownership and conventions. The original prompt is kept only in ignored `.local/PROJECT_PROMPT.txt`.

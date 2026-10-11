@@ -166,3 +166,22 @@ The owner changed Phase 7 to a server-free classroom demonstration. Provider-neu
 An onboarded member request page reads the policy through restricted `read_demo_policy()`. `POST /api/v1/bookings` additionally accepts strict `{teacherId,skillId,startMode:"demo",policyVersion:positiveInteger}`; client `startsAt`, `endsAt`, `durationMinutes` and `costUnits` are rejected. Server checks an enabled matching policy version, derives actual time and cost, and reserves the cost atomically. The teacher has one minute to accept; formal start is creation + one minute, end is start + configured actual minutes. Calls open immediately on acceptance. Return `Booking.isDemo` is true; its `durationMinutes` can be 1–10, independently of `costUnits`. Standard bookings return false and retain 30/60/90 minutes and duration-derived cost.
 
 Replay lookup occurs before policy checks, preserving the original booking even if settings change or are disabled. New requests with stale/disabled policy return 409 `INVALID_STATE`; overlap and insufficient available funds return their existing 409 errors. Changes do not alter existing snapshots or force transfers. Expiry/rejection/pre-start cancellation release configured cost; only both confirmations after the actual end transfer once. Demo bookings cannot publish feedback (409 `INVALID_STATE`), including direct RPC attempts. Demo booking pages refresh state/actions every five seconds; countdown follows database server time. No provider attendance/duration is measured.
+## Product upgrade additions
+
+Non-validation API errors include an optional opaque `error.requestId` and `X-Request-ID` response header. Unexpected failures log only the ID, status and error code. Page cursors preserve the raw database timestamp precision independently of millisecond display DTOs.
+
+All new member APIs require verified active identity. Writes require the exact origin and JSON; administrative cancellation also requires an idempotency key and a reason.
+
+| Endpoint | Contract |
+| --- | --- |
+| `GET /api/v1/me/availability` | `{availableUntil, serverNow}`; own availability |
+| `PUT /api/v1/me/availability` | Strict `{minutes: 0\|15\|30\|60}`; 0 turns it off; actor is server derived |
+| `GET /api/v1/discover?availableOnly=true` | Only unexpired declared availability; matching still requires a wanted/offered shared skill; cursor is bound to the filter |
+| `GET /api/v1/me/notifications?limit=20&cursor=...` | Own inbox `{items, unreadCount, nextCursor}`; items include booking ID/kind/skill/timestamps, never meeting links |
+| `PUT /api/v1/me/notifications` | Strict `{ids: UUID[]}` with at most 50 entries; only own matching IDs become read; replays are harmless |
+| `GET /api/v1/bookings?view=upcoming\|history\|all` | Default API view remains all; UI defaults upcoming/awaiting action. History is newest first; cursor binds state/role/view |
+| `POST /api/v1/admin` | New `{action:"cancel_stuck_booking", target, reason}`; uninvolved admin; accepted/disputed held booking; end ≥24 hours ago or a suspended participant; audited release only |
+| `POST /api/auth/forgot-password` | Strict `{email}`; neutral response avoids identifying accounts; requires enabled email delivery; recovery callback is exact `/auth/recovery` |
+| `POST /api/auth/reset-password` | Strict `{password}` of 8–128 characters; authoritative active verified session; successful change signs out sessions and returns `sessionsRevoked` |
+
+Existing public RPCs and DTOs remain compatible. Additive SQL functions implement these operations; privileged expiry runs only through a restricted private worker. Provider join limits are independent of the booking clock. HTTP server failures return a request ID with sanitized diagnostic logs.
