@@ -1,136 +1,344 @@
 # SkillSwap
 
-SkillSwap connects people who want to teach and learn through time credits. Members choose or add skills, find learning partners, book sessions, meet through Jitsi or Google Meet, and exchange feedback. It includes Google and email authentication, protected profiles, audited credits and an admin panel. Built with Next.js, TypeScript, Tailwind and Supabase.
+**Teach what you know. Learn what you need. Exchange time credits.**
 
-The working release is preserved as `demo-working-2026-10-11`. The separate `product-upgrade` branch adds availability, booking alerts, recovery and live booking views; it is ready for review without changing production. See [upgrade and rollback](docs/PRODUCT_UPGRADE.md). Hosted email signup/recovery need an explicitly enabled, tested SMTP sender; Google signup and existing password login remain available.
+SkillSwap is a community platform for one-to-one skill exchanges. Members choose skills they can teach and skills they want to learn, discover partners, book sessions, meet through Jitsi or Google Meet, and exchange credits after mutual completion. The same person can teach in one booking and learn in another.
 
-For a live call, request a session with **Start now**. The teacher has five minutes to accept; after acceptance, both participants can open **Prepare for call** immediately. Choose **Schedule for later** for a future session. Calls do not transfer credits: both participants confirm after the actual scheduled end. See the [two-person session checklist](docs/CLASSROOM_DEMO.md).
+**Live application:** [skillswap-comm.vercel.app](https://skillswap-comm.vercel.app)
 
-## Local development
+The previous address redirects to the new one. Sign in again on the new hostname because browser sessions belong to their original hostname.
 
-Use Node 24.5 or later (`nvm use` if available), npm, and a running Docker daemon. From the repository root:
+## The problem behind SkillSwap
+
+People often have useful knowledge to share but cannot afford expensive courses or private tutoring for the next skill they need. Free resources such as YouTube make information accessible, but self-paced learning often leaves the learner responsible for creating a schedule, staying consistent and finding answers when stuck. Without a learning partner or an agreed commitment, it can be easy to watch passively, jump between topics or stop before making progress.
+
+SkillSwap addresses both affordability and learning discipline: members earn access through teaching, while scheduled sessions with another person provide structure, interaction and accountability. Informal exchanges can still be difficult to arrange, and a direct swap requires both people to want exactly what the other offers.
+
+For example, someone who teaches Python may want to learn design, while a designer wants help with guitar. A direct Python-for-design swap does not meet both people's needs. There may still be a useful exchange across the wider community.
+
+SkillSwap separates earning from spending: teach one person to earn credits, then use those credits to learn from another. Booking, reservations and shared completion rules give the exchange a clear process.
+
+## The proposed solution
+
+SkillSwap combines three ideas:
+
+- **Affordable access:** contribute your knowledge to earn credits, then use them to learn without purchasing a course through the platform.
+- **Shared accountability:** agree on a time, meet a learning partner and participate actively instead of relying entirely on self-paced viewing.
+- **Learning by teaching:** explaining a topic encourages you to organize your knowledge, answer questions and notice gaps in your own understanding.
+
+1. **Create a profile:** sign in, introduce yourself and choose your timezone.
+2. **Choose skills:** select or add skills you offer and skills you want to learn.
+3. **Discover teachers:** find members whose offered skills match your wanted skills.
+4. **Book a session:** review the skill, schedule and credit cost before requesting.
+5. **Meet:** after acceptance, use embedded Jitsi or a teacher-saved Google Meet link.
+6. **Confirm completion:** both participants confirm after the scheduled end; credits transfer once.
+7. **Leave feedback:** completed standard sessions can receive participant reviews.
+
+### Why both participants benefit
+
+The learner receives direct explanation, conversation and a scheduled opportunity to practise. The teacher reinforces their own understanding by explaining and answering questions, while earning credits for their next learning session. Teaching is therefore part of the learning experience: knowledge moves in both directions across the community, and everyone can grow through both roles.
+
+Credits are an internal exchange unit, with no purchase, cash withdrawal or payment gateway in the current implementation. A balance does not guarantee that a suitable teacher will be available.
+
+## Release status
+
+The live application uses the preserved working demo source. The owner has demonstrated Google onboarding, a Jitsi call and a 0.5-credit transfer leaving learner/teacher balances of 2.5 and 3.5 credits.
+
+| Status | What it includes |
+| --- | --- |
+| **Live demo** | Authentication, profiles, custom skills, skill matching, responsive navigation, scheduling, reservations, wallets, mutual completion, Jitsi, teacher-saved Meet links, feedback and administration |
+| **Implemented and tested; awaiting rollout** | Opt-in availability, booking notifications, active/history booking views, additional session refresh fixes, password recovery, restricted support cancellation, an expiry worker and a prepared CI workflow on [`product-upgrade`](https://github.com/sonalreji7/skillswap/tree/product-upgrade) |
+| **Future ideas** | Better matching, demand requests, reputation/abuse controls and more capable video infrastructure; these are proposals without promised release dates |
+
+The working application source is preserved under Git tag `demo-working-2026-10-11`, with merged-release backup branch `demo-backup-2026-10-11`. Production remains on the existing Vercel Hobby project. Git pushes do not currently deploy automatically.
+
+Hosted Supabase retains 16 applied migrations and 12 public application tables. The upgrade adds two migrations and two tables; those additions are tested locally and have not been applied to production. See the [upgrade and rollback guide](https://github.com/sonalreji7/skillswap/blob/product-upgrade/docs/PRODUCT_UPGRADE.md) before releasing that branch.
+
+## System architecture
+
+Frontend and backend are organized separately inside one Next.js application. Supabase provides authentication and PostgreSQL. Video runs through external providers.
+
+```mermaid
+flowchart TD
+    Member[Member using a browser]
+    subgraph App[Next.js application on Vercel]
+        UI[React UI and Tailwind layouts]
+        Routes[Pages and API route handlers]
+        Services[Server identity checks and business services]
+        UI --> Routes --> Services
+    end
+    Member --> UI
+    Services --> Auth[Supabase Auth]
+    Auth <--> Google[Google OAuth]
+    Services --> RPC[Restricted PostgreSQL functions]
+    RPC --> DB[Profiles, skills, bookings and credit ledger]
+    Services --> Reads[Authorized database reads with RLS]
+    Reads --> DB
+    UI --> Jitsi[Embedded public Jitsi or new tab]
+    UI --> Meet[Teacher-saved Google Meet link]
+```
+
+API handlers validate requests and obtain the authenticated identity. Database functions enforce important booking and financial rules inside transactions. Row Level Security (RLS) limits which records a member can read. The browser cannot choose its own trusted user identity, credit balance or settlement amount.
+
+Google account authentication and Google Meet are separate integrations: signing in through Google does not automatically create a Meet room.
+
+## Technology stack and responsibilities
+
+Versions below describe the repository's current dependency declarations.
+
+| Technology | How SkillSwap uses it |
+| --- | --- |
+| **Next.js 16 / App Router** | Routes pages, renders server-backed views and runs HTTP API/callback handlers in the same application |
+| **React 19** | Interactive forms, navigation, booking actions, provider controls and countdowns |
+| **TypeScript 5** | Shared data contracts and compile-time checks across frontend, backend and database clients |
+| **Tailwind CSS 4** | Responsive layouts, stacked mobile forms, readable cards and reusable styles |
+| **Zod 4** | Runtime validation of request bodies, query parameters and selected response data; rejects unsupported fields |
+| **Supabase Auth** | Google OAuth and email/password sessions, confirmation and identity verification |
+| **Google Cloud OAuth** | Registers the Google sign-in client and its authorized Supabase callback; its credentials are configured in Supabase |
+| **Supabase JS 2 + SSR helpers** | Cookie-aware server clients, database reads and calls to restricted database functions |
+| **PostgreSQL on Supabase** | Persistent profiles, skills, bookings, reservations, wallets, balanced ledger entries and feedback |
+| **SQL functions, RLS and constraints** | Participant access, overlap prevention, one-time grants, retries and financial consistency |
+| **Jitsi Meet** | Embedded public video calls, device controls and a new-tab fallback without a video API key |
+| **Google Meet links** | A second call option: the teacher supplies a meeting link and participants open it externally |
+| **Vercel** | Hosts the dynamic Next.js application and API handlers over HTTPS |
+| **Node.js 24.5+ and npm** | Runtime tooling, scripts and reproducible installation through the lockfile |
+| **Supabase CLI and Docker** | Isolated local PostgreSQL/Auth services and versioned migration development |
+| **Local mail inbox** | Receives authentication messages during local testing; it is not production SMTP |
+| **Vitest, Playwright and ESLint** | Unit checks, real local integration/browser tests, mobile workflows and code checks |
+
+## Main features
+
+### Identity, profiles and skills
+
+- Google sign-in reads actual provider availability from Supabase settings.
+- Email/password authentication exists; hosted signup confirmation requires working email delivery. Google onboarding is the verified access path for the demo.
+- Members have a display name, bio, optional Organization and IANA timezone.
+- Teaching and learning selections are independent, with up to 20 skills per direction.
+- Missing skills can be added with a category including Other. Normalized names share one catalogue identity; administrators can disable entries.
+- New custom skills are limited to 10 per member per rolling 24 hours. Reusing an enabled skill does not consume that creation allowance.
+
+### Discovery and scheduling
+
+Discovery finds members offering a skill the learner wants, excludes the learner and uses stable pagination. Matching currently uses offered/wanted skills; proficiency and availability ranking remain future work.
+
+| Booking mode | Timing and acceptance |
+| --- | --- |
+| **Schedule for later** | Start between 15 minutes and 30 days ahead; pending requests expire after 24 hours or at the start, whichever comes first |
+| **Start now** | Teacher has five minutes to accept; formal start is request time + five minutes, and calls open immediately after acceptance |
+| **Admin-enabled Demo session** | Teacher has one minute to accept; formal start is request time + one minute, followed by the configured actual duration |
+
+Standard sessions last 30, 60 or 90 minutes. Both participants' time is reserved, including across teaching and learning roles, to prevent overlaps. Participants see the schedule in their saved timezone. Either participant can cancel before the formal start.
+
+**The five-minute Start now deadline is not a SkillSwap video-duration limit.** Early joining does not move the financial completion deadline forward.
+
+### Credits and settlement
+
+Verified, onboarded members receive **3 starter credits once**. Ordinary pricing is:
+
+| Standard duration | Credit cost | Internal minute units |
+| --- | --- | --- |
+| 30 minutes | 0.5 credits | 30 |
+| 60 minutes | 1 credit | 60 |
+| 90 minutes | 1.5 credits | 90 |
+
+One credit represents 60 minute units for ordinary sessions. Wallets show total, reserved and available amounts. A reservation reduces availability while keeping ownership with the learner until settlement.
+
+```mermaid
+sequenceDiagram
+    participant L as Learner
+    participant API as SkillSwap server
+    participant DB as PostgreSQL
+    participant T as Teacher
+    L->>API: Request session with a retry key
+    API->>DB: Validate terms, funds and both schedules
+    DB-->>API: Reserve learner credits and participant time
+    API-->>L: Pending booking
+    T->>API: Accept request
+    API->>DB: Mark accepted and retain reservation
+    Note over L,T: Meet through Jitsi or Google Meet
+    Note over API,DB: Completion requires the actual scheduled end
+    L->>API: Confirm completion
+    API->>DB: Record learner confirmation
+    T->>API: Confirm completion
+    API->>DB: Atomically settle once when both have confirmed
+    DB-->>API: Debit learner, credit teacher, release reservation
+    Note over DB: Retries cannot duplicate the transfer
+```
+
+Rejection, pending expiry and permitted cancellation release reservations. A dispute keeps funds held until both participants agree to complete or cancel. The live release has no automatic deadline that forces a disputed payment. Video join/leave events and countdowns never authorize a credit transfer.
+
+The database uses transaction locks, occupancy constraints, unique issuance/transfer events and balanced append-only ledger entries. Financial consistency is checked when transactions finish. This protects against duplicate clicks and competing requests; it does not prove useful teaching occurred.
+
+### Booking lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> pending: Request and reserve
+    pending --> accepted: Teacher accepts
+    pending --> rejected: Teacher declines
+    pending --> expired: Acceptance deadline passes
+    pending --> cancelled: Cancel before start
+    accepted --> cancelled: Cancel before start
+    accepted --> completed: End reached and both confirm
+    accepted --> disputed: Participant reports a problem
+    disputed --> completed: Both agree to complete after end
+    disputed --> cancelled: Both agree to cancel
+    rejected --> [*]
+    expired --> [*]
+    cancelled --> [*]
+    completed --> [*]
+```
+
+This diagram describes the live participant flow. Restricted admin recovery is part of the unreleased upgrade, not an additional live settlement path.
+
+### Video, feedback and administration
+
+**Jitsi:** accepted, funded participants can prepare an embedded public room or open it in a new tab. The app checks identity, booking state and join eligibility. Standard access opens ten minutes before start and closes fifteen minutes after end; accepted quick/demo sessions can join immediately. Public Jitsi controls its own host authentication and duration policies.
+
+**Google Meet:** the teacher creates a meeting externally and saves its standard HTTPS meeting-code link. SkillSwap stores it for authorized participants and enables joining during the call window. Google handles sign-in, admission, devices and call limits. There is no automatic Meet creation or attendance API integration.
+
+**Feedback:** each participant can submit one immutable 1–5-star review after a completed standard session. Received reviews contribute to reputation. Community ranking requires at least three received ratings. Demo sessions cannot publish reputation feedback.
+
+**Administration:** trusted admins manage member suspension/restoration, administrator roles, skills, feedback visibility, booking/wallet summaries and dispute review notes. Changes require a reason and immutable audit records. Privileges come from private database membership, never editable user metadata. The panel has no arbitrary credit grants, forced settlement or impersonation.
+
+**Fast credit-transfer demo:** an admin can enable 1–10 actual minutes and a cost of 0.5–3 credits in 0.5-credit increments. Learners explicitly select Demo session; terms are saved with the booking and later policy edits do not change them. A one-minute/0.5-credit demo becomes eligible for completion about two minutes after requesting. Both confirmations still transfer real reserved credits once. See the [two-person walkthrough](docs/CLASSROOM_DEMO.md).
+
+## Development challenges and resolutions
+
+| Challenge | How it was addressed |
+| --- | --- |
+| **Google login was missing or unavailable** | Displayed a Google option, checked actual provider availability and configured a Google OAuth web client in Supabase. Supabase OAuth Server settings are a different feature and do not enable Google account sign-in. |
+| **Local Auth settings did not match hosting** | Aligned application `SITE_URL`, Supabase Site URL and exact callbacks. The friendly-domain change retained old callback entries and added new ones without replacing Google credentials. |
+| **A teacher's Meet link would not save** | Common copied links included sharing parameters/fragments. Added server/client normalization of genuine HTTPS meeting-code URLs before canonical storage; lookalike hosts and malformed links remain rejected. |
+| **Learners still saw no link after a save** | Added five-second/focus refresh and manual refresh, prevented stale reads from overwriting saves, preserved unsaved teacher input and cleared access for removed/replaced links. |
+| **Counting time with Meet in another tab** | Displayed a shared countdown using database server time and the original booking schedule. Reloading does not restart it. It measures scheduled time, not attendance or actual Google call duration. |
+| **Jitsi required first-host signup** | Disclosed the provider requirement, supplied a new-tab fallback and offered Meet alongside it. SkillSwap cannot remove external authentication requirements or duration limits. |
+| **The original video option required credentials/infrastructure** | Replaced the active Daily path with public Jitsi and teacher-saved Meet links. Historical applied migrations remain intact; no active Daily API/key is required. |
+| **Normal sessions were too long for a transfer demonstration** | Added versioned admin Demo settings with short real durations and selected costs. Actual end time and both confirmations remain required; no fake clocks or balances are used in the live feature. |
+| **Duplicate clicks/concurrent actions could duplicate payments** | Used retry keys, transactions, unique ledger events and reservation reconciliation. Settlement retries return the existing result rather than paying again. |
+| **Database protection rejected a Demo settings update** | Added a separate migration with an explicit singleton-row filter for PostgREST safe-update enforcement, preserving applied migration history. |
+| **Forms and navigation were awkward on phones** | Added a compact Menu, stacked controls, full-width actions, wrapping names and visible selection chips. Browser checks include 320px layouts. |
+| **Missing catalogue skills blocked useful matches** | Added normalized custom skills, Other, reuse/moderation rules and a database-enforced creation allowance. |
+| **Credentials on another computer were unavailable in the cloud** | Used secure management environment bindings, ignored local configuration and environment-switch helpers. Credentials and the original prompt are excluded from Git and uploads. |
+| **Google worked but email confirmation remained limited** | Preserved Google access and documented the need for a real SMTP sender. The pending upgrade gates hosted email signup/recovery until delivery is configured and tested. |
+| **Cloud network rules blocked some provider/public checks** | Verified settings through permitted management APIs and saved the new-hostname rule for environment publication. Configuration checks are reported separately from actual browser/media verification. |
+
+### Google configuration and Meet links
+
+Google login uses two different callbacks. The Google Cloud OAuth client redirects to `https://<project-ref>.supabase.co/auth/v1/callback`. Supabase then returns the user to SkillSwap's exact `/auth/callback` URL. Its Site URL and callback allowlist must match the deployed app origin. The Google client ID and secret belong in Supabase's Google provider settings, not in public browser variables.
+
+Meet uses a teacher-supplied link instead of that login flow. A copied link such as `https://meet.google.com/xxx-xxxx-xxx?authuser=0` is normalized to its canonical meeting-code URL before storage. Both participants read the saved link from SkillSwap; opening it does not generate a room, bypass Google admission or provide attendance data.
+
+## Current limitations
+
+- **Video privacy and duration:** public Jitsi and external Meet links can be shared outside the app. SkillSwap cannot revoke copied links or enforce provider-side participant-only admission. The exact current public Jitsi duration cap has not been independently verified here.
+- **Attendance and learning quality:** a countdown, call-access grant and two confirmations do not prove attendance or successful teaching. No trustworthy provider attendance telemetry is collected.
+- **Unresolved disputes:** the live release retains holds until participant agreement. Staff review notes cannot resolve a dispute or move funds. Restricted support cancellation is on the pending upgrade branch.
+- **Demand and trust:** matching depends on available teachers. Email verification cannot prevent every duplicate account, and collusion can influence reviews. Equal-duration standard sessions cost the same despite differences in expertise.
+- **Email delivery:** production SMTP remains an external requirement. Password recovery exists on the upgrade branch, but is not a released, verified hosted email flow.
+- **Expiry without user activity:** live expiry occurs during relevant reads/actions. A scheduled worker is prepared in the upgrade and is not running on production yet.
+- **Scale:** financial routines share an advisory lock, and the skill editor loads the full catalogue. These need refinement for a much larger community.
+- **Verification gaps:** actual Meet media, fresh-environment restoration and end-to-end login on the new hostname remain separate checks. The owner-reported Jitsi/transfer demo is distinct from automated local tests. The pending CI workflow has not had a verified remote run.
+- **Dependency maintenance:** the latest review found a development-only `braces` advisory without a compatible published patch at that time; production audit was clean. Dependency checks remain ongoing maintenance.
+
+## Coming next and longer-term roadmap
+
+### Next release: implemented, awaiting rollout
+
+The [`product-upgrade` branch](https://github.com/sonalreji7/skillswap/tree/product-upgrade) contains:
+
+- Expiring **15/30/60-minute availability** and available-now discovery.
+- Private transactional **booking notifications**, read controls and unread badges.
+- Clearer **active/history booking views**, partner/skill names and automatic refresh.
+- Protected-page cookie refresh and timestamp-precision-safe pagination.
+- Password recovery and session revocation, with hosted email gated on tested SMTP.
+- Audited support cancellation by an uninvolved admin for eligible held accepted/disputed bookings after 24 hours past the end or when a participant is suspended. It cannot force payment or change settled balances.
+- A restricted expiry worker, an opt-in one-minute Cron helper, safer diagnostics and a prepared GitHub checks workflow.
+
+Rollout requires reviewed additive migrations, deliberate scheduler/email configuration where applicable, deployment and hosted checks. These are upcoming changes, not features already available on the live site.
+
+### Later possibilities: proposed, not scheduled
+
+- A **request-a-skill board** to reveal unmet demand and help teachers find opportunities.
+- Matching by proficiency, availability and timezone, with understandable ranking criteria.
+- Reputation using unique partners and reduced repeated-pair influence.
+- Signup-abuse review and clearer no-show/dispute policies.
+- Private video infrastructure or authenticated admission and server attendance events.
+- Server-side catalogue search and finer database locking for higher traffic.
+
+Variable teacher pricing, group sessions and purchased credits would change the financial model and require separate design and authorization. They are not enabled by this roadmap. No release dates are promised.
+
+## Repository layout
+
+```text
+skillswap/
+├── src/
+│   ├── app/             # Pages, API routes and Auth callbacks
+│   ├── frontend/        # React components and interaction flows
+│   ├── backend/         # Identity checks and business services
+│   └── shared/          # Types and runtime validation
+├── supabase/
+│   ├── migrations/      # Versioned SQL schema and business rules
+│   └── templates/       # Authentication email templates
+├── scripts/             # Local environment and hosted-management helpers
+├── tests/               # Unit, integration and browser checks
+├── docs/                # Detailed contracts, setup and progress
+└── .local/              # Ignored prompt, credentials and local tooling
+```
+
+The original prompt stays in ignored `.local/PROJECT_PROMPT.txt`. Real environment files, credentials, generated output and local reports are excluded from Git and deployment uploads.
+
+## Run locally
+
+Prerequisites: Node.js **24.5+**, npm and a running Docker daemon. From the repository root:
 
 ```sh
 npm ci --cache /tmp/skillswap-npm-cache
 npm run db:start
+npm run supabase -- migration up --local
 node scripts/environment.mjs prepare-tests
 npm run env:local
-npm run supabase -- migration up --local
-npm run dev
+npm run dev -- --hostname 0.0.0.0
 ```
 
-The setup helper uses pinned official Supabase slim images from GHCR. It keeps CLI state and local Docker proxy configuration under ignored `.local/`, makes the email template readable, and configures local service networking. No remote database is linked or changed. Existing external HTTPS proxy settings are preserved; local-only containers use direct internal HTTP because their BusyBox health checks ignore `NO_PROXY`. The app uses port 3000; use the same origin as `SITE_URL` for browser requests.
+Open **http://127.0.0.1:3000**, matching local `SITE_URL`. The local mail inbox is at **http://127.0.0.1:54324**. Email confirmation is enabled; confirm before onboarding. Helpers preserve user-managed `.env.local` files rather than overwriting them. If switching is refused, back up your configuration before choosing a new active environment.
 
-`environment.mjs` prepares ignored `.local/local.env` for tests and switches generated app configuration explicitly. It preserves user-managed `.env.local` files. Test configuration always uses loopback Supabase, independently of the active app environment. Confirmation messages appear in the local Mailpit inbox on port 54324. Supabase Auth has email confirmation enabled; accounts must confirm before onboarding. Container data survives ordinary `npm run db:stop`, but live containers must restart in a new task. No fresh-task restoration has been verified.
+The Supabase helper uses pinned official slim images and configures local networking while preserving external HTTPS proxy settings. `npm run db:stop` retains ordinary local data; never reset a database you need to preserve. Future tasks still need services restarted; fresh-task restoration has not been verified.
 
-If Docker is unavailable, the landing and auth setup notice still render; use [hosted configuration instructions](docs/SUPABASE_SETUP.md) for real auth. Do not disable health checks or TLS verification to make setup pass.
+For hosted development, follow [Supabase setup](docs/SUPABASE_SETUP.md). Use the public publishable/anon key in the app; management tokens and service-role keys must not be browser variables. `SITE_URL` must match the actual origin, with corresponding exact Supabase callbacks.
 
-## Checks
+`hosted:migrate` and `hosted:configure` change the remote project. They are deliberate release operations, not local quick-start steps. Never configure hosted Auth to a local origin merely to run isolated tests.
+
+## Validation
 
 ```sh
-npm test                 # Validation/config boundary unit tests
-npm run check            # ESLint, Next route types, TypeScript, production build
-npm run test:integration  # Real local Auth/PostgreSQL and feature/mobile checks
-npm run test:e2e          # Includes the mobile Chromium workflow
+npm test                  # Unit tests
+npm run check             # Lint, route types, TypeScript and production build
+npm run test:integration   # Real local Auth/PostgreSQL integration checks
+npm run test:e2e           # Full Playwright suite, including browser workflows
 ```
 
-Integration tests create uniquely named accounts only on loopback Supabase/app origins and require local Mailpit; they refuse hosted URLs. They start their own app on the configured `SITE_URL` port, which must be free. Browser tests require Playwright's Chromium (`npx playwright install chromium`) or an existing compatible executable:
+Install Chromium with `npx playwright install chromium`, or use the existing cloud executable:
 
 ```sh
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e
 ```
 
-Playwright loads `.local/local.env`, verifies it is loopback and passes it explicitly to the test server; it never loads active hosted `.env.local`. Browser cache/config folders use writable temporary paths in this cloud machine. Test output and local prompts are ignored. Synthetic local accounts remain in the local database; Phase 4–6 tests clear their own selections and cancel their own future requests after use. Local booking deadline/end-time fixtures advance timestamps to exercise timing guards; they do not claim real elapsed sessions. Financial tests use real PostgreSQL transactions and each account’s normal one-time grant, without extra demo credits. Tests do not delete existing users or reset user data.
+Tests load `.local/local.env`, require loopback services and refuse hosted account creation. Leave the test app port free and stop task test/dev servers before building. Some tests adjust local timing fixtures; those are not claims of real elapsed hosted sessions or real provider media. The short timed demo test separately verifies actual local elapsed time and exact-once transfer with normal starter grants.
 
-After a successful build, `npm start` serves production. Stop app processes before reinstalling dependencies or building. `npm run db:start` is repeatable; `npm run db:stop` stops this project's containers while retaining their data. Later migrations can be applied locally with `npm run supabase -- migration up --local`; never run a reset on data you need to preserve.
+The preserved release has passing unit/build and integration/mobile evidence in [progress](docs/PROGRESS.md). The upgrade has 39 passing unit tests and passing evidence for 32 distinct local integration/browser cases across full and focused runs. Automated checks do not establish external email delivery, Google account interaction or physical-phone video quality.
 
-## Structure
+## Further documentation
 
-- `src/app/`: App Router pages, protected member route group, callback handlers, and HTTP endpoints.
-- `src/frontend/`: auth/profile/skill-selection/scheduling/navigation UI components.
-- `src/backend/`: config, verified session guard, Supabase server client/schema types, profile/skills/discovery/booking/wallet services, HTTP validation/errors.
-- `src/shared/`: shared DTOs and runtime input schemas.
-- `supabase/`: local configuration, confirmation template, and versioned database migrations.
-- `scripts/`: reproducible local Supabase/environment helpers.
-- `tests/`: unit, integration, and mobile UI checks.
-- `docs/`: setup, API/database design, UI plan, and phase progress.
-- `.local/PROJECT_PROMPT.txt`: original project prompt, excluded from Git.
+- [Product specification and adopted rules](PROJECT_SPEC.md)
+- [API contract](docs/API_CONTRACT.md)
+- [Database design](docs/DATABASE_SCHEMA.md)
+- [Supabase setup](docs/SUPABASE_SETUP.md)
+- [Administration](docs/ADMIN.md)
+- [Two-person demo walkthrough](docs/CLASSROOM_DEMO.md)
+- [Deployment history and setup](docs/DEPLOYMENT.md)
+- [Development progress](docs/PROGRESS.md)
+- [Current domain and rollback notes](https://github.com/sonalreji7/skillswap/blob/friendly-url/docs/FRIENDLY_URL.md)
+- [Pending upgrade rollout and rollback](https://github.com/sonalreji7/skillswap/blob/product-upgrade/docs/PRODUCT_UPGRADE.md)
 
-## Security and configuration
-
-Only use the project's public publishable key in `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`; no service-role/secret key is used by the application. Identity is validated on the server with `getUser()`; `getClaims()` in `src/proxy.ts` refreshes cookies. Private responses are not cached. The `save_my_profile` database function derives the actor, checks verified email, and writes profile/preferences atomically. RLS protects preferences, and ordinary API roles cannot directly mutate profile rows or onboarding timestamps. Skill choices are replaced atomically through `replace_my_skills`, which derives the actor, requires verified onboarding, enforces enabled IDs/counts/uniqueness and serializes concurrent saves. Discovery matches wanted-to-offered skills in stable member ID order; no rating or credit data is simulated.
-
-See [Supabase setup](docs/SUPABASE_SETUP.md), [MVP specification](PROJECT_SPEC.md), [API contract](docs/API_CONTRACT.md), [database design](docs/DATABASE_SCHEMA.md), [UI plan](docs/UI_PLAN.md), and [progress](docs/PROGRESS.md).
-
-## Hosting
-
-SkillSwap is live at **[skillswap-delta-taupe.vercel.app](https://skillswap-delta-taupe.vercel.app)** on Vercel's Hobby plan. The owner authorized the initial production deployment of Phase 9 source commit `87d48f1` on 2026-10-10; the remote build and live public/protected-route checks passed. Hosted Supabase **SkillSwap** (`avunxagyeywvfjhhowqk`, Mumbai) retains all 13 migrations and uses the matching HTTPS Auth origin/callbacks. Google sign-in is configured; its onboarding was confirmed by the owner. Email/password confirmation still needs email delivery, with custom SMTP absent. Physical-phone calls and real-duration hosted settlement remain manual checks. The first release uses the deployment API; Git pushes do not automatically redeploy it. See [deployment details](docs/DEPLOYMENT.md). No paid resources were created.
-
-## Administration and Google sign-in
-
-The authorized admin extension adds `/admin` with member suspension/restoration, administrator roles, skill management, booking/wallet summaries, dispute review notes, feedback moderation and an immutable audit log. Admin rights are private database membership, checked on the server and in privileged RPCs. Existing credit-transfer rules are unchanged. See [administration and provisioning](docs/ADMIN.md).
-
-Login/signup always show **Continue with Google** and detect Supabase's actual provider availability. The button is disabled until the Google OAuth web client is configured; configuration no longer depends on a stale deployment flag. Google sign-in is enabled in the hosted provider settings. Google-only authentication avoids the email-delivery prerequisite; email/password confirmation still requires email delivery.
-
-## Skills and mobile navigation
-
-On **Profile → Your skills**, search the catalogue or filter by category. If your skill is missing, open **Add a custom skill**, enter its name, choose a category (including Other), and add it to teaching, learning or both. Save your skills to update your profile and discovery matches. Matching names reuse the same skill. New skills work with normal discovery and session booking, and administrators can disable them. Each member can add up to 10 new catalogue skills per rolling 24 hours.
-
-Phones and tablets use a compact Menu with the current page highlighted. Forms stack on narrow screens, primary actions fill the available width, long names wrap, and selected skills remain visible while searching. The optional affiliation is labelled Organization; saved profile values remain compatible.
-
-## Scheduling and credits
-
-Use a member's **Request a session** action, choose an offered skill and a date/time in your saved IANA timezone, select 30/60/90 minutes, review and submit. Bookings show start/end, request expiry, roles and state. The teacher can accept/reject; either participant can cancel before start. Overlapping requests reserve both people's time across teaching/learning roles; rejection/cancellation/expiry releases that time. Requests expire at creation + 24 hours or session start, whichever comes first.
-
-New requests reserve **time and credits**. Verified, onboarded members receive 3 starter credits once. Sessions cost 0.5/1/1.5 credits for 30/60/90 minutes. Reservations reduce availability without moving credits. Rejection, pre-start cancellation or pending expiry releases them. Both participants must confirm after the scheduled end to transfer the exact amount from learner to teacher. Disputes hold funds until both vote to complete (after end) or cancel; mismatched votes have no automatic timeout. Wallet pages show available, reserved and total amounts, private history and active holds.
-
-Historical Phase 5 bookings stay `not_integrated`: create a new request for a funded exchange. They cannot be charged or financially completed. The MVP serializes scheduling/financial routines with one database advisory transaction lock, ordered participant/wallet locks and GiST occupancy constraints. Unique issuance/transfer events, append-only balanced ledger pairs and deferred reconciliation protect financial consistency. This favors correctness for the current release over high-volume throughput.
-
-## Switch between hosted app and local tests
-
-```sh
-npm run hosted:check
-npm run hosted:migrate                          # Explicit remote mutation; inspect the target first
-npm run hosted:configure -- --site-url http://127.0.0.1:3000
-npm run env:hosted                              # Copies ignored public hosted settings into .env.local
-node scripts/environment.mjs prepare-tests      # Local test settings; preserves hosted app selection
-PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e
-# To develop the app against local services again:
-npm run env:local
-```
-
-`SUPABASE_ACCESS_TOKEN` is needed only for management commands. `SUPABASE_PROJECT_REF` or `--project-ref` selects the project; this workspace also retains ignored management metadata. Management migration history is written in the same transaction as each migration. Untracked existing application tables block first-time migration. No local accounts, test data or balances are copied to hosted Supabase. Generated environment files and management metadata remain ignored. Restart after changing environment; rebuild production because Next.js compiles public variables. npm startup/build scripts enable Node’s native environment proxy support for this cloud machine.
-
-Before deployment, configure the exact HTTPS app origin in both `SITE_URL` and hosted Auth, configure custom SMTP if students outside your Supabase team need email, rebuild, and validate real signup/login. Creating the database did not deploy the application.
-
-## Public Jitsi integration
-
-Set `VIDEO_PROVIDER=jitsi_demo`. Open an accepted, funded booking and choose **Prepare for demo call**. Check devices, then join within 10 minutes before start through 15 minutes after end. Public Jitsi requires no API key or separate video server; the first participant may have to authenticate with Jitsi. The new-tab option helps when embedded authentication is blocked. Do not distribute room links.
-
-SkillSwap checks participants, state, funding and time on every in-app grant, limits grants to 8 per minute per member, and assigns an unpredictable room name. This does **not** secure public Jitsi outside the app: a leaked link can allow outsiders and remain usable after the app window. The app states this explicitly and does not issue fake private join tokens. Embedded calls close when polling detects a state change or the app window ends, while external Jitsi sessions cannot be revoked by SkillSwap. Native Jitsi handles device selection and reconnect; leaving a call never settles credits. Full private-video enforcement requires a separately configured private provider/server.
-
-The mobile Jitsi adapter test uses an explicitly labelled browser fixture. It verifies UI and guards, not a real media connection, Jitsi sign-in or two phones.
-
-## Google Meet and community feedback
-
-For an accepted funded booking, the teacher can paste a standard `https://meet.google.com/abc-defg-hij` link on the booking page. Both participants can prepare/open it from the meeting page during the join window. Meet opens in a new tab; Google manages sign-in, admission, devices and call limits. There is no embedded Meet SDK, API key, automatic meeting creation or application Google OAuth dependency. Jitsi remains an alternative. Participant-only link storage protects the link inside SkillSwap; copied external links cannot be revoked by the app. No active Daily package, API request or key is used. Historical applied migrations retain the retired provider’s original schema and its subsequent Jitsi conversion.
-
-After both participants complete and settle a session, each can publish one immutable 1–5 star review of the other with an optional comment of at most 500 characters. Names, ratings and plain-text comments are visible to signed-in members. Profile/discovery scores use the server’s average and count; unrated members show no score. **Community** ranks members with at least 3 received ratings by average, count and stable user-ID ties. Scores never grant or spend credits. Feedback supports safe idempotent retries and paginated received reviews.
-
-Phase 9 adds a single two-account browser journey, Vercel configuration, a read-only deployment readiness command and the [two-person session validation checklist](docs/CLASSROOM_DEMO.md). The site is deployed and Google onboarding works. Hosted email delivery, actual Google Meet/Jitsi calls and physical-phone HTTPS checks remain separate validation tasks.
-
-## Phase 9 verification and hosting preparation
-
-See [deployment instructions](docs/DEPLOYMENT.md) and the [two-phone demonstration checklist](docs/CLASSROOM_DEMO.md). `main` includes the merged Phase 8 application. The additional Phase 9 preparation is on `phase-9-demo-readiness`; use that branch or an explicitly approved merge for these release checks.
-
-```sh
-npm run demo:check       # Read-only hosted configuration report; exits 1 for blockers
-PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:demo
-```
-
-The integrated journey uses two independently confirmed local accounts, responsive browser screens, real reservations/ledger settlement and feedback. Timing and Jitsi SDK fixtures are clearly identified tests, not a live call or accelerated hosted mode. The readiness command checks the hosted project, migration/RLS/Auth settings and SMTP metadata without exposing credentials or making changes. A passing configuration report does not prove email delivery, deployment or live media. `vercel.json` and `.vercelignore` prepare the dynamic Next.js app for an explicitly authorized Vercel deployment and exclude private local files. No deployment has been performed.
-
-For a fast live credit-transfer walkthrough, an administrator can open **Admin → Demo**, enable a **1-minute** demo costing **0.5 credits**, and save with a reason. Learner explicitly chooses **Demo session**; teacher accepts within one minute. Completion opens about two minutes after requesting, and both participants confirm to transfer the real reserved credits. Full instructions are in [the two-person checklist](docs/CLASSROOM_DEMO.md).
-## Upgrade and preserved demo
-
-The owner reports the live Jitsi/credit-transfer demo works. Its exact application source is preserved as `demo-working-2026-10-11`, with backup branch `demo-backup-2026-10-11`. The `product-upgrade` branch adds availability, booking notifications, password recovery, live booking views and restricted support cancellation. See [upgrade and rollback](docs/PRODUCT_UPGRADE.md) before rollout. Production remains on the preserved release while this branch is reviewed; no hosted migrations or deployment are implied by this source change.
+The current URL and release status here supersede older statements in historical phase notes. Roll back application code without resetting accounts, migration history or legitimate transfers; use a retained deployment whose captured `SITE_URL` matches the canonical domain.
