@@ -1,6 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { profileSchema, signupSchema, loginSchema, safeReturnPath } from "@/shared/validation";
+import { profileSchema, signupSchema, loginSchema, safeReturnPath, createBookingSchema } from "@/shared/validation";
 const profile = { displayName: "Student", bio: "Hello", college: "College", timezone: "Asia/Kolkata" };
+describe("quick-call input boundary", () => {
+  const fields = { teacherId: "41000000-0000-4000-8000-000000000001", skillId: "41000000-0000-4000-8000-000000000004", durationMinutes: 30 };
+  it("allows explicit immediate requests and retains existing scheduled clients", () => {
+    expect(createBookingSchema.safeParse({ ...fields, startMode: "now" }).success).toBe(true);
+    expect(createBookingSchema.safeParse({ ...fields, startsAt: "2026-10-12T12:00:00Z" }).success).toBe(true);
+  });
+  it("rejects ambiguous timing, missing scheduling input and client-controlled duration or cost", () => {
+    for (const extra of [{}, { startsAt: null }, { startMode: "now", startsAt: "2026-10-12T12:00:00Z" }, { startMode: "scheduled" }, { startMode: "now", costUnits: 1 }, { startMode: "now", durationMinutes: 1 }]) {
+      expect(createBookingSchema.safeParse({ ...fields, ...extra }).success).toBe(false);
+    }
+  });
+});
 describe("profile input boundary", () => {
   it("accepts and trims valid profile fields", () => expect(profileSchema.parse({ ...profile, displayName: " Student " }).displayName).toBe("Student"));
   it("rejects a client-selected owner", () => expect(profileSchema.safeParse({ ...profile, id: "another-user" }).success).toBe(false));

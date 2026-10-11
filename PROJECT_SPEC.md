@@ -20,6 +20,10 @@ The panel manages member suspension/restoration, admin membership (without remov
 
 The owner authorized shared custom skills, friendlier mobile layouts and public product branding. Verified active onboarded members can create a named catalogue skill or reuse an existing normalized identity, choose a category including Other, and select it for teaching, learning or both. Database-enforced limits allow 10 new skills per member per rolling 24 hours and keep disabled names unavailable. Existing max-20 selections, discovery, booking, credit and moderation rules remain unchanged. The optional affiliation appears as Organization while retaining the compatible `college` field. Public screens describe SkillSwap as a community product; public Jitsi access limits remain visible without academic/demo labels.
 
+## Quick-call scheduling (owner-authorized 2026-10-11)
+
+The owner requested less waiting for live calls. An explicit **Start now** request uses database time to set its formal start five minutes after creation, giving the teacher five minutes to accept. The existing ten-minute early-join window makes both Jitsi and a teacher-added Google Meet link available immediately after acceptance. No date entry or client clock is needed. Pending requests expire at that formal start and release their hold. Retrying the same request key preserves the original booking and timestamps. Scheduled requests retain the 15-minute–30-day window. All durations, prices, participant checks, overlap checks, cancellation deadlines and mutual confirmation after the actual scheduled end remain unchanged; ending a short demonstration does not transfer credits.
+
 ## MVP capabilities and boundaries
 
 | Phase | Deliverable | Completion evidence |
@@ -42,7 +46,7 @@ Decision record: after being offered the core defaults, the owner instructed the
 | --- | --- |
 | Starter grant | Once per verified account after profile onboarding: 3 credits (180 integer minute units). Demo accounts do not receive extra silent grants. |
 | Exact amounts | 1 credit = 60 integer minute units. Never store floating-point balances. 30/60/90-minute sessions cost 30/60/90 units (0.5/1/1.5 credits). |
-| Booking window | Start must be at least 15 minutes and at most 30 days ahead, checked against database time; sessions are fixed-duration and not editable. Cancel and request anew to reschedule. |
+| Booking window | Scheduled requests: 15 minutes–30 days ahead. Explicit Start now requests: server sets start to creation + 5 minutes; call opens upon acceptance. Sessions are fixed-duration and not editable. Cancel and request anew to reschedule. |
 | Participants | Requester is learner, recipient is teacher. Different verified/onboarded accounts; teacher must currently offer the selected catalogue skill. |
 | Reservation | Reserve the full cost when the request is created, atomically with booking and participant occupancy. A pending request holds time and credits for both people. |
 | Expiry | Pending requests expire at the earlier of creation + 24 hours or scheduled start. Expiry releases credits and occupancy exactly once. Reads and mutations process relevant overdue requests; an optional scheduled sweep improves prompt cleanup. |
@@ -104,6 +108,8 @@ The owner requested an open-source/free video option and clarified that this is 
 ## Google Meet and Phase 8 decisions
 
 The owner requested both public Jitsi and Google Meet. Keep Jitsi available; a teacher may add, replace or remove a canonical `https://meet.google.com/xxx-xxxx-xxx` link for an accepted funded booking. Only participants can read it; opening through SkillSwap requires the same join window. Google controls admission and device checks in its new tab. No embedding, Google OAuth integration, automatic meeting creation, key or server is required. Links copied outside the app cannot be revoked by SkillSwap. Calls never change financial completion. Applied historical migrations remain immutable even when they describe retired providers; no active Daily integration or key is needed.
+
+The owner reported failed Meet saves and stale learner link status. Copied HTTPS Google Meet code links may include sharing parameters/fragments; the app strips them before storage and access, while rejecting alternate hosts, credentials, control characters, creation/landing pages and malformed meeting codes. Stored/granted links remain canonical, and existing database guards stay intact. Participants refresh saved-link status automatically or manually; polling preserves an unsaved teacher draft and clears obsolete access when the saved link changes. A shared server-based countdown shows the booking's scheduled start/end for either provider. It continues across navigation and never measures attendance, accelerates a lesson or changes financial eligibility.
 
 Phase 8 uses the adopted one immutable review per completed settled booking participant, 1–5 integer stars and optional plain-text comment of at most 500 characters. The server derives the other participant. Ratings, reviewer identity and comments are published to signed-in members; the UI explains this before submission. Booking details and meeting links stay participant-only. Reputation has no financial effect. The leaderboard requires at least three received ratings and sorts by exact average descending, count descending, then UUID ascending. A retry with the same idempotency key/input returns the original review; a new key cannot create a second review.
 

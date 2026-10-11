@@ -95,6 +95,8 @@ Public Jitsi demo mode needs no video secret. Remove any unused `DAILY_API_KEY` 
 
 Apply the three new migrations (Google Meet, feedback/reputation and actor qualification) through `hosted:migrate` under the owner’s existing hosted setup authorization. Local tests use only `.local/local.env`; active hosted configuration is preserved. Google Meet links need no environment variable, Google API key or OAuth setup. `VIDEO_PROVIDER=jitsi_demo` continues to enable the optional embedded Jitsi demo.
 
+Quick-call support adds `20261011120000_quick_calls.sql` (14 migrations total). Apply it locally with `npm run supabase -- migration up --local` and to the authorized hosted project with `npm run hosted:migrate` before deploying the Start now form. It preserves existing bookings, financial history, RLS and working Google Auth settings; no new key or provider configuration is required.
+
 No active Daily integration remains. Its original applied migration is preserved for database history. The environment draft tool cannot delete requirements: remove the obsolete video key requirement and its `api.daily.co` destination in environment settings. Neither video flow needs that key. Review/save/publish updates for the current branch snapshot.
 
 Current verification: all 10 migrations are applied locally and to hosted SkillSwap; repeated hosted migration applies zero changes. Hosted Auth settings return 200; anonymous feedback/reputation and new RPCs return 401. Complete signed-in workflows are verified locally, not against hosted email or real video media.

@@ -2,6 +2,8 @@
 
 SkillSwap connects people who want to teach and learn through time credits. Members choose or add skills, find learning partners, book sessions, meet through Jitsi or Google Meet, and exchange feedback. It includes Google and email authentication, protected profiles, audited credits and an admin panel. Built with Next.js, TypeScript, Tailwind and Supabase.
 
+For a live call, request a session with **Start now**. The teacher has five minutes to accept; after acceptance, both participants can open **Prepare for call** immediately. Choose **Schedule for later** for a future session. Calls do not transfer credits: both participants confirm after the actual scheduled end. See the [two-person session checklist](docs/CLASSROOM_DEMO.md).
+
 ## Local development
 
 Use Node 24.5 or later (`nvm use` if available), npm, and a running Docker daemon. From the repository root:

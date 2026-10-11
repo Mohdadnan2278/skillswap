@@ -41,10 +41,9 @@ export interface UpdateProfileRequest {
 export interface Skill { id: UUID; slug: string; name: string; category: string }
 export interface SkillSelections { offeredSkillIds: UUID[]; wantedSkillIds: UUID[] }
 export interface DiscoveryMatch { profile: PublicProfile; matchedSkills: Skill[] }
-export interface CreateBookingRequest {
-  teacherId: UUID; skillId: UUID; startsAt: UtcTimestamp;
-  durationMinutes: DurationMinutes;
-}
+export type CreateBookingRequest = {
+  teacherId: UUID; skillId: UUID; durationMinutes: DurationMinutes;
+} & ({ startMode?: "scheduled"; startsAt: UtcTimestamp } | { startMode: "now"; startsAt?: never });
 export interface BookingDispute {
   openedBy: UUID; reason: string; openedAt: UtcTimestamp;
   teacherResolution: DisputeResolution | null;
