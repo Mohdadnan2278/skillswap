@@ -1,5 +1,7 @@
 # SkillSwap
 
+![SkillSwap — Teach. Learn. Grow together.](docs/assets/skillswap-banner.svg)
+
 **Teach what you know. Learn what you need. Exchange time credits.**
 
 SkillSwap is a community platform for one-to-one skill exchanges. Members choose skills they can teach and skills they want to learn, discover partners, book sessions, meet through Jitsi or Google Meet, and exchange credits after mutual completion. The same person can teach in one booking and learn in another.

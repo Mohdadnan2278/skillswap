@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="360" viewBox="0 0 1100 360" role="img" aria-labelledby="title description">
+  <title id="title">SkillSwap</title>
+  <desc id="description">Teach. Learn. Grow together. A community for sharing skills and exchanging time credits.</desc>
+  <defs>
+    <linearGradient id="background" x2="1" y2="1">
+      <stop stop-color="#0b1328"/>
+      <stop offset="1" stop-color="#18132f"/>
+    </linearGradient>
+    <linearGradient id="wordmark" x1="0" x2="1">
+      <stop stop-color="#67e8f9"/>
+      <stop offset="0.52" stop-color="#a5b4fc"/>
+      <stop offset="1" stop-color="#f0abfc"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" x2="1">
+      <stop stop-color="#22d3ee"/>
+      <stop offset="1" stop-color="#c084fc"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop stop-color="#8b5cf6" stop-opacity="0.19"/>
+      <stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1100" height="360" rx="24" fill="url(#background)"/>
+  <rect x="0.5" y="0.5" width="1099" height="359" rx="23.5" fill="none" stroke="#35304f"/>
+  <ellipse cx="925" cy="155" rx="280" ry="255" fill="url(#glow)"/>
+  <path d="M64 37H218" stroke="url(#accent)" stroke-width="4" stroke-linecap="round"/>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="64" y="78" fill="#bac4dc" font-size="16" font-weight="700" letter-spacing="2.3">COMMUNITY POWERED LEARNING</text>
+    <text x="59" y="197" fill="url(#wordmark)" font-size="112" font-weight="800" letter-spacing="-5">SkillSwap</text>
+    <text x="64" y="249" fill="#edf1fc" font-size="30" font-weight="500">Teach. Learn. Grow together.</text>
+    <g font-size="16" font-weight="600" text-anchor="middle">
+      <rect x="64" y="282" width="126" height="36" rx="18" fill="#122c3d" stroke="#24596d"/>
+      <text x="127" y="306" fill="#8be8f5">Teach skills</text>
+      <rect x="202" y="282" width="138" height="36" rx="18" fill="#272242" stroke="#54457b"/>
+      <text x="271" y="306" fill="#d1bcff">Earn credits</text>
+      <rect x="352" y="282" width="162" height="36" rx="18" fill="#30203c" stroke="#6a4275"/>
+      <text x="433" y="306" fill="#f2c1f4">Learn together</text>
+    </g>
+    <g transform="translate(906 173)">
+      <circle r="111" fill="#141a33" stroke="#373357"/>
+      <circle r="84" fill="none" stroke="#39365e" stroke-dasharray="3 9"/>
+      <path d="M-68-20C-54-73 30-85 68-28M68-28V-60M68-28H36" fill="none" stroke="#67e8f9" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M68 20C54 73-30 85-68 28M-68 28V60M-68 28H-36" fill="none" stroke="#c4a0ff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M-28-6L0-20L28-6L0 8Z" fill="#e7e4ff"/>
+      <path d="M-18 5V19Q0 32 18 19V5L0 14Z" fill="#a5b4fc"/>
+      <path d="M28-6V18" stroke="#e7e4ff" stroke-width="3" stroke-linecap="round"/>
+      <text x="0" y="150" fill="#b9c3df" font-size="17" font-weight="600" text-anchor="middle" letter-spacing="1">KNOWLEDGE GOES BOTH WAYS</text>
+    </g>
+  </g>
+</svg>
