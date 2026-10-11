@@ -20,6 +20,10 @@ The panel manages member suspension/restoration, admin membership (without remov
 
 The owner authorized shared custom skills, friendlier mobile layouts and public product branding. Verified active onboarded members can create a named catalogue skill or reuse an existing normalized identity, choose a category including Other, and select it for teaching, learning or both. Database-enforced limits allow 10 new skills per member per rolling 24 hours and keep disabled names unavailable. Existing max-20 selections, discovery, booking, credit and moderation rules remain unchanged. The optional affiliation appears as Organization while retaining the compatible `college` field. Public screens describe SkillSwap as a community product; public Jitsi access limits remain visible without academic/demo labels.
 
+## Quick-call scheduling (owner-authorized 2026-10-11)
+
+The owner requested less waiting for live calls. An explicit **Start now** request uses database time to set its formal start five minutes after creation, giving the teacher five minutes to accept. The existing ten-minute early-join window makes both Jitsi and a teacher-added Google Meet link available immediately after acceptance. No date entry or client clock is needed. Pending requests expire at that formal start and release their hold. Retrying the same request key preserves the original booking and timestamps. Scheduled requests retain the 15-minute–30-day window. All durations, prices, participant checks, overlap checks, cancellation deadlines and mutual confirmation after the actual scheduled end remain unchanged; ending a short demonstration does not transfer credits.
+
 ## MVP capabilities and boundaries
 
 | Phase | Deliverable | Completion evidence |
@@ -42,7 +46,7 @@ Decision record: after being offered the core defaults, the owner instructed the
 | --- | --- |
 | Starter grant | Once per verified account after profile onboarding: 3 credits (180 integer minute units). Demo accounts do not receive extra silent grants. |
 | Exact amounts | 1 credit = 60 integer minute units. Never store floating-point balances. 30/60/90-minute sessions cost 30/60/90 units (0.5/1/1.5 credits). |
-| Booking window | Start must be at least 15 minutes and at most 30 days ahead, checked against database time; sessions are fixed-duration and not editable. Cancel and request anew to reschedule. |
+| Booking window | Scheduled requests: 15 minutes–30 days ahead. Explicit Start now requests: server sets start to creation + 5 minutes; call opens upon acceptance. Sessions are fixed-duration and not editable. Cancel and request anew to reschedule. |
 | Participants | Requester is learner, recipient is teacher. Different verified/onboarded accounts; teacher must currently offer the selected catalogue skill. |
 | Reservation | Reserve the full cost when the request is created, atomically with booking and participant occupancy. A pending request holds time and credits for both people. |
 | Expiry | Pending requests expire at the earlier of creation + 24 hours or scheduled start. Expiry releases credits and occupancy exactly once. Reads and mutations process relevant overdue requests; an optional scheduled sweep improves prompt cleanup. |

@@ -59,6 +59,8 @@ Inside a mutation: establish authorized actor → lock participants → expire r
 
 Pending expiry derives from database time; acceptance and expiry serialize on the same booking/participant locks. If cleanup expires a request and an attempted action is invalid, commit cleanup and return a typed conflict outcome rather than rolling it back via an exception. Reads needing authoritative wallet/bookings run the scoped expiry routine before selecting. A later optional scheduled sweep is not the only correctness mechanism.
 
+`20261011120000_quick_calls.sql` replaces only `create_booking_request`: a null RPC `p_starts_at` explicitly requests a quick call. The original null payload is compared/stored for idempotency before a server start of `clock_timestamp() + 5 minutes` is derived under participant locks. HTTP requires explicit `startMode: "now"` and forbids a supplied timestamp in that mode. Non-null scheduled starts keep the 15-minute–30-day bound. Expiry, occupancy, funded reservations, grants and completion routines are unchanged. No historical migration or existing booking is rewritten, and no new exposed table/column is required.
+
 ## Financial invariants
 
 One credit = 60 units, not a float. Every starter or transfer event has a balanced pair of immutable entries summing to zero. Starter grant posts −180 to a distinguished issuance account (null user) and +180 to the verified member; only the issuance account may be negative. Each user wallet equals the sum of their posted entries; reserved equals their held reservations. Add a reconciliation query/test for both invariants. The system account is represented by ledger entries, not an ordinary member wallet.

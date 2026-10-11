@@ -30,7 +30,11 @@ export const catalogueQuerySchema = z.object({
 export const discoveryQuerySchema = catalogueQuerySchema.extend({ skillId: z.string().uuid().optional() });
 
 export const utcInstantSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/, "Send a UTC timestamp ending in Z.").refine(value => !Number.isNaN(Date.parse(value)) && new Date(value).toISOString().slice(0,19) === value.slice(0,19), "Choose a valid date and time.");
-export const createBookingSchema = z.object({ teacherId: z.string().uuid(), skillId: z.string().uuid(), startsAt: utcInstantSchema, durationMinutes: z.union([z.literal(30),z.literal(60),z.literal(90)]) }).strict();
+const bookingFields = { teacherId: z.string().uuid(), skillId: z.string().uuid(), durationMinutes: z.union([z.literal(30),z.literal(60),z.literal(90)]) };
+export const createBookingSchema = z.union([
+  z.object({ ...bookingFields, startMode: z.literal("scheduled").optional(), startsAt: utcInstantSchema }).strict(),
+  z.object({ ...bookingFields, startMode: z.literal("now") }).strict(),
+]);
 export const bookingStateSchema = z.enum(["pending","accepted","rejected","cancelled","expired","completed","disputed"]);
 export const bookingQuerySchema = catalogueQuerySchema.extend({ state: bookingStateSchema.optional(), role: z.enum(["teacher","learner"]).optional() });
 export const bookingActionSchema = z.enum(["accept","reject","cancel"]);

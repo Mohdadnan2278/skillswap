@@ -63,7 +63,7 @@ Profile validation: display name 2–60 characters, bio 0–500, college 0–120
 
 | Method/path | Request | Response data / actor |
 | --- | --- | --- |
-| POST `/bookings` | `CreateBookingRequest`: `{ teacherId, skillId, startsAt, durationMinutes }` | 201 `Booking`; actor is learner; implemented time/offering/occupancy checks; atomic available-credit check and funded reservation |
+| POST `/bookings` | Scheduled: `{ teacherId, skillId, startsAt, durationMinutes }` (optional `startMode: "scheduled"`); immediate: `{ teacherId, skillId, startMode: "now", durationMinutes }` | 201 `Booking`; actor is learner; implemented time/offering/occupancy checks; atomic available-credit check and funded reservation |
 | GET `/bookings` | Pagination; optional `state`, `role: teacher|learner` | `Page<Booking>`; participant only; expire actor's overdue pending requests first |
 | GET `/bookings/:id` | None | `Booking`; participants only; expire if overdue first |
 | POST `/bookings/:id/accept` | `{}` | `Booking`; teacher; pending/unexpired, before start |
@@ -74,6 +74,8 @@ Profile validation: display name 2–60 characters, bio 0–500, college 0–120
 | POST `/bookings/:id/resolve` | `{ resolution: "complete" | "cancel" }` | `Booking`; participant, disputed; both same votes resolve; complete requires end passed |
 
 `Booking` includes participant IDs, skill ID, start/end, duration, state, authoritative cost units, expiry, confirmation flags, optional participant-visible dispute reason/resolution votes, and created/updated timestamps. Public discovery never includes booking details. Changing skill selections does not invalidate an already requested/accepted session; new requests require the teacher's current offering.
+
+`startMode: "now"` accepts no `startsAt` field. Database time determines a start five minutes after creation, with expiry at that start. Once the teacher accepts, both call access endpoints work immediately through the existing ten-minute early-join window. Idempotent retries return the original booking/timestamps. Scheduled requests still require 15 minutes–30 days ahead; missing/null timestamps do not implicitly opt into immediate scheduling through HTTP. Both modes retain 30/60/90-minute durations, exact costs, conflict/funding/participant checks and post-end mutual settlement.
 
 Financial operations and scheduling become one atomic workflow in Phase 6. Phase 5 explicitly returns `creditReservationStatus: "not_integrated"` and labels financial reservations as unimplemented and must not expose real paid bookings or claim a usable financial workflow before integration. No unauthenticated expiry/settlement endpoint is exposed: use trusted database routines invoked with verified actors and, if configured, a restricted scheduler.
 

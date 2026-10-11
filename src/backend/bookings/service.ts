@@ -8,7 +8,7 @@ import { utcInstantSchema } from "@/shared/validation";
 type Client = SupabaseClient<Database>;
 export type BookingQuery = { limit: number; cursor?: string; state?: string; role?: string };
 const messages: Partial<Record<ErrorCode,string>> = {
- VALIDATION_ERROR: "Choose an offered skill, 30/60/90 minutes, and a start between 15 minutes and 30 days ahead.",
+ VALIDATION_ERROR: "Choose an offered skill, 30/60/90 minutes, and Start now or a scheduled start between 15 minutes and 30 days ahead.",
  INSUFFICIENT_CREDITS: "You do not have enough available credits for this session. Check your wallet or choose a shorter duration.",
  SCHEDULE_CONFLICT: "One of you already has a request or session at that time. Choose another time.",
  IDEMPOTENCY_CONFLICT: "This request key was already used for different details. Start a new request.",
@@ -35,7 +35,7 @@ export function bookingDto(row: BookingRow): Booking {
   createdAt: new Date(row.created_at).toISOString(),updatedAt: new Date(row.updated_at).toISOString() };
 }
 export async function createBooking(client: Client,fields: CreateBookingRequest,key: string) {
- const {data,error}=await client.rpc("create_booking_request",{p_teacher_id:fields.teacherId,p_skill_id:fields.skillId,p_starts_at:fields.startsAt,p_duration:fields.durationMinutes,p_key:key});
+ const {data,error}=await client.rpc("create_booking_request",{p_teacher_id:fields.teacherId,p_skill_id:fields.skillId,p_starts_at:fields.startMode==="now"?null:fields.startsAt,p_duration:fields.durationMinutes,p_key:key});
  const result=outcome(data,error); if (!result.booking) throw new Error("Missing booking result"); return bookingDto(result.booking);
 }
 export async function getBooking(client: Client,id: string) {

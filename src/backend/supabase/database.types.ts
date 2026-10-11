@@ -59,7 +59,7 @@ export interface Database {
       meeting_access_context: { Args: { p_booking_id: string; p_consume?: boolean }; Returns: Json };
       booking_financial_action: { Args: { p_booking_id: string; p_action: string; p_key: string; p_reason?: string; p_resolution?: string }; Returns: Json };
       read_my_wallet: { Args: { p_kind?: string; p_limit?: number; p_after_created?: string; p_after_id?: string }; Returns: Json };
-      create_booking_request: { Args: { p_teacher_id: string; p_skill_id: string; p_starts_at: string; p_duration: number; p_key: string }; Returns: Json };
+      create_booking_request: { Args: { p_teacher_id: string; p_skill_id: string; p_starts_at: string | null; p_duration: number; p_key: string }; Returns: Json };
       booking_action: { Args: { p_booking_id: string; p_action: string; p_key: string }; Returns: Json };
       read_my_bookings: { Args: { p_id?: string; p_after_start?: string; p_after_id?: string; p_state?: string; p_role?: string; p_limit?: number }; Returns: Json };
       replace_my_skills: { Args: { p_offered: string[]; p_wanted: string[] }; Returns: undefined };
