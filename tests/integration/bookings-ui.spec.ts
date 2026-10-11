@@ -14,7 +14,7 @@ test('mobile scheduling review, two-party acceptance, cancellation and local tim
   const parts=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(start)).map(part=>[part.type,part.value]));
   const wall=`${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`;
   await page.getByLabel('Start date and time (Asia/Kolkata)').fill(wall);await page.getByLabel('Duration',{exact:true}).selectOption('30');
-  await page.getByRole('button',{name:'Review request',exact:true}).click();await expect(page.getByRole('heading',{name:'Review your request'})).toBeVisible();
+  await page.getByRole('button',{name:'Review request',exact:true}).click();await expect(page.getByRole('heading',{name:'Review your request'})).toBeVisible();await expect(page.getByRole('region',{name:'Review your request',exact:true})).toBeFocused();
   await expect(page.getByText('This request reserves 0.5 credits',{exact:false})).toBeVisible();
   await page.getByRole('button',{name:'Edit details'}).click();await expect(page.getByLabel('Start date and time (Asia/Kolkata)')).toHaveValue(wall);
   await page.getByRole('button',{name:'Review request',exact:true}).click();await page.getByRole('button',{name:'Send request',exact:true}).click();

@@ -45,18 +45,18 @@ export function AuthForm({ mode, configured, googleEnabled,emailSignupEnabled=tr
     finally { setBusy(false); }
   }
   return <div>
-    {!configured && <p role="status" className="mb-6 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">Sign-in is temporarily unavailable. Please try again later.</p>}
+    {!configured && <p role="status" className="mb-6 rounded-xl bg-warning p-4 text-sm text-warning-ink">Sign-in is temporarily unavailable. Please try again later.</p>}
     {mode==='signup'&&!emailSignupEnabled?<p className="mb-5 leading-6">Join with Google to start teaching and learning. Email signup is currently unavailable.</p>:<form onSubmit={submit} className="space-y-5" aria-busy={busy}>
       <div><label htmlFor="email" className="block font-semibold">Email</label><input id="email" name="email" type="email" required maxLength={254} autoComplete="email" aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? "email-error" : undefined} className="field" /><p id="email-error" className="field-error">{errors.email?.join(" ")}</p></div>
-      <div><label htmlFor="password" className="block font-semibold">Password</label><input id="password" name="password" type="password" required minLength={mode === "signup" ? 8 : undefined} maxLength={128} autoComplete={mode === "signup" ? "new-password" : "current-password"} aria-invalid={Boolean(errors.password)} aria-describedby={mode === "signup" ? "password-hint password-error" : "password-error"} className="field" />{mode === "signup" && <p id="password-hint" className="mt-2 text-sm text-slate-600">At least 8 characters. Use a unique password.</p>}<p id="password-error" className="field-error">{errors.password?.join(" ")}</p></div>
+      <div><label htmlFor="password" className="block font-semibold">Password</label><input id="password" name="password" type="password" required minLength={mode === "signup" ? 8 : undefined} maxLength={128} autoComplete={mode === "signup" ? "new-password" : "current-password"} aria-invalid={Boolean(errors.password)} aria-describedby={mode === "signup" ? "password-hint password-error" : "password-error"} className="field" />{mode === "signup" && <p id="password-hint" className="mt-2 text-sm text-muted">At least 8 characters. Use a unique password.</p>}<p id="password-error" className="field-error">{errors.password?.join(" ")}</p></div>
       {mode === "signup" && <div><label htmlFor="confirmPassword" className="block font-semibold">Confirm password</label><input className="field" id="confirmPassword" name="confirmPassword" type="password" required maxLength={128} autoComplete="new-password" aria-invalid={Boolean(errors.confirmPassword)} aria-describedby="confirmPassword-error" /><p id="confirmPassword-error" className="field-error">{errors.confirmPassword?.join(" ")}</p></div>}
       <button disabled={busy || !configured || confirmationSent} className="primary-button w-full">{busy ? "Please wait…" : mode === "signup" ? "Create account" : "Sign in"}</button>
     </form>}
-    {mode==='login'&&<Link href="/forgot-password" className="mt-4 inline-flex min-h-11 items-center font-semibold text-emerald-800 underline">Forgot password?</Link>}
-    {message && <p role="status" className="mt-5 rounded-xl bg-slate-100 p-4 text-sm">{message}</p>}
+    {mode==='login'&&<Link href="/forgot-password" className="mt-4 inline-flex min-h-11 items-center font-semibold text-accent-strong underline">Forgot password?</Link>}
+    {message && <p role="status" className="mt-5 rounded-xl bg-soft p-4 text-sm">{message}</p>}
     {resendEmail && <button type="button" onClick={resend} disabled={busy} className="secondary-button mt-4 w-full">Resend confirmation</button>}
     <button type="button" onClick={google} disabled={busy || !configured || !googleEnabled} aria-describedby={!googleEnabled ? 'google-status' : undefined} className="secondary-button mt-4 w-full">Continue with Google</button>
-    {!googleEnabled && <p id="google-status" className="mt-2 text-sm text-slate-600">Google sign-in is being set up and is currently unavailable.</p>}
-    <p className="mt-6 text-sm text-slate-600">{mode === "signup" ? "Already have an account? " : "New to SkillSwap? "}<Link href={mode === "signup" ? "/login" : "/signup"} className="font-semibold text-emerald-800 underline">{mode === "signup" ? "Sign in" : "Create an account"}</Link></p>
+    {!googleEnabled && <p id="google-status" className="mt-2 text-sm text-muted">Google sign-in is being set up and is currently unavailable.</p>}
+    <p className="mt-6 text-sm text-muted">{mode === "signup" ? "Already have an account? " : "New to SkillSwap? "}<Link href={mode === "signup" ? "/login" : "/signup"} className="font-semibold text-accent-strong underline">{mode === "signup" ? "Sign in" : "Create an account"}</Link></p>
   </div>;
 }
