@@ -39,7 +39,7 @@ No wallet or starter credits are granted during Phase 3. This migration must not
 
 These steps need public project settings, not a service-role key. Enter credentials securely in environment/provider settings; never send secret values in chat or commit real environment files.
 
-## Optional Google OAuth (unverified)
+## Google OAuth
 
 Follow the current [Supabase Google guide](https://supabase.com/docs/guides/auth/social-login/auth-google). Configure a Google OAuth Web client/consent screen and paste its client ID and secret into Supabase's Google provider settings, not browser code. Add the exact Supabase provider callback (`https://<project-ref>.supabase.co/auth/v1/callback`, or the callback shown for your configured domain) to Google's authorized redirect URIs. Add `<SITE_URL>/auth/callback` to Supabase's redirect allowlist. The button is visible with a disabled status until the actual provider is available; enabling Google in Supabase activates it without redeploying or changing the legacy environment flag. See [admin and Google configuration](ADMIN.md) for this project's exact URLs and the optional secure management helper.
 
@@ -55,7 +55,7 @@ Automated local tests cover:
 - Foreign-origin mutation rejection, callback replay failure, local logout and independent sessions.
 - Chromium at 390×844: signup, confirmation, device timezone selection, onboarding, edit/reload, logout, protected redirect, and sign-in again; dashboard has no horizontal overflow.
 
-For a hosted project, repeat the flow with two real accounts in separate browser sessions: confirm both emails, edit one profile, verify the other remains unchanged, inspect network errors for unauthorized requests, logout one, and verify the other remains signed in. Test an expired link and an unavailable provider. Repeat on physical smartphones over HTTPS before reporting phone readiness. Google OAuth, production SMTP delivery, physical phones, hosted RLS, and fresh-task restoration remain unverified.
+For a hosted project, repeat the flow with two real accounts in separate browser sessions: confirm both emails, edit one profile, verify the other remains unchanged, inspect network errors for unauthorized requests, logout one, and verify the other remains signed in. Test an expired link and an unavailable provider. Repeat on physical smartphones over HTTPS before reporting phone readiness. The owner reports working Google onboarding, and the hosted provider is enabled with its credentials present. Production SMTP delivery, physical phones and fresh-task restoration remain separate checks; hosted RLS is checked by the read-only readiness command.
 
 ## Official guidance consulted
 
