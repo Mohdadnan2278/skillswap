@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { canonicalGoogleMeetUrl } from "@/shared/google-meet";
 
 export const emailSchema = z.string().trim().email("Enter a valid email address.").max(254);
 export const loginSchema = z.object({ email: emailSchema, password: z.string().min(1, "Enter your password.").max(128) }).strict();
@@ -47,5 +48,11 @@ export const resolutionSchema = z.object({ resolution: z.enum(["complete","cance
 export const databaseInstantSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$/).refine(value=>!Number.isNaN(Date.parse(value)));
 
 export const googleMeetUrlSchema = z.string().length(36).regex(/^https:\/\/meet\.google\.com\/[a-z]{3}-[a-z]{4}-[a-z]{3}$/, "Use a Google Meet link like https://meet.google.com/abc-defg-hij without extra parameters.");
-export const googleMeetLinkSchema = z.object({url: googleMeetUrlSchema.nullable()}).strict();
+export const googleMeetInputSchema = z.string().max(2048).transform((value, context) => {
+  const url = canonicalGoogleMeetUrl(value);
+  if (url) return url;
+  context.addIssue({ code: "custom", message: "Paste the meeting link from Google Meet, like https://meet.google.com/abc-defg-hij." });
+  return z.NEVER;
+}).pipe(googleMeetUrlSchema);
+export const googleMeetLinkSchema = z.object({url: googleMeetInputSchema.nullable()}).strict();
 export const feedbackSchema = z.object({rating:z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4),z.literal(5)]),comment:z.string().trim().max(500).default('')}).strict();
