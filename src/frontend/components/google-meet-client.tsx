@@ -87,7 +87,7 @@ export function GoogleMeetClient({ id, canEdit, initialUrl, allowJoin = false }:
     {message && <p role="status" className="mt-3 break-words rounded-xl bg-soft p-3 text-sm">{message}</p>}
     <p className="mt-3 leading-6">The teacher creates a meeting in Google Meet and adds its link here. Calls open in a new tab; Google controls admission and may require sign-in. Jitsi remains available. Joining or leaving transfers no credits.</p>
     {canEdit && <>
-      <a href="https://meet.google.com/new" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex min-h-11 items-center font-semibold text-accent-strong underline">Create a Google Meet meeting</a>
+      <a href="https://meet.google.com/new" target="_blank" rel="noopener noreferrer" className="secondary-button mt-3 min-h-11 font-semibold text-accent-strong">Create a Google Meet meeting</a>
       <p className="mt-2 text-sm leading-6">Create the meeting, copy its link, then return here and save it. Extra sharing parameters are removed automatically.</p>
       <form className="mt-4" onSubmit={event => { event.preventDefault(); void submit(false); }}>
         <label className="block font-semibold" htmlFor="google-meet-url">Google Meet link</label>

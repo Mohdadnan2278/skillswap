@@ -52,11 +52,11 @@ export function AuthForm({ mode, configured, googleEnabled,emailSignupEnabled=tr
       {mode === "signup" && <div><label htmlFor="confirmPassword" className="block font-semibold">Confirm password</label><input className="field" id="confirmPassword" name="confirmPassword" type="password" required maxLength={128} autoComplete="new-password" aria-invalid={Boolean(errors.confirmPassword)} aria-describedby="confirmPassword-error" /><p id="confirmPassword-error" className="field-error">{errors.confirmPassword?.join(" ")}</p></div>}
       <button disabled={busy || !configured || confirmationSent} className="primary-button w-full">{busy ? "Please wait…" : mode === "signup" ? "Create account" : "Sign in"}</button>
     </form>}
-    {mode==='login'&&<Link href="/forgot-password" className="mt-4 inline-flex min-h-11 items-center font-semibold text-accent-strong underline">Forgot password?</Link>}
+    {mode==='login'&&<Link href="/forgot-password" className="secondary-button mt-4 min-h-11 font-semibold text-accent-strong">Forgot password?</Link>}
     {message && <p role="status" className="mt-5 rounded-xl bg-soft p-4 text-sm">{message}</p>}
     {resendEmail && <button type="button" onClick={resend} disabled={busy} className="secondary-button mt-4 w-full">Resend confirmation</button>}
     <button type="button" onClick={google} disabled={busy || !configured || !googleEnabled} aria-describedby={!googleEnabled ? 'google-status' : undefined} className="secondary-button mt-4 w-full">Continue with Google</button>
     {!googleEnabled && <p id="google-status" className="mt-2 text-sm text-muted">Google sign-in is being set up and is currently unavailable.</p>}
-    <p className="mt-6 text-sm text-muted">{mode === "signup" ? "Already have an account? " : "New to SkillSwap? "}<Link href={mode === "signup" ? "/login" : "/signup"} className="font-semibold text-accent-strong underline">{mode === "signup" ? "Sign in" : "Create an account"}</Link></p>
+    <p className="mt-6 text-sm text-muted">{mode === "signup" ? "Already have an account? " : "New to SkillSwap? "}<Link href={mode === "signup" ? "/login" : "/signup"} className="secondary-button font-semibold text-accent-strong">{mode === "signup" ? "Sign in" : "Create an account"}</Link></p>
   </div>;
 }

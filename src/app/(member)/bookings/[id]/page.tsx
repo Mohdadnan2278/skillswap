@@ -42,7 +42,7 @@ export default async function BookingDetail({ params }: { params: Promise<{ id: 
   if (people.error || skill.error) throw new HttpError(503, "DATABASE_UNAVAILABLE", "Booking details are unavailable.");
   const name = (personId: string) => people.data?.find(person => person.id === personId)?.display_name ?? "Member";
   return <section className="mx-auto max-w-2xl">
-    <Link href="/bookings" className="inline-flex min-h-11 items-center text-accent-strong underline">Back to bookings</Link>
+    <Link href="/bookings" className="secondary-button min-h-11 text-accent-strong">Back to bookings</Link>
     <div className="mt-3 flex flex-wrap items-center justify-between gap-3"><h1 className="text-3xl font-bold">Session booking</h1><p data-testid="booking-state" className="rounded-full bg-selected px-3 py-1 text-sm font-semibold uppercase text-accent-deep">{booking.state}</p></div>
     <section id="session-actions" className="mt-5 scroll-mt-4 rounded-2xl border border-line bg-surface p-4 sm:p-5" aria-labelledby="session-actions-title">
       <h2 id="session-actions-title" className="text-xl font-semibold">{booking.state === "completed" ? "Session completed" : funded && ended ? "Finish your session" : "Session controls"}</h2>

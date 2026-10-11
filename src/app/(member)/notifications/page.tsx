@@ -8,7 +8,7 @@ import {NotificationInbox} from '@/frontend/components/notification-inbox';
 import {HttpError} from '@/backend/http';
 export default async function Notifications({searchParams}:{searchParams:Promise<Record<string,string|string[]|undefined>>}){
  const {client,user}=await requirePageSession();const current=await getCurrentUser(client,user);if(!current.profile)redirect('/onboarding');const query=catalogueQuerySchema.safeParse(await searchParams);
- if(!query.success)return <p>Invalid notification page. <Link href="/notifications">Start again</Link></p>;
- let inbox;try{inbox=await notifications(client,user.id,query.data);}catch(e){if(e instanceof HttpError&&e.status===400)return <p>Invalid notification page. <Link href="/notifications">Start again</Link></p>;throw e;}
+ if(!query.success)return <p>Invalid notification page. <Link className="secondary-button" href="/notifications">Start again</Link></p>;
+ let inbox;try{inbox=await notifications(client,user.id,query.data);}catch(e){if(e instanceof HttpError&&e.status===400)return <p>Invalid notification page. <Link className="secondary-button" href="/notifications">Start again</Link></p>;throw e;}
  return <NotificationInbox timezone={current.timezone} {...inbox}/>;
 }

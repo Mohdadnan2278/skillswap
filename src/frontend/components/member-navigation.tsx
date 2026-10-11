@@ -27,7 +27,7 @@ export function MemberNavigation({ isAdmin }: { isAdmin: boolean }) {
   function items(close?: (event: React.MouseEvent<HTMLAnchorElement>) => void) {
     return links.map(([href, label]) => {
       const active = pathname === href || pathname.startsWith(href + "/");
-      return <Link key={href} href={href} onClick={close} aria-current={active ? "page" : undefined} className={`flex min-h-11 items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold ${active ? "bg-selected text-accent-deep" : "text-muted hover:bg-tint hover:text-accent-deep"}`}>{label}{href==='/notifications'&&unread>0&&<span className="rounded-full bg-emerald-800 px-2 py-1 text-xs text-white" aria-label={`${unread} unread notifications`}>{unread>99?'99+':unread}</span>}</Link>;
+      return <Link key={href} href={href} onClick={close} aria-current={active ? "page" : undefined} className={`secondary-button justify-start gap-2 px-3 text-sm ${active ? "bg-selected text-accent-deep" : "text-muted hover:bg-tint hover:text-accent-deep"}`}>{label}{href==='/notifications'&&unread>0&&<span className="rounded-full bg-emerald-800 px-2 py-1 text-xs text-white" aria-label={`${unread} unread notifications`}>{unread>99?'99+':unread}</span>}</Link>;
     });
   }
   return <>

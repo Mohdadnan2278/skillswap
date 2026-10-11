@@ -34,7 +34,9 @@ test("mobile skill selection persists and discovery links to a safe member profi
     await expect(page.getByText("No ratings yet.", { exact: false })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.goto("/people/41000000-0000-4000-8000-999999999999");
-    await expect(page.getByText("This page could not be found.")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Page unavailable", exact: true })).toBeVisible();
+    await page.getByRole("link", { name: "Return to dashboard", exact: true }).click();
+    await expect(page).toHaveURL(/\/dashboard$/);
   } finally {
     await Promise.all([teacher, page.request].map(context => context.put("/api/v1/me/skills", { headers, data: { offeredSkillIds: [], wantedSkillIds: [] } })));
     await teacher.dispose();
