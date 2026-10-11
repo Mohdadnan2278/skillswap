@@ -92,6 +92,6 @@ video, iframe { max-width: 100%; }
   .field:focus-visible { border-color: var(--focus); outline: 2px solid var(--focus); outline-offset: 2px; }
   .field-error { @apply mt-2 text-sm text-danger; }
   .primary-button { @apply inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-emerald-800 px-5 py-3 text-center font-semibold text-white hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto; }
-  .secondary-button { @apply inline-flex min-h-11 items-center justify-center rounded-xl border border-control bg-surface px-4 py-2 text-center font-semibold hover:bg-tint disabled:cursor-not-allowed disabled:opacity-60; }
+  .secondary-button { @apply inline-flex min-h-11 max-w-full items-center justify-center rounded-xl border border-control bg-surface px-4 py-2 text-center align-middle font-semibold hover:bg-tint disabled:cursor-not-allowed disabled:opacity-60; color: var(--accent-strong); }
 }
 button:focus-visible, select:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }

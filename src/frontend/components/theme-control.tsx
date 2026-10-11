@@ -51,7 +51,7 @@ export function ThemeObserver() {
 export function ThemeControl() {
   const preference = useSyncExternalStore(subscribe, readPreference, () => "system" as const);
   return <label className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-xl border border-line bg-surface pl-2">
-    <span className="sr-only">Color theme</span>
+    <span className="text-sm font-semibold">Theme</span>
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="h-4 w-4 text-accent"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
     <select aria-label="Color theme" value={preference} className="min-h-11 max-w-24 cursor-pointer rounded-xl bg-transparent py-2 pl-1 pr-2 text-sm font-semibold" onChange={event => {
       const choice = event.target.value;

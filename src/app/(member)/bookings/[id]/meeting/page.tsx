@@ -39,7 +39,7 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
     {!funded && <Link className="secondary-button mt-3" href={`/bookings/${id}#session-actions`}>{booking.state === "completed" ? "View completed booking" : "Return to booking"}</Link>}
   </section>;
   return <section className="mx-auto max-w-4xl">
-    <Link href={`/bookings/${id}`} className="inline-flex min-h-11 items-center text-accent-strong underline">Back to booking</Link>
+    <Link href={`/bookings/${id}`} className="secondary-button min-h-11 text-accent-strong">Back to booking</Link>
     <h1 className="mt-3 text-2xl font-bold sm:text-3xl">Your video session</h1>
     <p className="mt-2 text-sm leading-6 text-muted">{formatSessionTime(booking.startsAt, current.timezone)} · {current.timezone} · {booking.durationMinutes} minutes</p>
     {message && <p role="status" className="mt-3 rounded-xl bg-warning p-3 text-sm">{message}</p>}

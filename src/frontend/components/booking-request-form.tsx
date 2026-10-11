@@ -86,7 +86,7 @@ export function BookingRequestForm({ teacherId, teacherName, skills, timezone, a
     {draft.startMode === "scheduled" && <div>
       <label htmlFor="request-start" className="block font-semibold">Start date and time ({timezone})</label>
       <input id="request-start" name="startsAt" type="datetime-local" className="field" value={draft.startsAt} onChange={event => setDraft({ ...draft, startsAt: event.target.value })} required aria-describedby="start-help" />
-      <p id="start-help" className="mt-2 text-sm text-muted">15 minutes to 30 days ahead. Times are shown in {timezone}. <Link href="/profile" className="underline">Change your timezone</Link>.</p>
+      <p id="start-help" className="mt-2 text-sm text-muted">15 minutes to 30 days ahead. Times are shown in {timezone}. <Link href="/profile" className="secondary-button">Change your timezone</Link>.</p>
     </div>}
     {draft.startMode!=='demo'&&<div>
       <label htmlFor="request-duration" className="block font-semibold">Duration</label>
@@ -94,7 +94,7 @@ export function BookingRequestForm({ teacherId, teacherName, skills, timezone, a
         <option value="30">30 minutes · 0.5 credits</option><option value="60">60 minutes · 1 credit</option><option value="90">90 minutes · 1.5 credits</option>
       </select>
     </div>}
-    <p className="text-sm">Available: {creditsLabel(availableUnits)}. <Link href="/wallet" className="underline">View wallet</Link></p>
+    <p className="text-sm">Available: {creditsLabel(availableUnits)}. <Link href="/wallet" className="secondary-button">View wallet</Link></p>
     <button className="primary-button" disabled={availableUnits < 30}>Review request</button>
   </form> : <section ref={reviewPane} tabIndex={-1} className="scroll-mt-4 rounded-2xl bg-surface p-6" aria-label="Review your request" aria-busy={busy}>
     <h2 className="text-xl font-semibold">Review your request</h2>

@@ -83,7 +83,7 @@ test('320px Start now booking needs no date, preserves edits and enables both ca
     await expect(page.getByLabel('Start date and time', { exact: false })).toHaveCount(0);
     await page.getByLabel('Duration', { exact: true }).selectOption('30');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await page.screenshot({ path: '.local/quick-call-request-mobile.png', fullPage: true });
+    await page.screenshot({ path: '.local/quick-call-request-mobile.png', fullPage: true, caret: 'initial' });
     await page.getByRole('button', { name: 'Review request', exact: true }).click();
     await expect(page.getByText('Immediately after the teacher accepts', { exact: true })).toBeVisible();
     await expect(page.getByText('It expires in 5 minutes', { exact: false })).toBeVisible();
@@ -133,7 +133,7 @@ test('320px Start now booking needs no date, preserves edits and enables both ca
     await page.reload();
     await expect(timer).toBeVisible();
     expect(seconds(await timer.innerText())).toBeLessThanOrEqual(beforeReload + 1);
-    await page.screenshot({ path: '.local/meet-schedule-mobile.png', fullPage: true });
+    await page.screenshot({ path: '.local/meet-schedule-mobile.png', fullPage: true, caret: 'initial' });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect(await wallet(page.request)).toEqual({ settledUnits: 180, reservedUnits: 30, availableUnits: 150 });
   } finally {
