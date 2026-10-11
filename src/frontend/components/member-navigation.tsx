@@ -3,10 +3,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { LogoutButton } from "@/frontend/components/logout-button";
+import {useUnreadNotifications} from './notification-inbox';
 
-const destinations = [["/dashboard", "Dashboard"], ["/discover", "Discover"], ["/bookings", "Bookings"], ["/wallet", "Wallet"], ["/community", "Community"], ["/profile", "Profile"]] as const;
+const destinations = [["/dashboard", "Dashboard"], ["/discover", "Discover"], ["/bookings", "Bookings"], ["/notifications", "Notifications"], ["/wallet", "Wallet"], ["/community", "Community"], ["/profile", "Profile"]] as const;
 export function MemberNavigation({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname();
+  const unread=useUnreadNotifications();
   const menu = useRef<HTMLDetailsElement>(null);
   useEffect(() => {
     const closeOutside = (event: PointerEvent) => {
@@ -25,13 +27,13 @@ export function MemberNavigation({ isAdmin }: { isAdmin: boolean }) {
   function items(close?: (event: React.MouseEvent<HTMLAnchorElement>) => void) {
     return links.map(([href, label]) => {
       const active = pathname === href || pathname.startsWith(href + "/");
-      return <Link key={href} href={href} onClick={close} aria-current={active ? "page" : undefined} className={`flex min-h-11 items-center rounded-xl px-3 py-2 text-sm font-semibold ${active ? "bg-emerald-100 text-emerald-900" : "text-slate-600 hover:bg-emerald-50 hover:text-emerald-900"}`}>{label}</Link>;
+      return <Link key={href} href={href} onClick={close} aria-current={active ? "page" : undefined} className={`flex min-h-11 items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold ${active ? "bg-emerald-100 text-emerald-900" : "text-slate-600 hover:bg-emerald-50 hover:text-emerald-900"}`}>{label}{href==='/notifications'&&unread>0&&<span className="rounded-full bg-emerald-800 px-2 py-1 text-xs text-white" aria-label={`${unread} unread notifications`}>{unread>99?'99+':unread}</span>}</Link>;
     });
   }
   return <>
     <nav aria-label="Member navigation" className="hidden flex-wrap items-center gap-1 lg:flex">{items()}<LogoutButton /></nav>
     <details ref={menu} className="group lg:hidden">
-      <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-xl border border-emerald-900/15 px-3 py-2 text-sm font-semibold text-emerald-800"><span className="hidden min-[360px]:inline">{current}</span><span>Menu</span><span aria-hidden="true" className="group-open:rotate-180">⌄</span></summary>
+      <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-xl border border-emerald-900/15 px-3 py-2 text-sm font-semibold text-emerald-800"><span className="hidden min-[360px]:inline">{current}</span><span>Menu</span>{unread>0&&<span role="status" aria-label={`${unread} unread notifications`} className="rounded-full bg-emerald-800 px-2 py-1 text-xs text-white">{unread>99?'99+':unread}</span>}<span aria-hidden="true" className="group-open:rotate-180">⌄</span></summary>
       <nav aria-label="Mobile member navigation" className="absolute inset-x-0 top-full z-20 grid grid-cols-2 gap-2 rounded-b-2xl border border-emerald-900/15 bg-white p-4 shadow-lg">{items(event => event.currentTarget.closest("details")?.removeAttribute("open"))}<div className="col-span-2 border-t border-emerald-900/15 pt-2"><LogoutButton /></div></nav>
     </details>
   </>;

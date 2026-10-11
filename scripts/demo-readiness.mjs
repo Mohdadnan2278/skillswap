@@ -34,12 +34,21 @@ if (settings.SUPABASE_ACCESS_TOKEN && report.projectRef && report.checks.find(c 
     const expected = readdirSync(join(root, 'supabase/migrations')).filter(f => /^\d{14}_[a-z0-9_]+\.sql$/.test(f)).map(f => f.slice(0, 14));
     const applied = new Set(history.map(row => row.version));
     add('migrations', expected.length > 0 && expected.every(version => applied.has(version)), `${expected.length} repository migrations must be applied; this check never applies them.`);
-    const tables = ['profiles', 'account_preferences', 'skills', 'user_skills', 'bookings', 'wallets', 'reservations', 'ledger_entries', 'booking_confirmations', 'booking_disputes', 'booking_dispute_votes', 'feedback'];
-    add('row_security', tables.every(name => security.some(row => row.relname === name && row.relrowsecurity === true)), 'All 12 exposed application tables must retain row security.');
+    const tables = ['profiles', 'account_preferences', 'skills', 'user_skills', 'bookings', 'wallets', 'reservations', 'ledger_entries', 'booking_confirmations', 'booking_disputes', 'booking_dispute_votes', 'feedback','member_availability','booking_notifications'];
+    add('row_security', tables.every(name => security.some(row => row.relname === name && row.relrowsecurity === true)), 'All 14 exposed application tables must retain row security.');
     add('confirmed_email', auth.mailer_autoconfirm === false && auth.external_email_enabled === true, 'Signup must require confirmed email.');
     const callbacks = String(auth.uri_allow_list ?? '').split(',').map(value => value.trim());
-    add('auth_origin', Boolean(report.siteOrigin) && auth.site_url === report.siteOrigin && [`${report.siteOrigin}/auth/callback`, `${report.siteOrigin}/auth/confirm`].every(url => callbacks.includes(url)), 'Auth site URL and both exact callbacks must match SITE_URL.');
-    add('student_email', Boolean(auth.smtp_host && auth.smtp_user && auth.smtp_admin_email) || (googleAvailable && auth.external_google_enabled===true), 'Student access needs custom SMTP for email signup or configured Google sign-in. Verify the chosen flow with real accounts.');
+    const emailEnabled=settings.EMAIL_DELIVERY_ENABLED==='true';
+    const requiredCallbacks=['auth/callback','auth/confirm',...(emailEnabled?['auth/recovery']:[])];
+    add('auth_origin', Boolean(report.siteOrigin) && auth.site_url === report.siteOrigin && requiredCallbacks.every(path => callbacks.includes(`${report.siteOrigin}/${path}`)), 'Auth site URL and required exact callbacks must match SITE_URL.');
+    const smtpConfigured=Boolean(auth.smtp_host && auth.smtp_user && auth.smtp_admin_email);
+    add('student_email', (emailEnabled && smtpConfigured) || (googleAvailable && auth.external_google_enabled===true), 'Student access needs explicitly enabled SMTP email signup or configured Google sign-in. Verify the chosen flow with real accounts.');
+    if(emailEnabled)add('email_delivery',smtpConfigured,'Email signup/recovery opt-in requires a configured SMTP sender and manual delivery testing.');
+    const [worker]=await management('/database/query',{query:"select to_regprocedure('private.sweep_booking_requests()') is not null as worker_present,to_regclass('cron.job') is not null as cron_present;"});
+    add('expiry_worker',worker?.worker_present===true,'The restricted expiry worker must be applied.');
+    let expiryScheduled=false;
+    if(worker?.cron_present){const jobs=await management('/database/query',{query:"select active,schedule,command from cron.job where jobname='skillswap-expire-pending';"});expiryScheduled=jobs.some(job=>job.active&&job.schedule==='* * * * *'&&job.command==='select private.sweep_booking_requests();');}
+    add('expiry_schedule',expiryScheduled,'The named one-minute pending-request expiry job must be enabled; this check never schedules it.');
     if (googleAvailable) add('google_oauth', auth.external_google_enabled === true, 'Google is available in Supabase; a real Google callback still needs manual testing.');
   } catch { add('management_checks', false, 'Hosted management checks could not complete; credentials and error responses are withheld.'); }
 } else add('management_checks', false, 'Migration/Auth/SMTP checks need the existing management token and matching hosted project.');

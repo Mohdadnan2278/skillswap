@@ -28,6 +28,11 @@ export function getSiteOrigin() {
   } catch { return null; }
 }
 export function isAuthConfigured() { return Boolean(getSupabaseConfig() && getSiteOrigin()); }
+/** Production email flows require an explicitly configured sender; local mail is available. */
+export function emailDeliveryEnabled(){
+ if(process.env.EMAIL_DELIVERY_ENABLED!==undefined)return process.env.EMAIL_DELIVERY_ENABLED==='true';
+ const origin=getSiteOrigin();return Boolean(origin&&['localhost','127.0.0.1'].includes(new URL(origin).hostname));
+}
 export async function googleAuthEnabled() {
   const config=getSupabaseConfig();if(!config)return false;
   try {

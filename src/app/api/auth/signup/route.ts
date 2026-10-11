@@ -1,5 +1,5 @@
 import { apiHandler, requireConfiguration, requireSameOrigin, parseJson, success, HttpError } from "@/backend/http";
-import { getSiteOrigin } from "@/backend/config";
+import { getSiteOrigin,emailDeliveryEnabled } from "@/backend/config";
 import { createSupabaseServerClient } from "@/backend/supabase/server";
 import { signupSchema } from "@/shared/validation";
 
@@ -7,6 +7,7 @@ export async function POST(request: Request) {
   return apiHandler(async () => {
     requireConfiguration(); requireSameOrigin(request);
     const fields = await parseJson(request, signupSchema);
+    if(!emailDeliveryEnabled())throw new HttpError(503,'PROVIDER_UNAVAILABLE','Join with Google. Email signup is currently unavailable.');
     const client = await createSupabaseServerClient(true);
     const { data, error } = await client.auth.signUp({ ...fields, options: { emailRedirectTo: `${getSiteOrigin()}/auth/callback` } });
     if (error?.status === 429) throw new HttpError(429, "RATE_LIMITED", "Please wait before requesting another confirmation email.");

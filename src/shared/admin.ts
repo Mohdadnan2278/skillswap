@@ -3,7 +3,7 @@ export const adminSections=['overview','demo','members','skills','bookings','dis
 export const adminQuerySchema=z.object({section:z.enum(adminSections).default('overview'),page:z.coerce.number().int().min(0).max(4000).default(0),search:z.string().trim().max(100).default('')}).strict();
 const reason=z.string().trim().min(10,'Give a reason of at least 10 characters.').max(500);
 const target=z.string().uuid();
-const actions=['suspend_member','restore_member','grant_admin','revoke_admin','enable_skill','disable_skill','hide_feedback','restore_feedback','review_dispute'] as const;
+const actions=['suspend_member','restore_member','grant_admin','revoke_admin','enable_skill','disable_skill','hide_feedback','restore_feedback','review_dispute','cancel_stuck_booking'] as const;
 export const adminCommandSchema=z.union([
  z.object({action:z.enum(actions),target,reason}).strict(),
  z.object({action:z.literal('create_skill'),reason,slug:z.string().min(2).max(60).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/),name:z.string().trim().min(2).max(80),category:z.string().trim().min(2).max(60)}).strict(),

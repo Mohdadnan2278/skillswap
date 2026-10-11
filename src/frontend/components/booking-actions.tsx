@@ -1,10 +1,11 @@
 "use client";
-import {useEffect,useRef,useState,type FormEvent} from 'react';
+import {useRef,useState,type FormEvent} from 'react';
 import {useRouter} from 'next/navigation';
+import {usePageRefresh} from './live-refresh';
 import type {ApiResponse,Booking,BookingAction} from '@/shared/contracts';
-export function BookingActions({id,actions,canResolveComplete=false,refreshWhileActive=false}:{id:string;actions:BookingAction[];canResolveComplete?:boolean;refreshWhileActive?:boolean}) {
+export function BookingActions({id,actions,canResolveComplete=false,refreshWhileActive=false,refreshSeconds=15}:{id:string;actions:BookingAction[];canResolveComplete?:boolean;refreshWhileActive?:boolean;refreshSeconds?:number}) {
  const router=useRouter();const attempt=useRef<{fingerprint:string;key:string}|null>(null);const [busy,setBusy]=useState(false);const [message,setMessage]=useState('');const [reason,setReason]=useState('');
- useEffect(()=>{if(!refreshWhileActive||busy)return;const interval=setInterval(()=>router.refresh(),5000);return()=>clearInterval(interval);},[refreshWhileActive,busy,router]);
+ usePageRefresh(refreshWhileActive&&!busy,refreshSeconds);
  async function act(action:BookingAction,fields:{reason?:string;resolution?:'complete'|'cancel'}={}) {
   setBusy(true);setMessage('');const fingerprint=JSON.stringify({action,fields});
   if(attempt.current?.fingerprint!==fingerprint)attempt.current={fingerprint,key:crypto.randomUUID()};
