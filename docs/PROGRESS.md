@@ -1,5 +1,9 @@
 # Progress
 
+## Friendly production URL — 2026-10-11
+
+The owner requested `skillswap-comm.vercel.app`. It is verified and assigned to READY deployment `dpl_67e2bxdGytmLjsDNoWQX6FbYa5pU`, rebuilt from the exact original demo source `69b77dc88186ca9c046459efeb62c8080af5084b`. Updated production SITE_URL and Supabase Site URL, retained prior callback entries and added exact new callbacks, and redirected the old domain with HTTP 307. Google credentials and all application/financial data remain unchanged; the separate upgrade code and migrations are not released. Vercel alias/readiness/source, Auth settings and the old-domain redirect are verified. New-hostname HTTP/sign-in checks are blocked by the current environment allowlist; its new network rule is saved for publication. See [current URL and origin-safe rollback](FRIENDLY_URL.md).
+
 ## Phase 10 — Product upgrade with a retained working release — 2026-10-11
 
 The owner reports a successful live Jitsi call and a 0.5-credit transfer leaving 2.5/3.5 credits. Pushed exact production-source tag `demo-working-2026-10-11` at `69b77dc88186ca9c046459efeb62c8080af5084b` and merged-release backup branch `demo-backup-2026-10-11`. Work is isolated on `product-upgrade`. The existing Vercel deployment and hosted database remain unchanged throughout implementation.

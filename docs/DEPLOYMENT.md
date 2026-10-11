@@ -1,5 +1,7 @@
 # Hosting SkillSwap
 
+The canonical URL is now **https://skillswap-comm.vercel.app**; the previous address redirects to it. The same preserved demo source was rebuilt with the new origin, with no upgrade migrations or new features released. See [current domain configuration and rollback](FRIENDLY_URL.md); this supersedes the older URL/deployment references below.
+
 The owner has since completed a successful live Jitsi/credit-transfer demo. The working application is retained under `demo-working-2026-10-11`; `product-upgrade` is a separate tested review branch. No upgrade migration, scheduler or deployment has been applied to production. Follow [upgrade and rollback](PRODUCT_UPGRADE.md) for the additive two-migration rollout and recovery procedure. Git pushes do not currently auto-deploy.
 
 SkillSwap is live at **https://skillswap-delta-taupe.vercel.app**. Vercel's existing Hobby project runs source commit `69b77dc88186ca9c046459efeb62c8080af5084b` from `admin-demo`; deployment `dpl_7NEQd9BRtTTfCYPTkZ8KFMfXTTqx` reached READY with the production domain assigned on 2026-10-11. The release includes admin-configured short credit-transfer Demo sessions, immediate Start now calls, copied Meet link normalization, participant refresh and server-based countdowns. The owner explicitly authorized short actual demo durations with separately selected real credit costs; standard scheduling and costs remain intact. Supabase retains all 16 migrations and the same HTTPS Auth origin/callbacks. Google onboarding is reported working by the owner. No paid resources were provisioned.
@@ -20,7 +22,7 @@ Configure these values in Vercel **Production** before the production build:
 | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://avunxagyeywvfjhhowqk.supabase.co` |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | The project's public publishable key or legacy `anon` key from Supabase Project Settings → API; never a secret/service-role key |
-| `SITE_URL` | `https://skillswap-delta-taupe.vercel.app` |
+| `SITE_URL` | `https://skillswap-comm.vercel.app` |
 | `VIDEO_PROVIDER` | `jitsi_demo` (Google Meet links also work) |
 | `GOOGLE_AUTH_ENABLED` | Legacy compatibility value; Google availability comes from live Supabase Auth settings |
 | `EMAIL_DELIVERY_ENABLED` | `false` until a real SMTP sender and recovery flow are configured and tested; `true` then enables hosted email signup/recovery |

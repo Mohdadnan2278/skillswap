@@ -1,8 +1,10 @@
 # Product upgrade and rollback
 
+The owner subsequently authorized the friendly production address; the exact same demo source was rebuilt with that origin. See [domain configuration](FRIENDLY_URL.md). This changes the retained deployment/origin, not the unreleased upgrade status.
+
 ## Preserved working release
 
-The owner reports successful Google onboarding, a live Jitsi call and a 0.5-credit transfer leaving 2.5 and 3.5 credits. Production remains `https://skillswap-delta-taupe.vercel.app`, deployment `dpl_7NEQd9BRtTTfCYPTkZ8KFMfXTTqx`, source `69b77dc88186ca9c046459efeb62c8080af5084b`.
+The owner reports successful Google onboarding, a live Jitsi call and a 0.5-credit transfer leaving 2.5 and 3.5 credits. Production remains `https://skillswap-comm.vercel.app`, deployment `dpl_67e2bxdGytmLjsDNoWQX6FbYa5pU`, source `69b77dc88186ca9c046459efeb62c8080af5084b`.
 
 - Git tag: `demo-working-2026-10-11` — exact production application source.
 - Backup branch: `demo-backup-2026-10-11` — merged working release, including release documentation.
@@ -40,7 +42,7 @@ The public `meet.jit.si` configuration announces new provider meeting limits and
 
 ## Returning to the working application
 
-Use Vercel's deployment view to promote the retained READY deployment `dpl_7NEQd9BRtTTfCYPTkZ8KFMfXTTqx` back to production. Alternatively rebuild the exact Git tag `demo-working-2026-10-11` with the original production configuration. The backup branch includes the same application source. Preserve the existing site URL, Google credentials and domain.
+Use Vercel's deployment view to promote the retained READY deployment `dpl_67e2bxdGytmLjsDNoWQX6FbYa5pU` back to production. Alternatively rebuild the exact Git tag `demo-working-2026-10-11` with the original production configuration. The backup branch includes the same application source. Preserve the existing site URL, Google credentials and domain.
 
 Do **not** roll back ledger data, delete new tables, reset migration history or restore old balances. Keep additive migrations and legitimately recorded cancellations/transfers. The old app does not depend on availability/notification tables and remains compatible. If a scheduled expiry job is implicated, disable only the named `skillswap-expire-pending` job after inspecting its run history; the old app's normal lazy expiry still works.
 
