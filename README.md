@@ -60,7 +60,7 @@ See [Supabase setup](docs/SUPABASE_SETUP.md), [MVP specification](PROJECT_SPEC.m
 
 ## Hosting
 
-SkillSwap is live at **[skillswap-delta-taupe.vercel.app](https://skillswap-delta-taupe.vercel.app)** on Vercel's Hobby plan. The owner authorized the production deployment of Phase 9 source commit `87d48f1` on 2026-10-10; the remote build and live public/protected-route checks passed. Hosted Supabase **SkillSwap** (`avunxagyeywvfjhhowqk`, Mumbai) retains all 10 migrations and uses the matching HTTPS Auth origin/callbacks. Email confirmation is required, and custom SMTP is still needed for ordinary student signup. Actual email delivery, physical-phone calls and real-duration hosted settlement remain pending. The first release uses the deployment API; Git pushes do not automatically redeploy it. See [deployment details](docs/DEPLOYMENT.md). No paid resources were created.
+SkillSwap is live at **[skillswap-delta-taupe.vercel.app](https://skillswap-delta-taupe.vercel.app)** on Vercel's Hobby plan. The owner authorized the initial production deployment of Phase 9 source commit `87d48f1` on 2026-10-10; the remote build and live public/protected-route checks passed. Hosted Supabase **SkillSwap** (`avunxagyeywvfjhhowqk`, Mumbai) retains all 12 migrations and uses the matching HTTPS Auth origin/callbacks. Email confirmation is required, and custom SMTP is still needed for ordinary student signup. Actual email delivery, physical-phone calls and real-duration hosted settlement remain pending. The first release uses the deployment API; Git pushes do not automatically redeploy it. See [deployment details](docs/DEPLOYMENT.md). No paid resources were created.
 
 ## Administration and Google sign-in
 

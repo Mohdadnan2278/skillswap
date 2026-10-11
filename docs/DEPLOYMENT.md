@@ -1,6 +1,6 @@
 # Hosting SkillSwap
 
-SkillSwap is live at **https://skillswap-delta-taupe.vercel.app**. The owner explicitly authorized deployment on 2026-10-10. Vercel's Hobby project runs source commit `87d48f1682fc3aa5aaee4c896aa754ddc15d4dfe` from `phase-9-demo-readiness`; the deployment reached `READY` and its production domain was assigned. Supabase Auth uses this exact HTTPS origin and callbacks. No branch was merged and no paid resources were provisioned.
+SkillSwap is live at **https://skillswap-delta-taupe.vercel.app**. The owner explicitly authorized deployment on 2026-10-10 and requested the admin/Google extension on 2026-10-11. Vercel's Hobby project now runs source commit `8f217557ffa898dd27ee02a357120b0ce5f1e98e` from `admin-google-auth`; deployment `dpl_3BoQB6q8gZNLdSemPEfCC12k2FCA` reached `READY` with the production domain assigned. Supabase Auth uses this exact HTTPS origin and callbacks. No branch was merged by the assistant and no paid resources were provisioned.
 
 ## Vercel configuration prepared
 
@@ -48,7 +48,9 @@ npm run demo:check
 npm run demo:check -- --env-file .local/hosted.env
 ```
 
-This does not deploy, alter Auth, apply migrations, create accounts or issue credits. It checks HTTPS/public-key/project consistency, hosted Auth connectivity, migration versions, application row security, confirmed-email settings, exact callbacks and SMTP metadata. It prints no credential values and exits **1** if a required setting/check is blocked. Management checks require the already securely bound management token. A passing report establishes configuration checks only; it explicitly lists live email, real phones and real-duration completion as manual checks. The post-deployment report passes the HTTPS origin, exact callbacks and other hosted checks; it still exits 1 because custom SMTP is absent.
+This does not deploy, alter Auth, apply migrations, create accounts or issue credits. It checks HTTPS/public-key/project consistency, hosted Auth connectivity, migration versions, application row security, confirmed-email settings, exact callbacks and signup-provider availability. It prints no credential values and exits **1** if a required setting/check is blocked. Management checks require the already securely bound management token. A passing report establishes configuration checks only. The latest report passes the HTTPS origin, 12 migrations, exact callbacks and other hosted checks; it still exits 1 because neither custom SMTP nor Google OAuth is configured for ordinary student signup. Google-only sign-in can avoid SMTP once a real OAuth web client is configured; the live button detects provider availability automatically. See [admin and Google setup](ADMIN.md).
+
+The admin extension passed 29 unit tests and all 19 integration/mobile cases, plus the production checks and Vercel build. Live checks verified the explicitly requested demo administrator's password login, all seven admin sections and `/admin`, logout, anonymous admin API denial, and a visible Google option with its pending setup state. Its random login details are in an ignored private file and were never included in the 153 uploaded source files. No real Google callback or phone media call is claimed.
 
 The release reran all 27 unit tests and `npm run check` successfully. Vercel's remote production build also passed. Live HTTP checks returned 200 for home/login/signup, 307 to login for dashboard/wallet/community, 401 for anonymous booking/wallet/leaderboard/review APIs, and 403 for a foreign-origin feedback mutation. Private responses remain `no-store`. No hosted test accounts, financial fixtures or real media calls were created by these checks.
 
