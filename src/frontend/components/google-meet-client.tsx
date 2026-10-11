@@ -81,11 +81,13 @@ export function GoogleMeetClient({ id, canEdit, initialUrl, allowJoin = false }:
     finally { working.current = false; setBusy(false); }
   }
 
-  return <section className="mt-7 rounded-2xl border border-emerald-900/15 bg-white p-5">
+  return <section className="mt-7 rounded-2xl border border-line bg-surface p-5">
     <h2 className="text-xl font-semibold">Google Meet option</h2>
+    {allowJoin && <div className="mt-3 flex flex-wrap gap-3">{grant ? <a href={grant.url} target="_blank" rel="noopener noreferrer" className="primary-button">Open Google Meet in a new tab</a> : <button className="primary-button" type="button" disabled={busy || blocked || !savedUrl} onClick={() => void submit(true)}>{busy ? 'Checking…' : 'Prepare Google Meet'}</button>}</div>}
+    {message && <p role="status" className="mt-3 break-words rounded-xl bg-soft p-3 text-sm">{message}</p>}
     <p className="mt-3 leading-6">The teacher creates a meeting in Google Meet and adds its link here. Calls open in a new tab; Google controls admission and may require sign-in. Jitsi remains available. Joining or leaving transfers no credits.</p>
     {canEdit && <>
-      <a href="https://meet.google.com/new" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex min-h-11 items-center font-semibold text-emerald-800 underline">Create a Google Meet meeting</a>
+      <a href="https://meet.google.com/new" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex min-h-11 items-center font-semibold text-accent-strong underline">Create a Google Meet meeting</a>
       <p className="mt-2 text-sm leading-6">Create the meeting, copy its link, then return here and save it. Extra sharing parameters are removed automatically.</p>
       <form className="mt-4" onSubmit={event => { event.preventDefault(); void submit(false); }}>
         <label className="block font-semibold" htmlFor="google-meet-url">Google Meet link</label>
@@ -96,10 +98,7 @@ export function GoogleMeetClient({ id, canEdit, initialUrl, allowJoin = false }:
     {!canEdit && <p className="mt-4" role="status">{savedUrl ? 'The teacher has added a Meet link.' : 'The teacher has not added a Meet link yet. This screen updates automatically when they save it. You can still use Jitsi.'}</p>}
     <div className="mt-4 flex flex-wrap gap-3">
       <button className="secondary-button" type="button" disabled={busy} onClick={() => void refreshLink(true)}>Refresh Meet link</button>
-      {allowJoin && <button className="primary-button" type="button" disabled={busy || blocked || !savedUrl} onClick={() => void submit(true)}>{busy ? 'Checking…' : 'Prepare Google Meet'}</button>}
     </div>
-    {grant && <a href={grant.url} target="_blank" rel="noopener noreferrer" className="mt-4 block min-h-11 break-words font-semibold text-emerald-800 underline">Open Google Meet in a new tab</a>}
-    {message && <p role="status" className="mt-4 break-words">{message}</p>}
-    <p className="mt-4 text-sm leading-6 text-slate-600">Links are shared only with booking participants in SkillSwap. A copied link can stay usable outside the app, including after cancellation or the join window.</p>
+    <p className="mt-4 text-sm leading-6 text-muted">Links are shared only with booking participants in SkillSwap. A copied link can stay usable outside the app, including after cancellation or the join window.</p>
   </section>;
 }

@@ -71,12 +71,15 @@ test('two mobile browsers complete signup → match → book → demo access →
     await test.step('Explicit local join-window and Jitsi browser fixtures exercise app access', async () => {
       meetingClockFixture(bookingId);
       await page.reload();
+      await page.getByRole('button', {name: 'Use Google Meet', exact: true}).click();
       await page.getByRole('button', {name: 'Prepare Google Meet', exact: true}).click();
       await expect(page.getByRole('link', {name: 'Open Google Meet in a new tab'})).toHaveAttribute('href', 'https://meet.google.com/abc-defg-hij');
       await page.route('https://meet.jit.si/external_api.js', route => route.fulfill({contentType: 'application/javascript', body: `window.JitsiMeetExternalAPI=class {constructor(domain,options){this.host=options.parentNode;this.frame=document.createElement('div');this.frame.textContent='Explicit Phase 9 Jitsi UI fixture';this.host.appendChild(this.frame);}addEventListeners(events){this.events=events;setTimeout(()=>events.videoConferenceJoined(),10);}dispose(){this.frame.remove();}};`}));
+      await page.getByRole('button', {name: 'Use Jitsi', exact: true}).click();
       await page.getByRole('button', {name: 'Join call', exact: true}).click();
       await expect(page.getByText('Connected to Jitsi.', {exact: false})).toBeVisible();
       await teacherPage.goto(`/bookings/${bookingId}/meeting`);
+      await teacherPage.getByRole('button', {name: 'Use Google Meet', exact: true}).click();
       await teacherPage.getByRole('button', {name: 'Prepare Google Meet', exact: true}).click();
       await expect(teacherPage.getByRole('link', {name: 'Open Google Meet in a new tab'})).toHaveAttribute('href', 'https://meet.google.com/abc-defg-hij');
       await page.getByRole('button', {name: 'Leave call', exact: true}).click();

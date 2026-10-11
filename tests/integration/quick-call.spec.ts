@@ -101,6 +101,7 @@ test('320px Start now booking needs no date, preserves edits and enables both ca
     await page.reload();
     await page.getByRole('link', { name: 'Prepare for call', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Join call', exact: true })).toBeEnabled();
+    await page.getByRole('button', { name: 'Use Google Meet', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Prepare Google Meet', exact: true })).toBeDisabled();
     await expect(page.getByText('The teacher has not added a Meet link yet.', { exact: false })).toBeVisible();
     await expect(teacherPage.getByRole('link', { name: 'Create a Google Meet meeting' })).toHaveAttribute('href', 'https://meet.google.com/new');

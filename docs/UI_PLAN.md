@@ -1,5 +1,11 @@
 # UI plan
 
+## Theme and session usability update
+
+The current emerald/off-white identity is retained, with shared semantic colors supporting light, dark and device-following themes. Header controls persist preferences locally and synchronize tabs; first-paint theme initialization avoids a light flash. Narrow headers wrap safely, touch targets and focus outlines remain visible, and color transitions honor reduced motion.
+
+Booking actions precede long details. The video workspace prioritizes the selected provider, local camera preview and embedded call; joining brings the frame into view. Scheduled-end refreshes reveal server-approved completion controls at the top of the call, preserving the running frame, with a waiting message after the viewer confirms. Meet launch links, post-session feedback, request reviews and admin confirmations are easier to reach. See [THEME_CALL_UX.md](THEME_CALL_UX.md) for behavior, verification and release limits.
+
 Phase 3 implements `/`, `/signup`, `/login`, auth callbacks, `/onboarding`, `/dashboard`, and `/profile`. Phase 4 implements profile skill editing, `/discover`, and `/people/[id]`. Phase 5 implements `/people/[id]/request`, `/bookings` and `/bookings/[id]` as a scheduling preview. Phase 6 implements `/wallet`, funded request review and completion/dispute controls. Phase 7 implements the public Jitsi meeting demo screen. Community screens remain planned. One mobile-first visual system continues Phase 1's emerald, off-white, rounded-card palette. Use system fonts, readable contrast, semantic headings, visible keyboard focus, explicit labels, and touch targets of at least 44px.
 
 ## Navigation and screen map

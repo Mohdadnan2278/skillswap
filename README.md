@@ -50,6 +50,7 @@ The live application uses the preserved working demo source. The owner has demon
 | --- | --- |
 | **Live demo** | Authentication, profiles, custom skills, skill matching, responsive navigation, scheduling, reservations, wallets, mutual completion, Jitsi, teacher-saved Meet links, feedback and administration |
 | **Implemented and tested; awaiting rollout** | Opt-in availability, booking notifications, active/history booking views, additional session refresh fixes, password recovery, restricted support cancellation, an expiry worker and a prepared CI workflow on [`product-upgrade`](https://github.com/sonalreji7/skillswap/tree/product-upgrade) |
+| **UI update prepared for review** | Light/dark/system themes with the existing emerald colors, a responsive call workspace and completion controls at the top of the session screen on [`theme-call-ux`](https://github.com/sonalreji7/skillswap/tree/theme-call-ux); see the [UI update guide](docs/THEME_CALL_UX.md) |
 | **Future ideas** | Better matching, demand requests, reputation/abuse controls and more capable video infrastructure; these are proposals without promised release dates |
 
 The working application source is preserved under Git tag `demo-working-2026-10-11`, with merged-release backup branch `demo-backup-2026-10-11`. Production remains on the existing Vercel Hobby project. Git pushes do not currently deploy automatically.

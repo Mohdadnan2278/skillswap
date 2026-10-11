@@ -80,7 +80,7 @@ test('mobile administration creates and disables a skill with an audit reason; G
   await page.goto('/admin?section=skills');await expect(page.getByRole('heading',{name:'Administration',exact:true})).toBeVisible();
   const slug='admin-ui-'+randomUUID().slice(0,8);const name='Admin UI '+slug;
   await page.getByLabel('Name',{exact:true}).fill(name);await page.getByLabel('Slug',{exact:true}).fill(slug);await page.getByLabel('Category',{exact:true}).fill('Demo');
-  await page.getByRole('button',{name:'Review new skill'}).click();await page.getByLabel('Reason or review note').fill(reason);await page.getByRole('button',{name:'Confirm action'}).click();
+  await page.getByRole('button',{name:'Review new skill'}).click();await expect(page.getByLabel('Reason or review note')).toBeFocused();await page.getByLabel('Reason or review note').fill(reason);await page.getByRole('button',{name:'Confirm action'}).click();
   const row=page.getByRole('article').filter({has:page.getByRole('heading',{name,exact:true})});await expect(row).toBeVisible();
   await row.getByRole('button',{name:'Disable skill'}).click();await page.getByLabel('Reason or review note').fill(reason);await page.getByRole('button',{name:'Confirm action'}).click();await expect(row.getByRole('button',{name:'Enable skill'})).toBeVisible();
   await page.getByRole('link',{name:'Audit',exact:true}).click();await expect(page.getByRole('heading',{name:'create_skill',exact:true}).first()).toBeVisible();

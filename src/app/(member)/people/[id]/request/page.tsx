@@ -18,5 +18,5 @@ export default async function RequestSession({params}:{params:Promise<{id:string
  const balance=await wallet(client);
  const demo=await demoPolicy(client);
  const choices=await selections(client,id);const offered=await selectedSkills(client,choices.offeredSkillIds);
- return <section className="mx-auto max-w-xl"><Link href={`/people/${id}`} className="inline-flex min-h-11 items-center text-emerald-800 underline">Back to member</Link><h1 className="mt-4 break-words text-3xl font-bold">Request a session with {teacher.display_name}</h1><BookingNotice />{offered.length?<BookingRequestForm teacherId={id} teacherName={teacher.display_name} skills={offered} timezone={current.timezone} availableUnits={balance.availableUnits} demo={demo}/>:<p>This member does not currently offer any enabled skills.</p>}</section>;
+ return <section className="mx-auto max-w-xl"><Link href={`/people/${id}`} className="inline-flex min-h-11 items-center text-accent-strong underline">Back to member</Link><h1 className="mt-4 break-words text-3xl font-bold">Request a session with {teacher.display_name}</h1><BookingNotice />{offered.length?<BookingRequestForm teacherId={id} teacherName={teacher.display_name} skills={offered} timezone={current.timezone} availableUnits={balance.availableUnits} demo={demo}/>:<p>This member does not currently offer any enabled skills.</p>}</section>;
 }
