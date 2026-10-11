@@ -48,6 +48,7 @@ export interface Database {
     };
     Views: {profile_reputation:{Row:{user_id:string;average_rating:number;rating_count:number};Relationships:[]}};
     Functions: {
+      create_custom_skill: {Args: {p_name:string;p_category:string}; Returns: Json};
       account_access: {Args: Record<string, never>; Returns: Json};
       admin_read: {Args: {p_section?:string;p_page?:number;p_search?:string}; Returns: Json};
       admin_manage: {Args: {p_action:string;p_target:string|null;p_value:Json;p_reason:string;p_key:string}; Returns: Json};

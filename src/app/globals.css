@@ -1,14 +1,20 @@
 @import "tailwindcss";
 :root { color-scheme: light; }
 body { margin: 0; background: #f8faf7; color: #172c25; font-family: Arial, Helvetica, sans-serif; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-padding-top: 1rem; }
+*, *::before, *::after { box-sizing: border-box; }
+h1, h2, h3, p, dd, label, summary, a { overflow-wrap: anywhere; }
+input, select, textarea { min-width: 0; max-width: 100%; }
+textarea { resize: vertical; }
+summary:focus-visible { outline: 3px solid #a16207; outline-offset: 4px; }
+summary::-webkit-details-marker { display: none; }
 a:focus-visible { outline: 3px solid #a16207; outline-offset: 5px; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
 @layer components {
-  .field { @apply mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base focus:border-emerald-700 focus:outline-2 focus:outline-emerald-700; }
+  .field { @apply mt-2 min-h-12 min-w-0 w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-base focus:border-emerald-700 focus:outline-2 focus:outline-emerald-700 sm:px-4; }
   .field-error { @apply mt-2 text-sm text-red-800; }
-  .primary-button { @apply inline-flex min-h-12 items-center justify-center rounded-xl bg-emerald-800 px-5 py-3 font-semibold text-white hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-60; }
+  .primary-button { @apply inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-emerald-800 px-5 py-3 text-center font-semibold text-white hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto; }
   .secondary-button { @apply inline-flex min-h-11 items-center justify-center rounded-xl border border-emerald-900/25 px-4 py-2 font-semibold hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-60; }
 }
 button:focus-visible { outline: 3px solid #a16207; outline-offset: 4px; }

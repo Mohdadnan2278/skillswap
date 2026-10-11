@@ -16,7 +16,7 @@ Configure these values in Vercel **Production** before the production build:
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | The project's public publishable key or legacy `anon` key from Supabase Project Settings → API; never a secret/service-role key |
 | `SITE_URL` | `https://skillswap-delta-taupe.vercel.app` |
 | `VIDEO_PROVIDER` | `jitsi_demo` (Google Meet links also work) |
-| `GOOGLE_AUTH_ENABLED` | `false` unless Google sign-in is separately configured and tested |
+| `GOOGLE_AUTH_ENABLED` | Legacy compatibility value; Google availability comes from live Supabase Auth settings |
 
 The management token, database password, SMTP password and provider secrets do not belong in `NEXT_PUBLIC_*` variables or in the deployed application. `SUPABASE_ACCESS_TOKEN` is used only by management/readiness commands in the development workspace; SkillSwap's app does not need it. There is no Daily key requirement. Keep Vercel's Node runtime selection at 24.x; npm scripts enable the standard Node environment-proxy flag, which is harmless when no proxy is configured.
 

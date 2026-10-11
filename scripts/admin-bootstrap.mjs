@@ -29,7 +29,7 @@ if(values.demo&&!users.length){
  if(!/^[0-9a-f-]{36}$/.test(user.id??''))throw Error('Provisioning did not return a valid identity.');
  writeFileSync(file,'SkillSwap demo administrator — private, never commit or share publicly\nSite: https://skillswap-delta-taupe.vercel.app\nEmail: '+email+'\nPassword: '+password+'\nThis reserved address cannot receive mail. This demo-only account was explicitly provisioned; no email delivery was verified.\n',{mode:0o600});
  const tokens=await request(base+'/auth/v1/token?grant_type=password',{apikey:secret},{email,password});
- await request(base+'/rest/v1/rpc/save_my_profile',{apikey:secret,Authorization:'Bearer '+tokens.access_token},{p_display_name:'Demo Administrator',p_bio:'Demo-only management account',p_college:'Semester demo',p_timezone:'Asia/Kolkata'});
+ await request(base+'/rest/v1/rpc/save_my_profile',{apikey:secret,Authorization:'Bearer '+tokens.access_token},{p_display_name:'SkillSwap Administrator',p_bio:'SkillSwap community management.',p_college:'',p_timezone:'Asia/Kolkata'});
  users=await query('select id,email_confirmed_at from auth.users where id='+literal(user.id));
  console.log('Created the explicitly authorized demo identity. Login details are in the ignored private credentials file.');
 }

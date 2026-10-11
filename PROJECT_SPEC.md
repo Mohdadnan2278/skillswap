@@ -16,6 +16,10 @@ Admins are explicitly provisioned verified/onboarded accounts in a private datab
 
 The panel manages member suspension/restoration, admin membership (without removing the last administrator), catalogue creation/enabling, feedback hiding/restoration, dispute review notes, and reads booking/wallet summaries. All writes require a reason, server-derived admin identity, idempotency and an immutable audit record. Suspension blocks member API/database operations and hides discovery profiles, while preserving balances and existing bookings. Restore suspended participants to let them complete existing exchanges. Moderation hides a review from public reputation without editing/deleting it. Dispute review records staff action; it never overrides participant votes or moves credits. There is no arbitrary balance editing, hard account deletion, rating manipulation or access to meeting links/provider secrets.
 
+## Custom skills and product presentation
+
+The owner authorized shared custom skills, friendlier mobile layouts and public product branding. Verified active onboarded members can create a named catalogue skill or reuse an existing normalized identity, choose a category including Other, and select it for teaching, learning or both. Database-enforced limits allow 10 new skills per member per rolling 24 hours and keep disabled names unavailable. Existing max-20 selections, discovery, booking, credit and moderation rules remain unchanged. The optional affiliation appears as Organization while retaining the compatible `college` field. Public screens describe SkillSwap as a community product; public Jitsi access limits remain visible without academic/demo labels.
+
 ## MVP capabilities and boundaries
 
 | Phase | Deliverable | Completion evidence |
@@ -32,7 +36,7 @@ Optional: Google OAuth if provider configuration is available. Deferred: payment
 
 ## Adopted MVP defaults — chosen under owner delegation
 
-Decision record: after being offered the core defaults, the owner instructed the assistant to choose appropriately for better user interaction and experience. The assistant adopted the rules below for this semester MVP. This approves the design direction, not implementation beyond the currently authorized phase, remote database changes, or paid services.
+Decision record: after being offered the core defaults, the owner instructed the assistant to choose appropriately for better user interaction and experience. The assistant adopted the rules below for this initial release. This approves the design direction, not implementation beyond the currently authorized phase, remote database changes, or paid services.
 
 | Rule | Adopted default |
 | --- | --- |

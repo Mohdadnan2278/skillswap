@@ -66,15 +66,15 @@ test('two mobile browsers complete signup → match → book → demo access →
     await expect(teacherPage.getByText('Google Meet link saved for both participants.', {exact: true})).toBeVisible();
     await page.reload();
     await expect(page.getByRole('button', {name: 'Confirm session completed'})).toHaveCount(0);
-    await page.getByRole('link', {name: 'Prepare for demo call', exact: true}).click();
-    await expect(page.getByRole('button', {name: 'Join demo call', exact: true})).toBeDisabled();
+    await page.getByRole('link', {name: 'Prepare for call', exact: true}).click();
+    await expect(page.getByRole('button', {name: 'Join call', exact: true})).toBeDisabled();
     await test.step('Explicit local join-window and Jitsi browser fixtures exercise app access', async () => {
       meetingClockFixture(bookingId);
       await page.reload();
       await page.getByRole('button', {name: 'Prepare Google Meet', exact: true}).click();
       await expect(page.getByRole('link', {name: 'Open Google Meet in a new tab'})).toHaveAttribute('href', 'https://meet.google.com/abc-defg-hij');
       await page.route('https://meet.jit.si/external_api.js', route => route.fulfill({contentType: 'application/javascript', body: `window.JitsiMeetExternalAPI=class {constructor(domain,options){this.host=options.parentNode;this.frame=document.createElement('div');this.frame.textContent='Explicit Phase 9 Jitsi UI fixture';this.host.appendChild(this.frame);}addEventListeners(events){this.events=events;setTimeout(()=>events.videoConferenceJoined(),10);}dispose(){this.frame.remove();}};`}));
-      await page.getByRole('button', {name: 'Join demo call', exact: true}).click();
+      await page.getByRole('button', {name: 'Join call', exact: true}).click();
       await expect(page.getByText('Connected to Jitsi.', {exact: false})).toBeVisible();
       await teacherPage.goto(`/bookings/${bookingId}/meeting`);
       await teacherPage.getByRole('button', {name: 'Prepare Google Meet', exact: true}).click();
@@ -109,6 +109,7 @@ test('two mobile browsers complete signup → match → book → demo access →
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect(await teacherPage.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await cleanupBookings(page.request);
+    await page.locator('summary').filter({hasText: 'Menu'}).click();
     await page.getByRole('button', {name: 'Sign out', exact: true}).click();
     await expect(page).toHaveURL(/\/login$/);
     await page.goto(`/bookings/${bookingId}`);

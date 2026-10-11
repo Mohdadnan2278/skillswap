@@ -1,6 +1,6 @@
 # SkillSwap
 
-A student skill-exchange semester project built as one Next.js application with TypeScript, Tailwind, and Supabase. Phase 3 implements email/password authentication, confirmation, profile onboarding/editing, protected navigation, and logout. Phase 4 adds the shared skill catalogue, offered/wanted selections, explained discovery and member profiles. Phase 5 adds a scheduling preview: requests, acceptance/rejection/cancellation, expiry and private booking screens. Phase 6 adds starter credits, wallet/history, funded reservations, releases, two-party completion and mutual dispute resolution. Phase 7 adds an explicitly public Jitsi classroom demo with device checks and guarded in-app access. Teacher-added Google Meet links are also available. Phase 8 implements immutable completed-session feedback, server-calculated reputation and a community leaderboard.
+SkillSwap connects people who want to teach and learn through time credits. Members choose or add skills, find learning partners, book sessions, meet through Jitsi or Google Meet, and exchange feedback. It includes Google and email authentication, protected profiles, audited credits and an admin panel. Built with Next.js, TypeScript, Tailwind and Supabase.
 
 ## Local development
 
@@ -60,13 +60,19 @@ See [Supabase setup](docs/SUPABASE_SETUP.md), [MVP specification](PROJECT_SPEC.m
 
 ## Hosting
 
-SkillSwap is live at **[skillswap-delta-taupe.vercel.app](https://skillswap-delta-taupe.vercel.app)** on Vercel's Hobby plan. The owner authorized the initial production deployment of Phase 9 source commit `87d48f1` on 2026-10-10; the remote build and live public/protected-route checks passed. Hosted Supabase **SkillSwap** (`avunxagyeywvfjhhowqk`, Mumbai) retains all 12 migrations and uses the matching HTTPS Auth origin/callbacks. Email confirmation is required, and custom SMTP is still needed for ordinary student signup. Actual email delivery, physical-phone calls and real-duration hosted settlement remain pending. The first release uses the deployment API; Git pushes do not automatically redeploy it. See [deployment details](docs/DEPLOYMENT.md). No paid resources were created.
+SkillSwap is live at **[skillswap-delta-taupe.vercel.app](https://skillswap-delta-taupe.vercel.app)** on Vercel's Hobby plan. The owner authorized the initial production deployment of Phase 9 source commit `87d48f1` on 2026-10-10; the remote build and live public/protected-route checks passed. Hosted Supabase **SkillSwap** (`avunxagyeywvfjhhowqk`, Mumbai) retains all 13 migrations and uses the matching HTTPS Auth origin/callbacks. Google sign-in is configured; its onboarding was confirmed by the owner. Email/password confirmation still needs email delivery, with custom SMTP absent. Physical-phone calls and real-duration hosted settlement remain manual checks. The first release uses the deployment API; Git pushes do not automatically redeploy it. See [deployment details](docs/DEPLOYMENT.md). No paid resources were created.
 
 ## Administration and Google sign-in
 
 The authorized admin extension adds `/admin` with member suspension/restoration, administrator roles, skill management, booking/wallet summaries, dispute review notes, feedback moderation and an immutable audit log. Admin rights are private database membership, checked on the server and in privileged RPCs. Existing credit-transfer rules are unchanged. See [administration and provisioning](docs/ADMIN.md).
 
-Login/signup always show **Continue with Google** and detect Supabase's actual provider availability. The button is disabled until the Google OAuth web client is configured; configuration no longer depends on a stale deployment flag. Google-only sign-in can replace SMTP for the demo, while email/password confirmation still requires email delivery.
+Login/signup always show **Continue with Google** and detect Supabase's actual provider availability. The button is disabled until the Google OAuth web client is configured; configuration no longer depends on a stale deployment flag. Google sign-in is enabled in the hosted provider settings. Google-only authentication avoids the email-delivery prerequisite; email/password confirmation still requires email delivery.
+
+## Skills and mobile navigation
+
+On **Profile → Your skills**, search the catalogue or filter by category. If your skill is missing, open **Add a custom skill**, enter its name, choose a category (including Other), and add it to teaching, learning or both. Save your skills to update your profile and discovery matches. Matching names reuse the same skill. New skills work with normal discovery and session booking, and administrators can disable them. Each member can add up to 10 new catalogue skills per rolling 24 hours.
+
+Phones and tablets use a compact Menu with the current page highlighted. Forms stack on narrow screens, primary actions fill the available width, long names wrap, and selected skills remain visible while searching. The optional affiliation is labelled Organization; saved profile values remain compatible.
 
 ## Scheduling and credits
 
@@ -74,7 +80,7 @@ Use a member's **Request a session** action, choose an offered skill and a date/
 
 New requests reserve **time and credits**. Verified, onboarded members receive 3 starter credits once. Sessions cost 0.5/1/1.5 credits for 30/60/90 minutes. Reservations reduce availability without moving credits. Rejection, pre-start cancellation or pending expiry releases them. Both participants must confirm after the scheduled end to transfer the exact amount from learner to teacher. Disputes hold funds until both vote to complete (after end) or cancel; mismatched votes have no automatic timeout. Wallet pages show available, reserved and total amounts, private history and active holds.
 
-Historical Phase 5 bookings stay `not_integrated`: create a new request for a funded exchange. They cannot be charged or financially completed. The MVP serializes scheduling/financial routines with one database advisory transaction lock, ordered participant/wallet locks and GiST occupancy constraints. Unique issuance/transfer events, append-only balanced ledger pairs and deferred reconciliation protect financial consistency. This favors correctness for the semester project over high-volume throughput.
+Historical Phase 5 bookings stay `not_integrated`: create a new request for a funded exchange. They cannot be charged or financially completed. The MVP serializes scheduling/financial routines with one database advisory transaction lock, ordered participant/wallet locks and GiST occupancy constraints. Unique issuance/transfer events, append-only balanced ledger pairs and deferred reconciliation protect financial consistency. This favors correctness for the current release over high-volume throughput.
 
 ## Switch between hosted app and local tests
 
@@ -93,7 +99,7 @@ npm run env:local
 
 Before deployment, configure the exact HTTPS app origin in both `SITE_URL` and hosted Auth, configure custom SMTP if students outside your Supabase team need email, rebuild, and validate real signup/login. Creating the database did not deploy the application.
 
-## Jitsi classroom demo
+## Public Jitsi integration
 
 Set `VIDEO_PROVIDER=jitsi_demo`. Open an accepted, funded booking and choose **Prepare for demo call**. Check devices, then join within 10 minutes before start through 15 minutes after end. Public Jitsi requires no API key or separate video server; the first participant may have to authenticate with Jitsi. The new-tab option helps when embedded authentication is blocked. Do not distribute room links.
 
@@ -107,7 +113,7 @@ For an accepted funded booking, the teacher can paste a standard `https://meet.g
 
 After both participants complete and settle a session, each can publish one immutable 1–5 star review of the other with an optional comment of at most 500 characters. Names, ratings and plain-text comments are visible to signed-in members. Profile/discovery scores use the server’s average and count; unrated members show no score. **Community** ranks members with at least 3 received ratings by average, count and stable user-ID ties. Scores never grant or spend credits. Feedback supports safe idempotent retries and paginated received reviews.
 
-Phase 9 adds a single two-account browser journey, Vercel configuration, a read-only deployment readiness command and the [classroom demonstration checklist](docs/CLASSROOM_DEMO.md). Hosted email delivery, actual Google Meet/Jitsi calls, physical-phone HTTPS checks and authorized deployment are still outstanding.
+Phase 9 adds a single two-account browser journey, Vercel configuration, a read-only deployment readiness command and the [two-person session validation checklist](docs/CLASSROOM_DEMO.md). The site is deployed and Google onboarding works. Hosted email delivery, actual Google Meet/Jitsi calls and physical-phone HTTPS checks remain separate validation tasks.
 
 ## Phase 9 verification and hosting preparation
 

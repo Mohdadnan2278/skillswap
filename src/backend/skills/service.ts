@@ -5,6 +5,7 @@ import type { Database } from "@/backend/supabase/database.types";
 import type { DiscoveryMatch, Page, Skill, SkillSelections } from "@/shared/contracts";
 import { HttpError } from "@/backend/http";
 import { z } from "zod";
+import { customSkillResultSchema, type CustomSkillResult, type customSkillSchema } from "@/shared/skills";
 
 type Client = SupabaseClient<Database>;
 type Query = { limit: number; cursor?: string; skillId?: string };
@@ -62,6 +63,17 @@ export async function replaceSelections(client: Client, fields: SkillSelections)
   databaseError(error);
   // Return the exact selection written by this transaction, avoiding a racing later read.
   return fields;
+}
+export async function createCustomSkill(client: Client, fields: z.infer<typeof customSkillSchema>): Promise<CustomSkillResult> {
+  const { data, error } = await client.rpc("create_custom_skill", { p_name: fields.name, p_category: fields.category });
+  databaseError(error);
+  if (data && typeof data === "object" && !Array.isArray(data)) {
+    if (data.error === "RATE_LIMITED") throw new HttpError(429, "RATE_LIMITED", "You can add up to 10 new skills in 24 hours. Choose an existing skill or try again later.");
+    if (data.error === "SKILL_UNAVAILABLE") throw new HttpError(409, "INVALID_STATE", "This skill is currently unavailable. Choose another skill or contact an administrator.");
+  }
+  const result = customSkillResultSchema.safeParse(data);
+  if (!result.success) throw storageError();
+  return result.data;
 }
 export async function discover(client: Client, userId: string, query: Query): Promise<Page<DiscoveryMatch>> {
   const context = `${userId}:${query.skillId ?? "all"}`;
