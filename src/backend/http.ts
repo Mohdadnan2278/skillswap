@@ -1,4 +1,5 @@
 import "server-only";
+import {randomUUID} from 'node:crypto';
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getSiteOrigin, isAuthConfigured } from "@/backend/config";
@@ -50,7 +51,9 @@ export async function apiHandler(operation: () => Promise<NextResponse>) {
       return NextResponse.json({ error: { code: "VALIDATION_ERROR", message: "Check the highlighted fields.", fieldErrors } }, { status: 400, headers: { "Cache-Control": "private, no-store" } });
     }
     const failure = error instanceof HttpError ? error : new HttpError(500, "INTERNAL_ERROR", "Something went wrong. Please try again.");
+    const requestId=randomUUID();
     // Never log request bodies, auth cookies, tokens or provider error details.
-    return NextResponse.json({ error: { code: failure.code, message: failure.message } }, { status: failure.status, headers: { "Cache-Control": "private, no-store", ...(failure.status === 429 ? { "Retry-After": "60" } : {}) } });
+    if(failure.status>=500)console.error(JSON.stringify({event:'api_failure',requestId,status:failure.status,code:failure.code}));
+    return NextResponse.json({ error: { code: failure.code, message: failure.message,requestId } }, { status: failure.status, headers: { "Cache-Control": "private, no-store",'X-Request-ID':requestId, ...(failure.status === 429 ? { "Retry-After": "60" } : {}) } });
   }
 }

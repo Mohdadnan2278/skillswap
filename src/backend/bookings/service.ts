@@ -4,9 +4,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database, BookingRow, Json } from "@/backend/supabase/database.types";
 import type { Booking, CreateBookingRequest, ErrorCode, Page, BookingAction } from "@/shared/contracts";
 import { HttpError } from "@/backend/http";
-import { utcInstantSchema } from "@/shared/validation";
 type Client = SupabaseClient<Database>;
-export type BookingQuery = { limit: number; cursor?: string; state?: string; role?: string };
+export type BookingQuery = { limit: number; cursor?: string; state?: string; role?: string;view?:string };
 const messages: Partial<Record<ErrorCode,string>> = {
  VALIDATION_ERROR: "Choose an offered skill, 30/60/90 minutes, and Start now or a scheduled start between 15 minutes and 30 days ahead.",
  INSUFFICIENT_CREDITS: "You do not have enough available credits for this session. Check your wallet or choose a shorter duration.",
@@ -50,18 +49,19 @@ export async function changeBooking(client: Client,id: string,action: string,key
  const result=outcome(data,error); if (!result.booking) throw new Error("Missing booking result"); return bookingDto(result.booking);
 }
 export async function listBookings(client: Client,userId: string,query: BookingQuery): Promise<Page<Booking>> {
- const context=`${userId}:${query.state??"all"}:${query.role??"all"}`;
+ const context=`${userId}:${query.state??"all"}:${query.role??"all"}${query.view&&query.view!=='all'?':'+query.view:''}`;
  let after: { start: string; id: string } | undefined;
  if (query.cursor) {
   try {
    if (!/^[A-Za-z0-9_-]+$/.test(query.cursor)) throw Error();
-   after=z.object({start:utcInstantSchema,id:z.string().uuid(),context:z.literal(context)}).strict().parse(JSON.parse(Buffer.from(query.cursor,"base64url").toString("utf8")));
+   after=z.object({start:z.string().datetime({offset:true}),id:z.string().uuid(),context:z.literal(context)}).strict().parse(JSON.parse(Buffer.from(query.cursor,"base64url").toString("utf8")));
   } catch { throw new HttpError(400,"VALIDATION_ERROR","Invalid booking page cursor. Start again from the first page."); }
  }
- const {data,error}=await client.rpc("read_my_bookings",{p_limit:query.limit+1,...(after?{p_after_start:after.start,p_after_id:after.id}:{}),...(query.state?{p_state:query.state}:{}),...(query.role?{p_role:query.role}:{})});
+ const {data,error}=await client.rpc("read_my_booking_list",{p_view:query.view??'all',p_limit:query.limit+1,...(after?{p_after_start:after.start,p_after_id:after.id}:{}),...(query.state?{p_state:query.state}:{}),...(query.role?{p_role:query.role}:{})});
  const rows=outcome(data,error).items; if (!rows) throw new Error("Missing bookings result");
- const items=rows.slice(0,query.limit).map(bookingDto); const last=items.at(-1);
- return {items,nextCursor:rows.length>query.limit&&last?Buffer.from(JSON.stringify({start:last.startsAt,id:last.id,context})).toString("base64url"):null};
+ const visibleRows=rows.slice(0,query.limit); const items=visibleRows.map(bookingDto); const last=visibleRows.at(-1);
+ // PostgreSQL retains microseconds; the display DTO's millisecond rounding is not a paging boundary.
+ return {items,nextCursor:rows.length>query.limit&&last?Buffer.from(JSON.stringify({start:last.starts_at,id:last.id,context})).toString("base64url"):null};
 }
 
 export async function bookingView(client: Client,id: string) {

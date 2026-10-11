@@ -1,5 +1,7 @@
 # Hosting SkillSwap
 
+The owner has since completed a successful live Jitsi/credit-transfer demo. The working application is retained under `demo-working-2026-10-11`; `product-upgrade` is a separate tested review branch. No upgrade migration, scheduler or deployment has been applied to production. Follow [upgrade and rollback](PRODUCT_UPGRADE.md) for the additive two-migration rollout and recovery procedure. Git pushes do not currently auto-deploy.
+
 SkillSwap is live at **https://skillswap-delta-taupe.vercel.app**. Vercel's existing Hobby project runs source commit `69b77dc88186ca9c046459efeb62c8080af5084b` from `admin-demo`; deployment `dpl_7NEQd9BRtTTfCYPTkZ8KFMfXTTqx` reached READY with the production domain assigned on 2026-10-11. The release includes admin-configured short credit-transfer Demo sessions, immediate Start now calls, copied Meet link normalization, participant refresh and server-based countdowns. The owner explicitly authorized short actual demo durations with separately selected real credit costs; standard scheduling and costs remain intact. Supabase retains all 16 migrations and the same HTTPS Auth origin/callbacks. Google onboarding is reported working by the owner. No paid resources were provisioned.
 
 The release uploaded 170 tracked source files allowed by `.vercelignore`; private prompts, login details, environment files and management metadata were excluded. Live checks passed public pages/Google availability, existing admin login, Demo section and duration/cost controls, initially disabled one-minute/0.5-credit policy, invalid duration rejection, participant cost override rejection, disabled-mode validation, unchanged policy/wallet, scheduling choices, existing quick-call/copied-Meet guards, logout and anonymous denial. Hosted migration/RLS/execute/private-write and safe-singleton-update checks pass. No hosted test booking/account, valid demo-setting change or financial clock fixture was created. Actual elapsed local two-person demo settlement is verified; hosted settlement and actual Meet media remain manual checks. The owner reports Jitsi video works with first-host signup. GitHub rejected automatic PR creation (Forbidden). The pushed review branch is https://github.com/sonalreji7/skillswap/pull/new/admin-demo.
@@ -21,6 +23,7 @@ Configure these values in Vercel **Production** before the production build:
 | `SITE_URL` | `https://skillswap-delta-taupe.vercel.app` |
 | `VIDEO_PROVIDER` | `jitsi_demo` (Google Meet links also work) |
 | `GOOGLE_AUTH_ENABLED` | Legacy compatibility value; Google availability comes from live Supabase Auth settings |
+| `EMAIL_DELIVERY_ENABLED` | `false` until a real SMTP sender and recovery flow are configured and tested; `true` then enables hosted email signup/recovery |
 
 The management token, database password, SMTP password and provider secrets do not belong in `NEXT_PUBLIC_*` variables or in the deployed application. `SUPABASE_ACCESS_TOKEN` is used only by management/readiness commands in the development workspace; SkillSwap's app does not need it. There is no Daily key requirement. Keep Vercel's Node runtime selection at 24.x; npm scripts enable the standard Node environment-proxy flag, which is harmless when no proxy is configured.
 
@@ -28,6 +31,7 @@ Obtain the real assigned production domain before configuring callbacks. Set Sup
 
 - `<production-origin>/auth/callback`
 - `<production-origin>/auth/confirm`
+- `<production-origin>/auth/recovery` (product upgrade)
 
 The existing management helper can apply those settings after hosting is authorized:
 

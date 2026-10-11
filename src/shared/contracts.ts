@@ -23,7 +23,7 @@ export type ErrorCode =
 
 export interface ApiSuccess<T> { data: T }
 export interface ApiFailure {
-  error: { code: ErrorCode; message: string; fieldErrors?: Record<string, string[]> };
+  error: { code: ErrorCode; message: string; fieldErrors?: Record<string, string[]>; requestId?: string };
 }
 export type ApiResponse<T> = ApiSuccess<T> | ApiFailure;
 export interface Page<T> { items: T[]; nextCursor: string | null }
@@ -40,7 +40,7 @@ export interface UpdateProfileRequest {
 }
 export interface Skill { id: UUID; slug: string; name: string; category: string }
 export interface SkillSelections { offeredSkillIds: UUID[]; wantedSkillIds: UUID[] }
-export interface DiscoveryMatch { profile: PublicProfile; matchedSkills: Skill[] }
+export interface DiscoveryMatch { profile: PublicProfile; matchedSkills: Skill[]; availableUntil?:UtcTimestamp|null }
 export type CreateBookingRequest = {
   teacherId: UUID; skillId: UUID; durationMinutes: DurationMinutes;
 } & ({ startMode?: "scheduled"; startsAt: UtcTimestamp } | { startMode: "now"; startsAt?: never }) | {

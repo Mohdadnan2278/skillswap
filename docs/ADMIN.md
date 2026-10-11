@@ -8,11 +8,17 @@ The owner authorized the admin extension and a demo-only account on 2026-10-11. 
 - Overview: member, administrator, suspension, booking, dispute, catalogue and hidden-feedback counts.
 - Members: search by name/email, inspect real total/reserved minute units, suspend/restore, grant/revoke administrator access. Admins must be demoted before suspension; self-suspension and removal of the last admin are denied.
 - Skills: add a validated name/slug/category and enable/disable catalogue entries. Existing bookings and skill history are preserved.
-- Bookings/disputes: inspect participants, schedule, funding state and dispute reasons; record staff review notes. These notes do not resolve a dispute or transfer credits. Restore suspended participants so they can finish an existing exchange.
+- Bookings/disputes: inspect participants, schedule, funding state and dispute reasons; record staff review notes. These notes do not resolve a dispute or transfer credits. The upgrade also permits narrowly scoped support cancellation as described below.
 - Feedback: hide/restore public reviews with an audit reason. Hidden reviews no longer contribute to member-visible reputation; their authors can still inspect the preserved original from their booking. Stars/comments are never rewritten.
 - Audit: read who changed what, when, why, and the previous/resulting state. All changes require a 10–500-character reason and a UUID retry key. Successful identical retries return the same audit result; changed payloads conflict. Audit rows are immutable.
 
 The panel has no arbitrary wallet edits, forced settlement, account deletion, impersonation or access to private meeting links/provider credentials. Suspend/restore preserves funds and bookings. Suspensions block server APIs, direct member RPC writes and exposed table reads; suspended profiles are hidden from discovery. Existing downloaded data cannot be recalled, but revoked admin membership is checked on every subsequent privileged operation.
+
+## Support cancellation in the product upgrade
+
+An active verified administrator who is neither participant may cancel an accepted/disputed booking with a held reservation only when its end is at least 24 hours past, or a participant is suspended. A reason and explicit review confirmation are required. The server releases the original hold, resolves any dispute as cancelled, clears occupancy, notifies both parties and records immutable before/after audit values. Successful identical retries are safe; changing a retry payload conflicts.
+
+This cannot pay the teacher, change settled balances, refund a completed booking or cancel a session merely because the administrator chooses to. Ordinary participants retain their completion/dispute actions until a qualifying cancellation. The new action requires the two additive upgrade migrations; the current live release stays unchanged until deliberate rollout. See [upgrade and rollback](PRODUCT_UPGRADE.md).
 
 ## Trusted bootstrap
 

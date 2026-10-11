@@ -13,6 +13,8 @@ export type BookingRow = {
 export interface Database {
   public: {
     Tables: {
+      member_availability: {Row:{user_id:string;available_until:string|null;updated_at:string};Insert:{user_id:string;available_until?:string|null};Update:{available_until?:string|null};Relationships:[]};
+      booking_notifications: {Row:{id:string;user_id:string;booking_id:string;kind:string;created_at:string;read_at:string|null};Insert:{user_id:string;booking_id:string;kind:string};Update:{read_at?:string|null};Relationships:[]};
       feedback: {Row:{id:string;booking_id:string;reviewer_id:string;reviewee_id:string;rating:number;comment:string;created_at:string};Insert:{booking_id:string;reviewer_id:string;reviewee_id:string;rating:number;comment?:string};Update:{rating?:number;comment?:string};Relationships:[]};
       wallets: { Row: { user_id: string; settled_units: number; reserved_units: number }; Insert: { user_id: string; settled_units?: number; reserved_units?: number }; Update: { settled_units?: number; reserved_units?: number }; Relationships: [] };
       reservations: { Row: { booking_id: string; learner_id: string; units: number; status: string; created_at: string; updated_at: string }; Insert: { booking_id: string; learner_id: string; units: number; status: string }; Update: { status?: string }; Relationships: [] };
@@ -48,6 +50,12 @@ export interface Database {
     };
     Views: {profile_reputation:{Row:{user_id:string;average_rating:number;rating_count:number};Relationships:[]}};
     Functions: {
+      read_my_booking_list:{Args:{p_view?:string;p_after_start?:string;p_after_id?:string;p_state?:string;p_role?:string;p_limit?:number};Returns:Json};
+      set_my_availability:{Args:{p_minutes:number};Returns:Json};
+      discover_members_v2:{Args:{p_after?:string;p_skill_id?:string;p_limit?:number;p_available_only?:boolean};Returns:{id:string;display_name:string;bio:string;college:string;matched_skills:Json;available_until:string|null}[]};
+      read_my_notifications:{Args:{p_limit?:number;p_before?:string;p_before_id?:string};Returns:Json};
+      mark_my_notifications_read:{Args:{p_ids:string[]};Returns:undefined};
+      admin_cancel_booking:{Args:{p_booking_id:string;p_reason:string;p_key:string};Returns:Json};
       read_demo_policy: {Args: Record<string,never>;Returns:Json};
       create_demo_booking: {Args: {p_teacher_id:string;p_skill_id:string;p_policy_version:number;p_key:string};Returns:Json};
       create_custom_skill: {Args: {p_name:string;p_category:string}; Returns: Json};

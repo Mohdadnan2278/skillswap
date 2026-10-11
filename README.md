@@ -2,6 +2,8 @@
 
 SkillSwap connects people who want to teach and learn through time credits. Members choose or add skills, find learning partners, book sessions, meet through Jitsi or Google Meet, and exchange feedback. It includes Google and email authentication, protected profiles, audited credits and an admin panel. Built with Next.js, TypeScript, Tailwind and Supabase.
 
+The working release is preserved as `demo-working-2026-10-11`. The separate `product-upgrade` branch adds availability, booking alerts, recovery and live booking views; it is ready for review without changing production. See [upgrade and rollback](docs/PRODUCT_UPGRADE.md). Hosted email signup/recovery need an explicitly enabled, tested SMTP sender; Google signup and existing password login remain available.
+
 For a live call, request a session with **Start now**. The teacher has five minutes to accept; after acceptance, both participants can open **Prepare for call** immediately. Choose **Schedule for later** for a future session. Calls do not transfer credits: both participants confirm after the actual scheduled end. See the [two-person session checklist](docs/CLASSROOM_DEMO.md).
 
 ## Local development
@@ -129,3 +131,6 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:demo
 The integrated journey uses two independently confirmed local accounts, responsive browser screens, real reservations/ledger settlement and feedback. Timing and Jitsi SDK fixtures are clearly identified tests, not a live call or accelerated hosted mode. The readiness command checks the hosted project, migration/RLS/Auth settings and SMTP metadata without exposing credentials or making changes. A passing configuration report does not prove email delivery, deployment or live media. `vercel.json` and `.vercelignore` prepare the dynamic Next.js app for an explicitly authorized Vercel deployment and exclude private local files. No deployment has been performed.
 
 For a fast live credit-transfer walkthrough, an administrator can open **Admin → Demo**, enable a **1-minute** demo costing **0.5 credits**, and save with a reason. Learner explicitly chooses **Demo session**; teacher accepts within one minute. Completion opens about two minutes after requesting, and both participants confirm to transfer the real reserved credits. Full instructions are in [the two-person checklist](docs/CLASSROOM_DEMO.md).
+## Upgrade and preserved demo
+
+The owner reports the live Jitsi/credit-transfer demo works. Its exact application source is preserved as `demo-working-2026-10-11`, with backup branch `demo-backup-2026-10-11`. The `product-upgrade` branch adds availability, booking notifications, password recovery, live booking views and restricted support cancellation. See [upgrade and rollback](docs/PRODUCT_UPGRADE.md) before rollout. Production remains on the preserved release while this branch is reviewed; no hosted migrations or deployment are implied by this source change.

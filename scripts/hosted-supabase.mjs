@@ -37,7 +37,7 @@ if(command==='check'){
  const currentAuth=await api(`projects/${ref}/config/auth`);
  const smtpConfigured=Boolean(currentAuth.smtp_host);
  console.log('Custom SMTP:',smtpConfigured?'configured':'absent; default hosted email limits apply. Default template uses the existing PKCE callback.');
- await api(`projects/${ref}/config/auth`,{site_url:origin.origin,uri_allow_list:[`${origin.origin}/auth/callback`,`${origin.origin}/auth/confirm`].join(','),mailer_autoconfirm:false,external_email_enabled:true,...(smtpConfigured?{mailer_templates_confirmation_content:template}:{})},'PATCH');
+ await api(`projects/${ref}/config/auth`,{site_url:origin.origin,uri_allow_list:[`${origin.origin}/auth/callback`,`${origin.origin}/auth/confirm`,`${origin.origin}/auth/recovery`].join(','),mailer_autoconfirm:false,external_email_enabled:true,...(smtpConfigured?{mailer_templates_confirmation_content:template,mailer_templates_recovery_content:readFileSync(join(root,'supabase/templates/recovery.html'),'utf8')}:{})},'PATCH');
  const keys=await api(`projects/${ref}/api-keys`);const key=keys.find(x=>x.name==='anon')?.api_key;if(!key)throw Error('No public anon key returned.');
  const file=join(local,'hosted.env'),marker='# Generated hosted Supabase settings by SkillSwap';
  if(existsSync(file)&&!readFileSync(file,'utf8').startsWith(marker))throw Error('User-managed hosted.env was preserved.');

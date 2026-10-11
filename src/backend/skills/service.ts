@@ -8,7 +8,7 @@ import { z } from "zod";
 import { customSkillResultSchema, type CustomSkillResult, type customSkillSchema } from "@/shared/skills";
 
 type Client = SupabaseClient<Database>;
-type Query = { limit: number; cursor?: string; skillId?: string };
+type Query = { limit: number; cursor?: string; skillId?: string; availableOnly?:boolean };
 const skillSchema = z.object({ id: z.string().uuid(), slug: z.string(), name: z.string(), category: z.string() });
 const storageError = () => new HttpError(503, "DATABASE_UNAVAILABLE", "Skill storage is unavailable. Please try again shortly.");
 function databaseError(error: { code?: string } | null) {
@@ -48,6 +48,12 @@ export async function allSkills(client: Client): Promise<Skill[]> {
   } while (cursor);
   return items;
 }
+/** Load only a member's bounded selected skills for discovery/profile summaries. */
+export async function selectedSkills(client:Client,ids:string[]):Promise<Skill[]>{
+ if(!ids.length)return [];
+ const {data,error}=await client.from('skills').select('id,slug,name,category').in('id',[...new Set(ids)]).eq('enabled',true).order('slug');
+ if(error||!data)throw storageError();return data;
+}
 export async function requireOnboarded(client: Client, userId: string) {
   const { data, error } = await client.from("profiles").select("id").eq("id", userId).maybeSingle();
   if (error) throw storageError();
@@ -76,14 +82,14 @@ export async function createCustomSkill(client: Client, fields: z.infer<typeof c
   return result.data;
 }
 export async function discover(client: Client, userId: string, query: Query): Promise<Page<DiscoveryMatch>> {
-  const context = `${userId}:${query.skillId ?? "all"}`;
+  const context = `${userId}:${query.skillId ?? "all"}${query.availableOnly?':available':''}`;
   const after = decodeCursor(query.cursor, "discover", context);
-  const { data, error } = await client.rpc("discover_members", { ...(after ? { p_after: after } : {}), ...(query.skillId ? { p_skill_id: query.skillId } : {}), p_limit: query.limit + 1 });
+  const { data, error } = await client.rpc("discover_members_v2", { ...(after ? { p_after: after } : {}), ...(query.skillId ? { p_skill_id: query.skillId } : {}), p_available_only:query.availableOnly??false,p_limit: query.limit + 1 });
   databaseError(error);
   if (!data) throw storageError();
   const rows = data.slice(0, query.limit);
   const scores=await reputations(client,rows.map(row=>row.id));
-  const items = rows.map(row => ({ profile: { id: row.id, displayName: row.display_name, bio: row.bio, college: row.college, reputation: scores.get(row.id)??{averageRating:null,ratingCount:0} }, matchedSkills: z.array(skillSchema).parse(row.matched_skills) }));
+  const items = rows.map(row => ({ profile: { id: row.id, displayName: row.display_name, bio: row.bio, college: row.college, reputation: scores.get(row.id)??{averageRating:null,ratingCount:0} }, matchedSkills: z.array(skillSchema).parse(row.matched_skills),availableUntil:row.available_until }));
   return { items, nextCursor: data.length > query.limit ? encodeCursor("discover", rows.at(-1)!.id, context) : null };
 }
 /** Reject repeated parameters rather than silently taking the last value. */

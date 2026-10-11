@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect,notFound } from "next/navigation";
 import { requirePageSession } from "@/backend/auth/session";
 import { getCurrentUser } from "@/backend/profiles/service";
-import { allSkills,selections } from "@/backend/skills/service";
+import { selectedSkills,selections } from "@/backend/skills/service";
 import { userIdSchema } from "@/shared/validation";
 import { BookingNotice } from "@/frontend/components/booking-notice";
 import { BookingRequestForm } from "@/frontend/components/booking-request-form";
@@ -17,6 +17,6 @@ export default async function RequestSession({params}:{params:Promise<{id:string
  if(error)throw new HttpError(503,'DATABASE_UNAVAILABLE','Member storage is unavailable.');if(!teacher)notFound();
  const balance=await wallet(client);
  const demo=await demoPolicy(client);
- const [catalogue,choices]=await Promise.all([allSkills(client),selections(client,id)]);const offered=catalogue.filter(skill=>choices.offeredSkillIds.includes(skill.id));
+ const choices=await selections(client,id);const offered=await selectedSkills(client,choices.offeredSkillIds);
  return <section className="mx-auto max-w-xl"><Link href={`/people/${id}`} className="inline-flex min-h-11 items-center text-emerald-800 underline">Back to member</Link><h1 className="mt-4 break-words text-3xl font-bold">Request a session with {teacher.display_name}</h1><BookingNotice />{offered.length?<BookingRequestForm teacherId={id} teacherName={teacher.display_name} skills={offered} timezone={current.timezone} availableUnits={balance.availableUnits} demo={demo}/>:<p>This member does not currently offer any enabled skills.</p>}</section>;
 }

@@ -14,6 +14,7 @@ export const profileSchema = z.object({
   }, "Choose a valid IANA timezone, for example Asia/Kolkata."),
 }).strict();
 export const resendSchema = z.object({ email: emailSchema }).strict();
+export const resetPasswordSchema = z.object({password:signupSchema.shape.password}).strict();
 export const emptySchema = z.object({}).strict();
 export const userIdSchema = z.string().uuid();
 
@@ -28,7 +29,7 @@ export const catalogueQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(20),
   cursor: z.string().min(1).max(512).optional(),
 }).strict();
-export const discoveryQuerySchema = catalogueQuerySchema.extend({ skillId: z.string().uuid().optional() });
+export const discoveryQuerySchema = catalogueQuerySchema.extend({ skillId: z.string().uuid().optional(), availableOnly:z.enum(['true','false']).transform(value=>value==='true').optional() });
 
 export const utcInstantSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/, "Send a UTC timestamp ending in Z.").refine(value => !Number.isNaN(Date.parse(value)) && new Date(value).toISOString().slice(0,19) === value.slice(0,19), "Choose a valid date and time.");
 const bookingFields = { teacherId: z.string().uuid(), skillId: z.string().uuid(), durationMinutes: z.union([z.literal(30),z.literal(60),z.literal(90)]) };
@@ -38,7 +39,7 @@ export const createBookingSchema = z.union([
   z.object({teacherId:bookingFields.teacherId,skillId:bookingFields.skillId,startMode:z.literal('demo'),policyVersion:z.number().int().positive().max(999999999)}).strict(),
 ]);
 export const bookingStateSchema = z.enum(["pending","accepted","rejected","cancelled","expired","completed","disputed"]);
-export const bookingQuerySchema = catalogueQuerySchema.extend({ state: bookingStateSchema.optional(), role: z.enum(["teacher","learner"]).optional() });
+export const bookingQuerySchema = catalogueQuerySchema.extend({ state: bookingStateSchema.optional(), role: z.enum(["teacher","learner"]).optional(),view:z.enum(['all','upcoming','history']).optional() });
 export const bookingActionSchema = z.enum(["accept","reject","cancel"]);
 export const idempotencyKeySchema = z.string().uuid("A valid Idempotency-Key header is required.");
 
