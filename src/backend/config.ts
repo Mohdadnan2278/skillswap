@@ -28,4 +28,11 @@ export function getSiteOrigin() {
   } catch { return null; }
 }
 export function isAuthConfigured() { return Boolean(getSupabaseConfig() && getSiteOrigin()); }
-export function googleAuthEnabled() { return process.env.GOOGLE_AUTH_ENABLED === "true"; }
+export async function googleAuthEnabled() {
+  const config=getSupabaseConfig();if(!config)return false;
+  try {
+    const response=await fetch(config.url+'/auth/v1/settings',{headers:{apikey:config.key},cache:'no-store',signal:AbortSignal.timeout(5000),redirect:'error'});
+    if(!response.ok)return false;
+    const data=await response.json();return data.external?.google===true;
+  }catch{return false;}
+}

@@ -39,7 +39,7 @@ export async function receivedFeedback(client:Client,id:string,query:Query):Prom
  const {data,error}=await request;if(error||!data)throw unavailable();const rows=data.slice(0,query.limit),last=rows.at(-1);
  return {items:rows.map(feedback),nextCursor:data.length>query.limit&&last?encode({kind:'feedback',context:id,at:last.created_at,id:last.id}):null};
 }
-export async function bookingFeedback(client:Client,id:string,actorId:string):Promise<Feedback|null>{const {data,error}=await client.from('feedback').select('*').eq('booking_id',id).eq('reviewer_id',actorId).maybeSingle();if(error)throw unavailable();return data?feedback(data):null;}
+export async function bookingFeedback(client:Client,id:string,actorId:string):Promise<(Feedback & {hidden:boolean})|null>{void actorId;const {data,error}=await client.rpc('read_my_feedback',{p_booking_id:id});if(error)throw unavailable();return data?{...feedback(data),hidden:typeof data==='object'&&!Array.isArray(data)&&Boolean(data.hidden)}:null;}
 export async function leaderboard(client:Client,query:Query):Promise<Page<LeaderboardEntry>>{
  const after=decode(query.cursor,z.object({kind:z.literal('leaderboard'),average:z.string().regex(/^[1-5](?:\.\d{1,30})?$/).refine(v=>Number(v)<=5),count:z.number().int().min(3).max(2147483647),id:z.string().uuid()}).strict());
  const {data,error}=await client.rpc('community_leaderboard',{p_limit:query.limit+1,...(after?{p_after_average:after.average,p_after_count:after.count,p_after_id:after.id}:{})});

@@ -62,6 +62,12 @@ See [Supabase setup](docs/SUPABASE_SETUP.md), [MVP specification](PROJECT_SPEC.m
 
 SkillSwap is live at **[skillswap-delta-taupe.vercel.app](https://skillswap-delta-taupe.vercel.app)** on Vercel's Hobby plan. The owner authorized the production deployment of Phase 9 source commit `87d48f1` on 2026-10-10; the remote build and live public/protected-route checks passed. Hosted Supabase **SkillSwap** (`avunxagyeywvfjhhowqk`, Mumbai) retains all 10 migrations and uses the matching HTTPS Auth origin/callbacks. Email confirmation is required, and custom SMTP is still needed for ordinary student signup. Actual email delivery, physical-phone calls and real-duration hosted settlement remain pending. The first release uses the deployment API; Git pushes do not automatically redeploy it. See [deployment details](docs/DEPLOYMENT.md). No paid resources were created.
 
+## Administration and Google sign-in
+
+The authorized admin extension adds `/admin` with member suspension/restoration, administrator roles, skill management, booking/wallet summaries, dispute review notes, feedback moderation and an immutable audit log. Admin rights are private database membership, checked on the server and in privileged RPCs. Existing credit-transfer rules are unchanged. See [administration and provisioning](docs/ADMIN.md).
+
+Login/signup always show **Continue with Google** and detect Supabase's actual provider availability. The button is disabled until the Google OAuth web client is configured; configuration no longer depends on a stale deployment flag. Google-only sign-in can replace SMTP for the demo, while email/password confirmation still requires email delivery.
+
 ## Scheduling and credits
 
 Use a member's **Request a session** action, choose an offered skill and a date/time in your saved IANA timezone, select 30/60/90 minutes, review and submit. Bookings show start/end, request expiry, roles and state. The teacher can accept/reject; either participant can cancel before start. Overlapping requests reserve both people's time across teaching/learning roles; rejection/cancellation/expiry releases that time. Requests expire at creation + 24 hours or session start, whichever comes first.

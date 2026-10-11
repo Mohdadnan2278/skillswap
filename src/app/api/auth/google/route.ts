@@ -6,7 +6,7 @@ import { emptySchema } from "@/shared/validation";
 export async function POST(request: Request) {
   return apiHandler(async () => {
     requireConfiguration(); requireSameOrigin(request); await parseJson(request, emptySchema);
-    if (!googleAuthEnabled()) throw new HttpError(403, "FORBIDDEN", "Google sign-in is not enabled.");
+    if (!await googleAuthEnabled()) throw new HttpError(503, "PROVIDER_UNAVAILABLE", "Google sign-in is being set up. Please try another sign-in method.");
     const client = await createSupabaseServerClient(true);
     const { data, error } = await client.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${getSiteOrigin()}/auth/callback`, skipBrowserRedirect: true } });
     if (error || !data.url) throw new HttpError(502, "PROVIDER_UNAVAILABLE", "Google sign-in is temporarily unavailable.");

@@ -48,6 +48,10 @@ export interface Database {
     };
     Views: {profile_reputation:{Row:{user_id:string;average_rating:number;rating_count:number};Relationships:[]}};
     Functions: {
+      account_access: {Args: Record<string, never>; Returns: Json};
+      admin_read: {Args: {p_section?:string;p_page?:number;p_search?:string}; Returns: Json};
+      admin_manage: {Args: {p_action:string;p_target:string|null;p_value:Json;p_reason:string;p_key:string}; Returns: Json};
+      read_my_feedback: {Args: {p_booking_id:string}; Returns: Json};
       create_feedback:{Args:{p_booking_id:string;p_rating:number;p_comment:string;p_key:string};Returns:Json};
       community_leaderboard:{Args:{p_limit?:number;p_after_average?:number|string;p_after_count?:number;p_after_id?:string};Returns:{id:string;display_name:string;bio:string;college:string;average_rating:string;rating_count:number;rank:number}[]};
       booking_meet_link: { Args: {p_booking_id:string;p_write?:boolean;p_url?:string|null;p_join?:boolean}; Returns:Json };

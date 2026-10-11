@@ -19,7 +19,7 @@ export function LandingPage() {
             <h1 id="hero-title" className="max-w-xl text-5xl font-bold leading-tight tracking-tight sm:text-6xl">Everyone has something to teach.</h1>
             <p className="mt-6 max-w-lg text-lg leading-8 text-slate-600">Trade your know-how for a new skill. Meet fellow students, learn together, and make your time count.</p>
             <a href="#how-it-works" className="mt-8 inline-flex min-h-12 items-center rounded-full bg-emerald-800 px-6 py-3 font-semibold text-white hover:bg-emerald-900">Explore the idea <span aria-hidden="true" className="ml-3">↗</span></a>
-            <p className="mt-4 text-sm text-slate-600">In development. Accounts, matching, bookings and credits are available when configured. Jitsi demos, Google Meet links and community feedback are available.</p>
+            <p className="mt-4 text-sm text-slate-600">Choose skills, find a learning partner, and manage sessions and credits. Meet through Jitsi or Google Meet, then share feedback.</p>
           </div>
           <aside className="rounded-3xl bg-emerald-900 p-7 text-white sm:p-10" aria-label="Examples of skill exchanges">
             <p className="text-sm uppercase tracking-widest text-emerald-200">A little time. A new possibility.</p>

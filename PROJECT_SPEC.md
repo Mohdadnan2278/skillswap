@@ -8,6 +8,14 @@ Confirmed by the owner's project prompt: one Next.js application with TypeScript
 
 The demonstration must eventually support two real accounts on two smartphones over HTTPS through signup → skills → discovery → request → accept → video → completion → credit transfer → feedback. No simulated balances, fake meetings, or accelerated hour-long sessions may be presented as verified behavior.
 
+## Admin and Google login extension (owner-authorized 2026-10-11)
+
+Google sign-in stays visible with an explicit unavailable state until the actual provider is configured. Google-only sign-in can avoid custom SMTP, but requires a Google OAuth web client in Supabase; a button is not proof of a working external login.
+
+Admins are explicitly provisioned verified/onboarded accounts in a private database membership table, never client metadata or the first signup. The owner requested a demo administrator with a reserved nonexistent test address; only that account may be confirmed through the trusted provisioning API without an email delivery claim. Its random password stays in an ignored private file. Ordinary signup confirmation remains required.
+
+The panel manages member suspension/restoration, admin membership (without removing the last administrator), catalogue creation/enabling, feedback hiding/restoration, dispute review notes, and reads booking/wallet summaries. All writes require a reason, server-derived admin identity, idempotency and an immutable audit record. Suspension blocks member API/database operations and hides discovery profiles, while preserving balances and existing bookings. Restore suspended participants to let them complete existing exchanges. Moderation hides a review from public reputation without editing/deleting it. Dispute review records staff action; it never overrides participant votes or moves credits. There is no arbitrary balance editing, hard account deletion, rating manipulation or access to meeting links/provider secrets.
+
 ## MVP capabilities and boundaries
 
 | Phase | Deliverable | Completion evidence |

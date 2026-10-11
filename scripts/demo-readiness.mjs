@@ -9,6 +9,7 @@ const file = resolve(root, values['env-file']);
 const settings = {...(existsSync(file) ? parseEnv(readFileSync(file, 'utf8')) : {}), ...process.env};
 const report = inspectDemoConfig(settings);
 const add = (id, passed, message) => report.checks.push({id, status: passed ? 'pass' : 'blocked', message});
+let googleAvailable=false;
 async function request(url, headers, body) {
   const response = await fetch(url, {method: body ? 'POST' : 'GET', headers, ...(body ? {body: JSON.stringify(body)} : {}), redirect: 'error', signal: AbortSignal.timeout(30000)});
   if (!response.ok) throw Error(`HTTP ${response.status}`);
@@ -17,6 +18,7 @@ async function request(url, headers, body) {
 if (report.supabaseOrigin && report.checks.find(c => c.id === 'public_key').status === 'pass') {
   try {
     const auth = await request(`${report.supabaseOrigin}/auth/v1/settings`, {apikey: settings.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY});
+    googleAvailable=auth.external?.google===true;
     add('public_auth', auth.external?.email === true, 'Hosted email Auth must be enabled and reachable.');
   } catch { add('public_auth', false, 'Hosted Auth could not be verified; check the public configuration and network.'); }
 }
@@ -37,12 +39,12 @@ if (settings.SUPABASE_ACCESS_TOKEN && report.projectRef && report.checks.find(c 
     add('confirmed_email', auth.mailer_autoconfirm === false && auth.external_email_enabled === true, 'Signup must require confirmed email.');
     const callbacks = String(auth.uri_allow_list ?? '').split(',').map(value => value.trim());
     add('auth_origin', Boolean(report.siteOrigin) && auth.site_url === report.siteOrigin && [`${report.siteOrigin}/auth/callback`, `${report.siteOrigin}/auth/confirm`].every(url => callbacks.includes(url)), 'Auth site URL and both exact callbacks must match SITE_URL.');
-    add('student_email', Boolean(auth.smtp_host && auth.smtp_user && auth.smtp_admin_email), 'Configure custom SMTP for signup outside the Supabase team; actual delivery still needs manual verification.');
-    if (settings.GOOGLE_AUTH_ENABLED === 'true') add('google_oauth', auth.external_google_enabled === true, 'Optional Google sign-in must be configured before the button is enabled.');
+    add('student_email', Boolean(auth.smtp_host && auth.smtp_user && auth.smtp_admin_email) || (googleAvailable && auth.external_google_enabled===true), 'Student access needs custom SMTP for email signup or configured Google sign-in. Verify the chosen flow with real accounts.');
+    if (googleAvailable) add('google_oauth', auth.external_google_enabled === true, 'Google is available in Supabase; a real Google callback still needs manual testing.');
   } catch { add('management_checks', false, 'Hosted management checks could not complete; credentials and error responses are withheld.'); }
 } else add('management_checks', false, 'Migration/Auth/SMTP checks need the existing management token and matching hosted project.');
 const configurationReady = report.checks.every(check => check.status === 'pass');
 console.log(JSON.stringify({configurationReady, siteOrigin: report.siteOrigin, supabaseOrigin: report.supabaseOrigin, checks: report.checks,
-  manualChecks: ['Authorized deployment on the selected branch', 'Two real email signup/confirmation/login flows', 'Two physical phones over HTTPS with camera, microphone and reconnect', 'A real scheduled session, both completion confirmations, transfer and feedback'],
+  manualChecks: ['Authorized deployment on the selected branch', 'Two real email confirmation/login flows or Google sign-in flows', 'Two physical phones over HTTPS with camera, microphone and reconnect', 'A real scheduled session, both completion confirmations, transfer and feedback'],
   note: 'Read-only configuration check. Passing does not verify deployment, email delivery or live video.'}, null, 2));
 process.exitCode = configurationReady ? 0 : 1;

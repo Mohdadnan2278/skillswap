@@ -24,7 +24,9 @@
     "hosted:migrate": "node --use-env-proxy scripts/hosted-supabase.mjs migrate",
     "hosted:configure": "node --use-env-proxy scripts/hosted-supabase.mjs configure",
     "demo:check": "node --use-env-proxy scripts/demo-readiness.mjs",
-    "test:demo": "playwright test demo-workflow.spec.ts"
+    "test:demo": "playwright test demo-workflow.spec.ts",
+    "admin:bootstrap": "node --use-env-proxy scripts/admin-bootstrap.mjs",
+    "google:configure": "node --use-env-proxy scripts/google-auth.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",

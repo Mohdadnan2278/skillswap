@@ -8,7 +8,7 @@ export class HttpError extends Error {
   constructor(public status: number, public code: ErrorCode, message: string) { super(message); }
 }
 export function requireConfiguration() {
-  if (!isAuthConfigured()) throw new HttpError(503, "CONFIGURATION_REQUIRED", "Authentication setup is incomplete. Follow docs/SUPABASE_SETUP.md.");
+  if (!isAuthConfigured()) throw new HttpError(503, "CONFIGURATION_REQUIRED", "Sign-in is temporarily unavailable. Please try again later.");
 }
 export function requireSameOrigin(request: Request) {
   const origin = request.headers.get("origin");
