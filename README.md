@@ -10,13 +10,21 @@ The previous address redirects to the new one. Sign in again on the new hostname
 
 ## The problem behind SkillSwap
 
-People often have useful knowledge to share but lack affordable access to someone who can teach the next skill they need. Paid lessons require money, while informal exchanges can be difficult to arrange and track. A direct swap also requires both people to want exactly what the other offers.
+People often have useful knowledge to share but cannot afford expensive courses or private tutoring for the next skill they need. Free resources such as YouTube make information accessible, but self-paced learning often leaves the learner responsible for creating a schedule, staying consistent and finding answers when stuck. Without a learning partner or an agreed commitment, it can be easy to watch passively, jump between topics or stop before making progress.
+
+SkillSwap addresses both affordability and learning discipline: members earn access through teaching, while scheduled sessions with another person provide structure, interaction and accountability. Informal exchanges can still be difficult to arrange, and a direct swap requires both people to want exactly what the other offers.
 
 For example, someone who teaches Python may want to learn design, while a designer wants help with guitar. A direct Python-for-design swap does not meet both people's needs. There may still be a useful exchange across the wider community.
 
 SkillSwap separates earning from spending: teach one person to earn credits, then use those credits to learn from another. Booking, reservations and shared completion rules give the exchange a clear process.
 
 ## The proposed solution
+
+SkillSwap combines three ideas:
+
+- **Affordable access:** contribute your knowledge to earn credits, then use them to learn without purchasing a course through the platform.
+- **Shared accountability:** agree on a time, meet a learning partner and participate actively instead of relying entirely on self-paced viewing.
+- **Learning by teaching:** explaining a topic encourages you to organize your knowledge, answer questions and notice gaps in your own understanding.
 
 1. **Create a profile:** sign in, introduce yourself and choose your timezone.
 2. **Choose skills:** select or add skills you offer and skills you want to learn.
@@ -25,6 +33,10 @@ SkillSwap separates earning from spending: teach one person to earn credits, the
 5. **Meet:** after acceptance, use embedded Jitsi or a teacher-saved Google Meet link.
 6. **Confirm completion:** both participants confirm after the scheduled end; credits transfer once.
 7. **Leave feedback:** completed standard sessions can receive participant reviews.
+
+### Why both participants benefit
+
+The learner receives direct explanation, conversation and a scheduled opportunity to practise. The teacher reinforces their own understanding by explaining and answering questions, while earning credits for their next learning session. Teaching is therefore part of the learning experience: knowledge moves in both directions across the community, and everyone can grow through both roles.
 
 Credits are an internal exchange unit, with no purchase, cash withdrawal or payment gateway in the current implementation. A balance does not guarantee that a suitable teacher will be available.
 
