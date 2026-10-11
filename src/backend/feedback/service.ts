@@ -20,7 +20,7 @@ export async function createFeedback(client:Client,id:string,fields:CreateFeedba
  if(error||!data||typeof data!=='object'||Array.isArray(data))throw unavailable();
  const code=data.error;switch(code){
  case 'NOT_FOUND':throw new HttpError(404,code,'Booking not found.');
- case 'INVALID_STATE':throw new HttpError(409,code,'Feedback is available after both participants complete and settle this booking.');
+ case 'INVALID_STATE':throw new HttpError(409,code,'Feedback requires a completed, settled standard session. Demo sessions do not publish ratings.');
  case 'ALREADY_REVIEWED':throw new HttpError(409,code,'You have already reviewed this booking. Reviews cannot be changed.');
  case 'IDEMPOTENCY_CONFLICT':throw new HttpError(409,code,'This submission key was already used with different feedback.');
  case 'VALIDATION_ERROR':throw new HttpError(400,code,'Choose 1–5 stars and a comment of at most 500 characters.');

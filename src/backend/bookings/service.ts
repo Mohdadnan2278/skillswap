@@ -30,12 +30,15 @@ function outcome(data: Json | null, error: { code?: string } | null) {
 export function bookingDto(row: BookingRow): Booking {
  return { id: row.id,teacherId: row.teacher_id,learnerId: row.learner_id,skillId: row.skill_id,
   startsAt: new Date(row.starts_at).toISOString(),endsAt: new Date(row.ends_at).toISOString(),durationMinutes: row.duration_minutes,
-  costUnits: row.cost_units,state: row.state,requestExpiresAt: new Date(row.request_expires_at).toISOString(),
+  costUnits: row.cost_units,isDemo:row.is_demo??false,state: row.state,requestExpiresAt: new Date(row.request_expires_at).toISOString(),
   creditReservationStatus: row.credit_reservation_status,teacherConfirmed: row.teacher_confirmed ?? false,learnerConfirmed: row.learner_confirmed ?? false,dispute: row.dispute ? {...row.dispute,openedAt:new Date(row.dispute.openedAt).toISOString(),resolvedAt:row.dispute.resolvedAt?new Date(row.dispute.resolvedAt).toISOString():null} : null,
   createdAt: new Date(row.created_at).toISOString(),updatedAt: new Date(row.updated_at).toISOString() };
 }
 export async function createBooking(client: Client,fields: CreateBookingRequest,key: string) {
- const {data,error}=await client.rpc("create_booking_request",{p_teacher_id:fields.teacherId,p_skill_id:fields.skillId,p_starts_at:fields.startMode==="now"?null:fields.startsAt,p_duration:fields.durationMinutes,p_key:key});
+ const {data,error}=fields.startMode==='demo'
+  ?await client.rpc('create_demo_booking',{p_teacher_id:fields.teacherId,p_skill_id:fields.skillId,p_policy_version:fields.policyVersion,p_key:key})
+  :await client.rpc("create_booking_request",{p_teacher_id:fields.teacherId,p_skill_id:fields.skillId,p_starts_at:fields.startMode==="now"?null:fields.startsAt,p_duration:fields.durationMinutes,p_key:key});
+ if(fields.startMode==='demo'&&data&&typeof data==='object'&&!Array.isArray(data)&&data.error==='INVALID_STATE')throw new HttpError(409,'INVALID_STATE','Demo settings changed or are disabled. Reload the request page and review the current terms.');
  const result=outcome(data,error); if (!result.booking) throw new Error("Missing booking result"); return bookingDto(result.booking);
 }
 export async function getBooking(client: Client,id: string) {

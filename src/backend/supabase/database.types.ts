@@ -4,7 +4,7 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 export type BookingRow = {
  id: string; teacher_id: string; learner_id: string; skill_id: string;
- starts_at: string; ends_at: string; duration_minutes: 30 | 60 | 90;
+ starts_at: string; ends_at: string; duration_minutes: number; is_demo: boolean; demo_policy_version: number | null;
  cost_units: number; state: "pending" | "accepted" | "rejected" | "cancelled" | "expired" | "completed" | "disputed";
  request_expires_at: string; credit_reservation_status: "not_integrated" | "held" | "released" | "settled";
  teacher_confirmed?: boolean; learner_confirmed?: boolean; dispute?: import("@/shared/contracts").BookingDispute | null;
@@ -48,6 +48,8 @@ export interface Database {
     };
     Views: {profile_reputation:{Row:{user_id:string;average_rating:number;rating_count:number};Relationships:[]}};
     Functions: {
+      read_demo_policy: {Args: Record<string,never>;Returns:Json};
+      create_demo_booking: {Args: {p_teacher_id:string;p_skill_id:string;p_policy_version:number;p_key:string};Returns:Json};
       create_custom_skill: {Args: {p_name:string;p_category:string}; Returns: Json};
       account_access: {Args: Record<string, never>; Returns: Json};
       admin_read: {Args: {p_section?:string;p_page?:number;p_search?:string}; Returns: Json};
