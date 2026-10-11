@@ -45,7 +45,7 @@ export function AuthForm({ mode, configured, googleEnabled }: { mode: "login" | 
     finally { setBusy(false); }
   }
   return <div>
-    {!configured && <p role="status" className="mb-6 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">Authentication needs Supabase configuration. Follow docs/SUPABASE_SETUP.md to connect this app.</p>}
+    {!configured && <p role="status" className="mb-6 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">Sign-in is temporarily unavailable. Please try again later.</p>}
     <form onSubmit={submit} className="space-y-5" aria-busy={busy}>
       <div><label htmlFor="email" className="block font-semibold">Email</label><input id="email" name="email" type="email" required maxLength={254} autoComplete="email" aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? "email-error" : undefined} className="field" /><p id="email-error" className="field-error">{errors.email?.join(" ")}</p></div>
       <div><label htmlFor="password" className="block font-semibold">Password</label><input id="password" name="password" type="password" required minLength={mode === "signup" ? 8 : undefined} maxLength={128} autoComplete={mode === "signup" ? "new-password" : "current-password"} aria-invalid={Boolean(errors.password)} aria-describedby={mode === "signup" ? "password-hint password-error" : "password-error"} className="field" />{mode === "signup" && <p id="password-hint" className="mt-2 text-sm text-slate-600">At least 8 characters. Use a unique password.</p>}<p id="password-error" className="field-error">{errors.password?.join(" ")}</p></div>
@@ -54,7 +54,8 @@ export function AuthForm({ mode, configured, googleEnabled }: { mode: "login" | 
     </form>
     {message && <p role="status" className="mt-5 rounded-xl bg-slate-100 p-4 text-sm">{message}</p>}
     {resendEmail && <button type="button" onClick={resend} disabled={busy} className="secondary-button mt-4 w-full">Resend confirmation</button>}
-    {googleEnabled && <button onClick={google} disabled={busy || !configured} className="secondary-button mt-4 w-full">Continue with Google</button>}
+    <button type="button" onClick={google} disabled={busy || !configured || !googleEnabled} aria-describedby={!googleEnabled ? 'google-status' : undefined} className="secondary-button mt-4 w-full">Continue with Google</button>
+    {!googleEnabled && <p id="google-status" className="mt-2 text-sm text-slate-600">Google sign-in is being set up and is currently unavailable.</p>}
     <p className="mt-6 text-sm text-slate-600">{mode === "signup" ? "Already have an account? " : "New to SkillSwap? "}<Link href={mode === "signup" ? "/login" : "/signup"} className="font-semibold text-emerald-800 underline">{mode === "signup" ? "Sign in" : "Create an account"}</Link></p>
   </div>;
 }
