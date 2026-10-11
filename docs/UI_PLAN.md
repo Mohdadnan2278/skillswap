@@ -74,3 +74,13 @@ The meeting page shows schedule/timezone, device check/stop controls, camera/mic
 Accepted booking pages let the teacher add/remove a Google Meet link. Meeting pages present Google Meet and Jitsi alternatives with external-link limits; Meet requires a fresh join-window check before exposing its new-tab link. Google handles devices and admission.
 
 Completed settled bookings show a single rating/comment publication form, visibility/immutability notice, safe retry, pending/error/success feedback, and the persisted review after refresh. Member pages show received comments as escaped plain text with pagination and reviewer names. Own profile and discovery cards show average/count or “No ratings yet”. Community has responsive ranked cards, the ≥3-rating explanation, no-qualifiers state and bounded next-page links. Parent member loading/error boundaries apply; invalid page/query links offer a first-page reset. Credits and reputation remain separate.
+
+## Product and responsive skills update
+
+Public landing, metadata, onboarding and call screens present SkillSwap as a community product. The optional affiliation is labelled Organization. Public Jitsi's link-sharing and external access limits remain visible with product language.
+
+Member navigation uses a compact native Menu below the desktop breakpoint, with active-page indicators, keyboard operation, Escape focus return, outside-click dismissal and close-on-navigation. Desktop keeps the full navigation. Shared input sizing, text wrapping, narrow-screen form stacks and full-width primary actions avoid squeezing forms or long names.
+
+The skills form has name/category search, bounded scrolling lists, selected removable chips and an unsaved-choice notice. A separate custom-skill form supports a named skill, category including Other, and teaching/learning/both. Matching names reuse a shared catalogue identity; success asks the member to save the selected lists. Recoverable errors preserve entries and retries do not create duplicate names. Counts and database max-20 guards still apply.
+
+Focused Chromium checks passed custom creation/save/reload, skill matching and booking, and the existing mobile signup/profile/selection journeys. All six main member screens fit 320/360/390/768/1280px widths; public home/login/signup also fit 320px. Screenshots were reviewed at narrow-phone and desktop sizes. Physical devices remain separate from browser viewport evidence.

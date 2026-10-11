@@ -3,7 +3,7 @@ import { origin } from '../helpers/local-auth';
 import { bookingAccount,startsAfter,cleanupBookings } from '../helpers/local-bookings';
 import { formatSessionTime } from '@/shared/time';
 test('mobile scheduling review, two-party acceptance, cancellation and local time display',async({page,browser})=>{
- await page.setViewportSize({width:390,height:844});
+ await page.setViewportSize({width:320,height:844});
  const teacherContext=await browser.newContext({baseURL:origin,viewport:{width:390,height:844}});const teacherPage=await teacherContext.newPage();
  try {
   const teacher=await bookingAccount(teacherContext.request,'Mobile Booking Teacher');await bookingAccount(page.request,'Mobile Booking Learner');

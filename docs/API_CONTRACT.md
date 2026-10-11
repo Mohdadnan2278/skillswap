@@ -31,7 +31,7 @@ Auth uses Supabase SSR cookie helpers through Next.js route handlers. These publ
 | POST `/api/auth/login` | `{ email, password }` | 200 `{ redirectTo: "/dashboard" }`; invalid credentials 401; unconfirmed email 403 |
 | POST `/api/auth/logout` | `{}` | 200 `{ redirectTo: "/login" }`; signs out this session locally, not every other device |
 | POST `/api/auth/resend` | `{ email }` | 200 `{ message }`; neutral confirmation response; provider throttling returns 429 |
-| POST `/api/auth/google` | `{}` | 200 `{ redirectTo }` Supabase OAuth URL; 403 when disabled; actual provider configuration unverified |
+| POST `/api/auth/google` | `{}` | 200 `{ redirectTo }` Supabase OAuth URL; 503 when actual provider settings are unavailable/disabled |
 | GET `/auth/callback` | `code`, optional `next` | PKCE exchange then 307 redirect; next allowlist: dashboard/profile/onboarding, default dashboard |
 | GET `/auth/confirm` | `token_hash`, `type=email|signup` | OTP verification then 307 dashboard redirect; rejects replay/invalid tokens with generic login notice |
 
@@ -47,10 +47,15 @@ Extra implemented errors: 401 `INVALID_CREDENTIALS`; 503 `CONFIGURATION_REQUIRED
 | PATCH `/me/profile` | `{ displayName, bio, college, timezone }` | `CurrentUser`; creates onboarding profile once or updates self; no owner ID in input |
 | GET `/profiles/:userId` | None | `PublicProfile`; onboarded members only; no email, timezone preference, credits or booking list |
 | GET `/skills` | Pagination | `Page<Skill>`; enabled catalogue only |
+| POST `/skills` | `{ name, category }` | 201 `{ skill, created: true }` or 200 `{ skill, created: false }` for an existing normalized name; verified active onboarded members only |
 | GET `/me/skills` | None | `SkillSelections`; self |
 | PUT `/me/skills` | `{ offeredSkillIds: UUID[], wantedSkillIds: UUID[] }` | `SkillSelections`; atomically replace self selections; unique IDs; max 20 per direction; enabled catalogue IDs |
 | GET `/discover` | Pagination; optional `skillId` | `Page<DiscoveryMatch>`; people offering at least one of caller's wanted skills, excluding caller; optional filter must be a wanted skill |
 | GET `/community/leaderboard` | Pagination | `Page<LeaderboardEntry>`; server-computed aggregates only |
+
+Custom skill names use NFKC normalization, collapsed whitespace and case-insensitive shared identity. Names have 2–60 characters and categories come from the supported UI list including `Other`. Matching enabled names are reused without changing their category; disabled names return 409 and cannot be recreated to evade moderation. A member can create at most 10 new catalogue entries per rolling 24 hours, enforced inside the database transaction, while reuse is still allowed. Direct catalogue writes remain forbidden. Creation does not select a skill automatically on the server: the UI adds it to the chosen list(s) and asks the member to save through the existing atomic selection endpoint. Discovery, teacher offerings and bookings use the same skill ID. Private submission records expose no member metadata through the catalogue.
+
+The optional profile affiliation is labelled **Organization** in the UI. The existing `college` API/storage field is retained for compatibility and preserves saved values.
 
 Profile validation: display name 2–60 characters, bio 0–500, college 0–120; valid IANA timezone required. Offered/wanted sets may overlap (one may teach basics and want more learning); no global account role. Catalogue seeding and changes are controlled migrations, not ordinary member writes.
 

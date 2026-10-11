@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     const client = await createSupabaseServerClient(true);
     const { data, error } = await client.auth.signUp({ ...fields, options: { emailRedirectTo: `${getSiteOrigin()}/auth/callback` } });
     if (error?.status === 429) throw new HttpError(429, "RATE_LIMITED", "Please wait before requesting another confirmation email.");
-    if (error?.code === "weak_password") throw new HttpError(400, "VALIDATION_ERROR", "Use a stronger password matching the project's password policy.");
+    if (error?.code === "weak_password") throw new HttpError(400, "VALIDATION_ERROR", "Use a stronger password matching the password requirements.");
     if (error) throw new HttpError(502, "PROVIDER_UNAVAILABLE", "Could not create the account. Please try again shortly.");
     return success({ verificationRequired: !data.session, redirectTo: data.session ? "/onboarding" : null }, 201);
   });

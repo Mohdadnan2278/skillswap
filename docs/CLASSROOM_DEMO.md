@@ -1,4 +1,4 @@
-# Two-person classroom demonstration
+# Two-person session validation
 
 This is the manual checklist for the final hosted demo. Automated local browser checks are separate evidence; actual phones, public email delivery and live media have not been verified yet. Use only test identities and comments the two participants consent to publish. No extra credit grants, hidden accelerated clock, database edits or resets are part of the hosted demonstration.
 

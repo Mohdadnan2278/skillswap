@@ -21,6 +21,7 @@ export async function manageAdmin(client:SupabaseClient<Database>,command:AdminC
  const {action,reason}=command;const {data,error}=await client.rpc('admin_manage',{p_action:action,p_reason:reason,p_key:key,p_target:action==='create_skill'?null:command.target,p_value:action==='create_skill'?{name:command.name,slug:command.slug,category:command.category}:{}});
  if(error?.code==='42501')throw new HttpError(403,'FORBIDDEN','Administrator access is required.');
  if(error?.code==='22023')throw new HttpError(400,'VALIDATION_ERROR','Check the action and reason.');
+ if(error?.code==='23505')throw new HttpError(409,'INVALID_STATE','A skill with this name or slug already exists. Find it in the catalogue instead.');
  if(error||!data||typeof data!=='object'||Array.isArray(data))throw new HttpError(503,'DATABASE_UNAVAILABLE','The action could not be confirmed. Review the audit log before retrying.');
  if(data.error==='IDEMPOTENCY_CONFLICT')throw new HttpError(409,'IDEMPOTENCY_CONFLICT','This retry key was already used for another action.');
  if(data.error==='NOT_FOUND')throw new HttpError(404,'NOT_FOUND','The selected item no longer exists.');
