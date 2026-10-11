@@ -43,7 +43,9 @@ export interface SkillSelections { offeredSkillIds: UUID[]; wantedSkillIds: UUID
 export interface DiscoveryMatch { profile: PublicProfile; matchedSkills: Skill[] }
 export type CreateBookingRequest = {
   teacherId: UUID; skillId: UUID; durationMinutes: DurationMinutes;
-} & ({ startMode?: "scheduled"; startsAt: UtcTimestamp } | { startMode: "now"; startsAt?: never });
+} & ({ startMode?: "scheduled"; startsAt: UtcTimestamp } | { startMode: "now"; startsAt?: never }) | {
+  teacherId: UUID; skillId: UUID; startMode: "demo"; policyVersion: number;
+};
 export interface BookingDispute {
   openedBy: UUID; reason: string; openedAt: UtcTimestamp;
   teacherResolution: DisputeResolution | null;
@@ -52,7 +54,8 @@ export interface BookingDispute {
 }
 export interface Booking {
   id: UUID; teacherId: UUID; learnerId: UUID; skillId: UUID;
-  startsAt: UtcTimestamp; endsAt: UtcTimestamp; durationMinutes: DurationMinutes;
+  startsAt: UtcTimestamp; endsAt: UtcTimestamp; durationMinutes: number;
+  isDemo: boolean;
   state: BookingState; costUnits: CreditUnits; requestExpiresAt: UtcTimestamp;
   creditReservationStatus: "not_integrated" | "held" | "released" | "settled";
   teacherConfirmed: boolean; learnerConfirmed: boolean;

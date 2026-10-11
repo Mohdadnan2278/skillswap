@@ -4,6 +4,7 @@ The owner authorized the admin extension and a demo-only account on 2026-10-11. 
 
 ## Management
 
+- Demo: enable/disable explicit demo sessions, set 1–10 actual minutes and 0.5–3 credits in 0.5-credit increments. Settings are versioned and audited, affect new requests only and never issue credits or settle bookings. A one-minute demo has a one-minute acceptance window and ends about two minutes after requesting. Both participants confirm after the actual end; demo sessions cannot publish ratings.
 - Overview: member, administrator, suspension, booking, dispute, catalogue and hidden-feedback counts.
 - Members: search by name/email, inspect real total/reserved minute units, suspend/restore, grant/revoke administrator access. Admins must be demoted before suspension; self-suspension and removal of the last admin are denied.
 - Skills: add a validated name/slug/category and enable/disable catalogue entries. Existing bookings and skill history are preserved.

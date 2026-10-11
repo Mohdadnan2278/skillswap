@@ -1,9 +1,10 @@
 "use client";
-import {useRef,useState,type FormEvent} from 'react';
+import {useEffect,useRef,useState,type FormEvent} from 'react';
 import {useRouter} from 'next/navigation';
 import type {ApiResponse,Booking,BookingAction} from '@/shared/contracts';
-export function BookingActions({id,actions,canResolveComplete=false}:{id:string;actions:BookingAction[];canResolveComplete?:boolean}) {
+export function BookingActions({id,actions,canResolveComplete=false,refreshWhileActive=false}:{id:string;actions:BookingAction[];canResolveComplete?:boolean;refreshWhileActive?:boolean}) {
  const router=useRouter();const attempt=useRef<{fingerprint:string;key:string}|null>(null);const [busy,setBusy]=useState(false);const [message,setMessage]=useState('');const [reason,setReason]=useState('');
+ useEffect(()=>{if(!refreshWhileActive||busy)return;const interval=setInterval(()=>router.refresh(),5000);return()=>clearInterval(interval);},[refreshWhileActive,busy,router]);
  async function act(action:BookingAction,fields:{reason?:string;resolution?:'complete'|'cancel'}={}) {
   setBusy(true);setMessage('');const fingerprint=JSON.stringify({action,fields});
   if(attempt.current?.fingerprint!==fingerprint)attempt.current={fingerprint,key:crypto.randomUUID()};

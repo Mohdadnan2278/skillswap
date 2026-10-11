@@ -17,7 +17,7 @@
     "supabase": "node scripts/supabase-local.mjs",
     "db:start": "npm run supabase -- start --exclude studio,realtime,storage-api,imgproxy,edge-runtime,logflare,vector,supavisor,postgres-meta",
     "db:stop": "npm run supabase -- stop",
-    "test:integration": "playwright test auth-profiles.spec.ts skills-matching.spec.ts custom-skills.spec.ts bookings.spec.ts quick-call.spec.ts credits.spec.ts meetings.spec.ts google-meet.spec.ts feedback.spec.ts",
+    "test:integration": "playwright test admin-demo.spec.ts admin.spec.ts auth-profiles.spec.ts skills-matching.spec.ts custom-skills.spec.ts bookings.spec.ts quick-call.spec.ts credits.spec.ts meetings.spec.ts google-meet.spec.ts feedback.spec.ts",
     "env:local": "node scripts/environment.mjs local",
     "env:hosted": "node scripts/environment.mjs hosted",
     "hosted:check": "node --use-env-proxy scripts/hosted-supabase.mjs check",

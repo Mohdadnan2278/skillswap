@@ -35,6 +35,7 @@ const bookingFields = { teacherId: z.string().uuid(), skillId: z.string().uuid()
 export const createBookingSchema = z.union([
   z.object({ ...bookingFields, startMode: z.literal("scheduled").optional(), startsAt: utcInstantSchema }).strict(),
   z.object({ ...bookingFields, startMode: z.literal("now") }).strict(),
+  z.object({teacherId:bookingFields.teacherId,skillId:bookingFields.skillId,startMode:z.literal('demo'),policyVersion:z.number().int().positive().max(999999999)}).strict(),
 ]);
 export const bookingStateSchema = z.enum(["pending","accepted","rejected","cancelled","expired","completed","disputed"]);
 export const bookingQuerySchema = catalogueQuerySchema.extend({ state: bookingStateSchema.optional(), role: z.enum(["teacher","learner"]).optional() });
